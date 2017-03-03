@@ -1,9 +1,11 @@
 <html>
 	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 		<script type="text/javascript" src="../jamrules.js"></script>
 	</head>
 	<body>
 	<section id="filterbox">
+		<h1>Filter box</h1>
 		<label>
 			<input id="priority-un" type="checkbox" value="priority.un">
 			Priority 1
@@ -24,19 +26,19 @@
 	<section id="element 1">
 		<h1>Elément 1</h1>
 		<label>
-			<input id="priority-un" type="checkbox" value="priority.un">
+			<input id="el1-priority-un" type="checkbox" value="priority.un">
 			Priority 1
 		</label>
 		<label>
-			<input id="priority-deux" type="checkbox" value="priority.deux">
+			<input id="el1-priority-deux" type="checkbox" value="priority.deux">
 			Priority 2
 		</label>
 		<label>
-			<input id="display-on" type="checkbox" value="display.on">
+			<input id="el1-display-on" type="checkbox" value="display.on">
 			Display Priority
 		</label>
 		<label>
-			<input id="compliant-on" type="checkbox" value="compliant.on">
+			<input id="el1-compliant-on" type="checkbox" value="compliant.on">
 			Technician Compliant
 		</label>
 	</section>
@@ -47,16 +49,27 @@
 			Priority 1
 		</label>
 		<label>
-			<input id="priority-deux" type="checkbox" value="priority.deux">
+			<input id="el2-priority-deux" type="checkbox" value="priority.deux">
 			Priority 2
 		</label>
 		<label>
-			<input id="display-on" type="checkbox" value="display.on">
+			<input id="el2-display-on" type="checkbox" value="display.on">
 			Display Priority
 		</label>
 		<label>
 			<input id="compliant-on" type="checkbox" value="compliant.on">
 			Technician Compliant
+		</label>
+	</section>
+	<section id="result">
+		<h1>Result Matching</h1>
+		<label>
+			<input id="el1-match" type="checkbox"  disabled>
+			Element 1 match?
+		</label>
+		<label>
+			<input id="el2-match" type="checkbox" disabled>
+			Element 2 match?
 		</label>
 	</section>
 		<script>
