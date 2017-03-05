@@ -26,20 +26,41 @@
  *
  * see README.md content or consult it on https://github.com/intersel/jamrules
  */
-function jamrules() {
+function jamrules(aJqueryObj) {
  
     // variables and functions private unless attached to API below
     // 'this' refers to global window
  
     // private array
-    var array = [];
+    var arrayProperties = [];
+    var myRulesEngineStates = {
+            DefaultState        :
+            {
+            	propertyChange   :   
+    	        {
+                    init_function: function(data,aEvent,dataFromCheckbox){
+                    }
+    	        }
+            }
+    };
+    var myRulesEngineStates = aJqueryObj.iFSM(myRulesEngineStates);
+
  
 	/**
 	 * 
 	 */
-    function addProperty(aPropertyName,aProperyValue,initialStatus) {
-    	log("property name:"+aPropertyName);
+    function setProperty(aPropertyName,aProperyValue,aStatus) {
+    	log("setProperty(aPropertyName,aProperyValue,aStatus):"+aPropertyName+','+aProperyValue+','+aStatus);
+    	var statusChanged = true;
+    	if (arrayProperties[aPropertyName] && arrayProperties[aPropertyName][aPropertyValue] && arrayProperties[aPropertyName][aPropertyValue] == initialStatus)
+    		statusChanged=false;
+    	
+    	arrayProperties[aPropertyName][aPropertyValue]=aStatus;
+		if (statusChanged) myRulesEngine.trigger('propertyChange',{propertyName:aPropertyName,propertyValue:aPropertyValue,status:aStatus});
+
     }
+    
+    
  
 	/**
 	 * 
@@ -47,12 +68,20 @@ function jamrules() {
     function addRule(aRule) {
     }
 
-    /**
-	 * 
+	/**
+	 * {
+	 * 		propertySet:
+	 * 		{	
+	 * 			propertyName.propertyValue:true|false
+	 * 		}
+	 * 		matched:function called when a rule will match for the element
+	 * 		notmatched:function called when there is a change but element does not match any rules
+	 * }
 	 */
-    function propertyStatusChange(aPropertyName,aPropertyValue,aStatus) {
+    function addElement(aElement) {
     }
- 
+
+    
 	/**
 	 * boolean return true if the properties set is compliant with the property configuration and the defined rules
 	 */
@@ -66,7 +95,6 @@ function jamrules() {
     function log(msg) {
         console.debug(msg);
     }
- 
  
     return {
     		addProperty: addProperty

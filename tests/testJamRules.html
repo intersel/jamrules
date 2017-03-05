@@ -1,80 +1,128 @@
 <html>
 	<head>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script type="text/javascript" src="../extlib/jQuery/jquery-2.2.4.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/iFSM.js"></script>
 		<script type="text/javascript" src="../jamrules.js"></script>
 	</head>
 	<body>
 	<section id="filterbox">
 		<h1>Filter box</h1>
+		<section id='priority'>
+			<label>
+				<input class="checkbox" id="priority-un" type="checkbox" value="priority1">
+				Priority 1
+			</label>
+			<label>
+				<input class="checkbox" id="priority-deux" type="checkbox" value="priority2">
+				Priority 2
+			</label>
+
+		</section>
+		<section id='technician'>
+			<label>
+				<input class="checkbox" id="priority-un" type="checkbox" value="technician1">
+				Priority 1
+			</label>
+			<label>
+				<input class="checkbox" id="priority-deux" type="checkbox" value="technician2">
+				Priority 2
+			</label>
+
+		</section>
 		<label>
-			<input id="priority-un" type="checkbox" value="priority.un">
-			Priority 1
-		</label>
-		<label>
-			<input id="priority-deux" type="checkbox" value="priority.deux">
-			Priority 2
-		</label>
-		<label>
-			<input id="display-on" type="checkbox" value="display.on">
+			<input class="checkbox" id="display-on" type="checkbox" value="display.on">
 			Display Priority
 		</label>
 		<label>
-			<input id="compliant-on" type="checkbox" value="compliant.on">
+			<input class="checkbox" id="compliant-on" type="checkbox" value="compliant.on">
 			Technician Compliant
 		</label>
 	</section> 
-	<section id="element 1">
+	<section id="element1">
 		<h1>Elément 1</h1>
-		<label>
-			<input id="el1-priority-un" type="checkbox" value="priority.un">
-			Priority 1
-		</label>
-		<label>
-			<input id="el1-priority-deux" type="checkbox" value="priority.deux">
-			Priority 2
-		</label>
-		<label>
-			<input id="el1-display-on" type="checkbox" value="display.on">
-			Display Priority
-		</label>
-		<label>
-			<input id="el1-compliant-on" type="checkbox" value="compliant.on">
-			Technician Compliant
-		</label>
-	</section>
-	<section id="element 2">
-		<h1>Elément 2</h1>
-		<label>
-			<input id="el2-priority-un" type="checkbox" value="priority.un">
-			Priority 1
-		</label>
-		<label>
-			<input id="el2-priority-deux" type="checkbox" value="priority.deux">
-			Priority 2
-		</label>
-		<label>
-			<input id="el2-display-on" type="checkbox" value="display.on">
-			Display Priority
-		</label>
-		<label>
-			<input id="compliant-on" type="checkbox" value="compliant.on">
-			Technician Compliant
-		</label>
+		<section id='priority' class="property">
+			<label>
+				<input class="checkbox" id="el1-priority-un" type="checkbox" value="priority1" checked>
+				Priority 1
+			</label>
+			<label>
+				<input class="checkbox" id="el1-priority-deux" type="checkbox" value="priority2">
+				Priority 2
+			</label>
+		</section>
+		<section id='compliantTechnician' class='property'>
+			<label>
+				<input class="checkbox" id="el1-technician1-compliant" type="checkbox" value="technician1" checked>
+				Technician 1 Compliant
+			</label>
+			<label>
+				<input class="checkbox" id="el1-technician2-compliant" type="checkbox" value="technician2">
+				Technician 2 Compliant
+			</label>
+		</section>
 	</section>
 	<section id="result">
 		<h1>Result Matching</h1>
 		<label>
-			<input id="el1-match" type="checkbox"  disabled>
+			<input class="checkbox" id="el1-match" type="checkbox"  disabled>
 			Element 1 match?
 		</label>
 		<label>
-			<input id="el2-match" type="checkbox" disabled>
+			<input class="checkbox" id="el2-match" type="checkbox" disabled>
 			Element 2 match?
 		</label>
+		<div id="debug">
+		</div>
 	</section>
-		<script>
-			aRule = new jamrules();
-			aRule.addProperty("propert1","value1",0)
-		</script>
+
+	<script>
+	var aRule = new jamrules($('#filterbox'));
+	aRule.setProperty("priority","priority1",0)
+	aRule.setProperty("priority","priority2",0)
+	aRule.setProperty("compliantTechnician","technician1",0)
+	aRule.setProperty("compliantTechnician","technician2",0)
+
+	var checkBoxFilterFSM = {
+            DefaultState        :
+            {
+    	        click   :   
+    	        {
+                    init_function: function(){
+                    	this.opts
+                    	.filterBoxes
+                    	.trigger('filterChange',{
+    							 who:this.myUIObject
+    							,propertyName:this.myUIObject.parent().parent().attr('id')
+    							,propertyValue:this.myUIObject.attr('value')
+    							,status:this.myUIObject.prop('checked')
+    					});
+                    },
+                    UI_event_bubble:true,
+    	        }
+            }
+        };
+    var filterBoxesFSM = {
+            DefaultState        :
+            {
+            	filterChange   :   
+    	        {
+                    init_function: function(data,aEvent,dataFromCheckbox){
+                    	$("#debug").html("who:"+dataFromCheckbox.who.attr('id')+"<br>propertyName:"+dataFromCheckbox.propertyName+"<br>propertyValue:"+dataFromCheckbox.propertyValue+"<br>status:"+dataFromCheckbox.status);
+                    	aRule.setProperty(dataFromCheckbox.propertyName,dataFromCheckbox.propertyValue,dataFromCheckbox.status);
+                    }
+    	        }
+            }
+        };
+
+	$(document).ready(function() {
+		$('#filterbox').iFSM(filterBoxesFSM);
+		$('input.checkbox').iFSM(checkBoxFilterFSM,{filterBoxes:$('#filterbox'),ruleEngine:aRule});
+	});
+
+    </script>
+	
 	</body>
+    
 </html>
