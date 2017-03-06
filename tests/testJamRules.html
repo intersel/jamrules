@@ -4,6 +4,7 @@
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/iFSM.js"></script>
+		<script type="text/javascript" src="../extlib/jQuery-MD5.jquery.md5.js))"></script>
 		<script type="text/javascript" src="../jamrules.js"></script>
 	</head>
 	<body>
@@ -84,6 +85,17 @@
 	aRule.setProperty("compliantTechnician","technician1",0)
 	aRule.setProperty("compliantTechnician","technician2",0)
 
+	aRule.addRule("priorityLayerRule","priority", aRuleEvent,aRuleTest,aRuleAction)
+	 
+	var el1={propertiesSet:null,matched:null,notmatched:null};
+	el1['propertiesSet']['priority']['priority1']=$("#el1-priority-un").prop('checked');
+	el1['propertiesSet']['priority']['priority2']=$("#el1-priority-deux").prop('checked');
+	el1['propertiesSet']['compliantTechnician']['technician1']=$("#el1-technician1-compliant").prop('checked');
+	el1['propertiesSet']['compliantTechnician']['technician2']=$("#el1-technician2-compliant").prop('checked');
+			
+	 
+	aRule.addElement(el1);
+	
 	var checkBoxFilterFSM = {
             DefaultState        :
             {
