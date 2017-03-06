@@ -1,5 +1,7 @@
 <html>
 	<head>
+		<title>testJamRules</title>
+	 	<meta charset="utf-8" />
 		<script type="text/javascript" src="../extlib/jQuery/jquery-2.2.4.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>
@@ -79,22 +81,22 @@
 	</section>
 
 	<script>
-	var aRule = new jamrules($('#filterbox'));
-	aRule.setProperty("priority","priority1",0)
-	aRule.setProperty("priority","priority2",0)
-	aRule.setProperty("compliantTechnician","technician1",0)
-	aRule.setProperty("compliantTechnician","technician2",0)
+	var rulesForPriorityLayer = new jamrules($('#filterbox'));
+	rulesForPriorityLayer.setProperty("priority","priority1",0)
+	rulesForPriorityLayer.setProperty("priority","priority2",0)
+	rulesForPriorityLayer.setProperty("compliantTechnician","technician1",0)
+	rulesForPriorityLayer.setProperty("compliantTechnician","technician2",0)
 
-	aRule.addRule("priorityLayerRule","priority", aRuleEvent,aRuleTest,aRuleAction)
+	rulesForPriorityLayer.addRule("Priority1Match","priority",'MatchPropertyName("priority")');
 	 
-	var el1={propertiesSet:null,matched:null,notmatched:null};
+	var el1={propertiesSet:{priority:{},compliantTechnician:{}},matched:null,notmatched:null};
 	el1['propertiesSet']['priority']['priority1']=$("#el1-priority-un").prop('checked');
 	el1['propertiesSet']['priority']['priority2']=$("#el1-priority-deux").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician1']=$("#el1-technician1-compliant").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician2']=$("#el1-technician2-compliant").prop('checked');
 			
 	 
-	aRule.addElement(el1);
+	rulesForPriorityLayer.addElement(el1);
 	
 	var checkBoxFilterFSM = {
             DefaultState        :
@@ -109,6 +111,7 @@
     							,propertyName:this.myUIObject.parent().parent().attr('id')
     							,propertyValue:this.myUIObject.attr('value')
     							,status:this.myUIObject.prop('checked')
+    							,ruleEngine:this.opts.ruleEngine
     					});
                     },
                     UI_event_bubble:true,
@@ -122,7 +125,7 @@
     	        {
                     init_function: function(data,aEvent,dataFromCheckbox){
                     	$("#debug").html("who:"+dataFromCheckbox.who.attr('id')+"<br>propertyName:"+dataFromCheckbox.propertyName+"<br>propertyValue:"+dataFromCheckbox.propertyValue+"<br>status:"+dataFromCheckbox.status);
-                    	aRule.setProperty(dataFromCheckbox.propertyName,dataFromCheckbox.propertyValue,dataFromCheckbox.status);
+                    	this.opts.ruleEngine.setProperty(dataFromCheckbox.propertyName,dataFromCheckbox.propertyValue,dataFromCheckbox.status);
                     }
     	        }
             }
@@ -130,7 +133,7 @@
 
 	$(document).ready(function() {
 		$('#filterbox').iFSM(filterBoxesFSM);
-		$('input.checkbox').iFSM(checkBoxFilterFSM,{filterBoxes:$('#filterbox'),ruleEngine:aRule});
+		$('#filterbox input.checkbox').iFSM(checkBoxFilterFSM,{filterBoxes:$('#filterbox'),ruleEngine:rulesForPriorityLayer});
 	});
 
     </script>
