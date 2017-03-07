@@ -55,6 +55,16 @@
 				Priority 2
 			</label>
 		</section>
+		<section id='technician' class='property'>
+			<label>
+				<input class="checkbox" id="el1-technician1" type="checkbox" value="technician1" checked>
+				Technician 1
+			</label>
+			<label>
+				<input class="checkbox" id="el1-technician2" type="checkbox" value="technician2">
+				Technician 2 
+			</label>
+		</section>
 		<section id='compliantTechnician' class='property'>
 			<label>
 				<input class="checkbox" id="el1-technician1-compliant" type="checkbox" value="technician1" checked>
@@ -84,14 +94,19 @@
 	var rulesForPriorityLayer = new jamrules($('#filterbox'));
 	rulesForPriorityLayer.setProperty("priority","priority1",0)
 	rulesForPriorityLayer.setProperty("priority","priority2",0)
+	rulesForPriorityLayer.setProperty("technician","technician1",0)
+	rulesForPriorityLayer.setProperty("technician","technician2",0)
 	rulesForPriorityLayer.setProperty("compliantTechnician","technician1",0)
 	rulesForPriorityLayer.setProperty("compliantTechnician","technician2",0)
 
-	rulesForPriorityLayer.addRule("Priority1Match","priority",'MatchPropertyName("priority")');
+	rulesForPriorityLayer.addRule("PriorityMatch","priority",'MatchPropertyName("priority")');
+	rulesForPriorityLayer.addRule("TechMatch","technician",'MatchPropertyName("technician")');
 	 
-	var el1={propertiesSet:{priority:{},compliantTechnician:{}},matched:null,notmatched:null};
+	var el1={propertiesSet:{priority:{},technician:{},compliantTechnician:{}},matched:null,notmatched:null};
 	el1['propertiesSet']['priority']['priority1']=$("#el1-priority-un").prop('checked');
 	el1['propertiesSet']['priority']['priority2']=$("#el1-priority-deux").prop('checked');
+	el1['propertiesSet']['technician']['technician1']=$("#el1-technician1").prop('checked');
+	el1['propertiesSet']['technician']['technician2']=$("#el1-technician2").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician1']=$("#el1-technician1-compliant").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician2']=$("#el1-technician2-compliant").prop('checked');
 			

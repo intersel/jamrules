@@ -111,7 +111,7 @@ function jamrules(aJqueryObj) {
  				enterState:
  				{
  					propagate_event:'testMatch'
- 				}
+ 				},
  			},
  			ruleDontMatch:
  			{
@@ -120,21 +120,27 @@ function jamrules(aJqueryObj) {
 	 				propagate_event:'testMatch'
  				}
  			},
-			DefaultState:
-			{
+ 			DefaultState:
+ 			{
 				eventExemple:
-				{
-			 		next_state_when: 'MatchPropertyName("priority")',
-			 		next_state:'ruleMatch',
-			 		propagate_event: 'ruleDontMatch',
-					
-				},
-				ruleDontMatch:
-				{
-					next_state:'ruleDontMatch'
-				}
-			}
-		}
+ 				{
+ 			 		process_event_if: 'this.opts.jamrules.MatchPropertyName("priority")',
+ 			 		propagate_event:'setRuleMatch',
+ 			 		propagate_event_on_refused:'setRuleDontMatch',
+ 			 		prevent_bubble:false
+ 				},
+ 				setRuleMatch:
+ 				{
+ 			 		next_state:'ruleMatch',
+ 				},
+ 				setRuleDontMatch:
+ 				{
+ 			 		next_state:'ruleDontMatch',
+ 				}
+ 			}
+		},
+		no_reinitialisation:true
+
  	};
     
     /**
@@ -144,11 +150,17 @@ function jamrules(aJqueryObj) {
     var myRulesEngineStates = {
             TestRules:
             {
+            	enterState:
+            	{
+                    init_function: function(){
+                    },
+            	},
     		 	delegate_machines: 
     		 	{
     		 		/***
     		 		 * submachine for testing
     		 		 */
+    		 		/*
     		 		PriorityTestMatch:
     		 		{
     		 			submachine:
@@ -159,7 +171,7 @@ function jamrules(aJqueryObj) {
         		 				enterState:
         		 				{
         		 					propagate_event:'testMatch'
-        		 				}
+        		 				},
         		 			},
         		 			ruleDontMatch:
         		 			{
@@ -172,34 +184,42 @@ function jamrules(aJqueryObj) {
         		 			{
         		 				priority:
         		 				{
-        		 			 		next_state_when: 'this.opts.jamrules.MatchPropertyName("priority")',
-        		 			 		next_state:'ruleMatch',
-        		 			 		propagate_event: 'ruletested',
-        		 					
+        		 			 		process_event_if: 'this.opts.jamrules.MatchPropertyName("priority")',
+        		 			 		propagate_event:'setRuleMatch',
+        		 			 		propagate_event_on_refused:'setRuleDontMatch',
+        		 			 		prevent_bubble:false
         		 				},
-        		 				/**
-        		 				 * if we're going there, that's mean the matching was wrong
-        		 				 */
-        		 				ruletested:
+        		 				setRuleMatch:
         		 				{
-        		 					next_state:'ruleDontMatch'
+        		 			 		next_state:'ruleMatch',
+        		 				},
+        		 				setRuleDontMatch:
+        		 				{
+        		 			 		next_state:'ruleDontMatch',
         		 				}
         		 			}
     		 				
-    		 			}
+    		 			},
+    		 			no_reinitialisation:true,
     		 		},
+    		 		*/
     		 	},	  	
     			testMatch:
     		 	{
+                    init_function: function(){
+                    	this.opts.submachineReturn++;
+                    },
     		 		next_state_on_target: 
     		 		{
-    		 			condition 			: '&&',
+    		 			condition 			: '||',
     		 			submachines			: 
     		 			{
+    		 				/*
     		 				PriorityTestMatch: 
     		 				{
     							target_list: ['ruleDontMatch'],
     		 				},
+    		 				*/
     			 		}
     		 		},
     		 		next_state:'ruleDontMatch',
@@ -386,12 +406,18 @@ function jamrules(aJqueryObj) {
     function addRule(aRuleName, aRuleEvent,aRuleTest,aRuleAction) {
     	var testRules = myRulesEngine._stateDefinition.TestRules;
     	if (!testRules.delegate_machines[aRuleName])
+    	{
     		testRules.delegate_machines[aRuleName]=$.extend(true, {}, matchRuleTemplate);
+    	 	testRules.delegate_machines[aRuleName]['submachine']['DefaultState']['ruletested']={
+				next_state:'ruleDontMatch'
+			}
+    	}
     	
-    	testRules.delegate_machines[aRuleName]['submachine']['DefaultState'][aRuleEvent]={
-			 		next_state_when: 'this.opts.jamrules.'+aRuleTest,
- 			 		next_state:'ruleMatch',
- 			 		propagate_event: 'ruleDontMatch',
+	 	testRules.delegate_machines[aRuleName]['submachine']['DefaultState'][aRuleEvent]={
+			 		process_event_if: 'this.opts.jamrules.'+aRuleTest,
+ 			 		propagate_event:'setRuleMatch',
+ 			 		propagate_event_on_refused:'setRuleDontMatch',
+ 			 		prevent_bubble:false
     	};
     	testRules.testMatch.next_state_on_target.submachines[aRuleName]={
     			target_list: ['ruleDontMatch']
