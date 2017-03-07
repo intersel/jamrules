@@ -6,7 +6,7 @@
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/iFSM.js"></script>
-		<script type="text/javascript" src="../extlib/jQuery-MD5.jquery.md5.js))"></script>
+		<script type="text/javascript" src="../extlib/jQuery-MD5/jquery.md5.js"></script>
 		<script type="text/javascript" src="../jamrules.js"></script>
 	</head>
 	<body>
@@ -26,11 +26,11 @@
 		<section id='technician'>
 			<label>
 				<input class="checkbox" id="priority-un" type="checkbox" value="technician1">
-				Priority 1
+				Technician 1
 			</label>
 			<label>
 				<input class="checkbox" id="priority-deux" type="checkbox" value="technician2">
-				Priority 2
+				Technician 2
 			</label>
 
 		</section>
@@ -125,7 +125,7 @@
     	        {
                     init_function: function(data,aEvent,dataFromCheckbox){
                     	$("#debug").html("who:"+dataFromCheckbox.who.attr('id')+"<br>propertyName:"+dataFromCheckbox.propertyName+"<br>propertyValue:"+dataFromCheckbox.propertyValue+"<br>status:"+dataFromCheckbox.status);
-                    	this.opts.ruleEngine.setProperty(dataFromCheckbox.propertyName,dataFromCheckbox.propertyValue,dataFromCheckbox.status);
+                    	dataFromCheckbox.ruleEngine.setProperty(dataFromCheckbox.propertyName,dataFromCheckbox.propertyValue,dataFromCheckbox.status);
                     }
     	        }
             }

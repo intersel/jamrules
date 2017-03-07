@@ -32,6 +32,16 @@ function jamrules(aJqueryObj) {
     // 'this' refers to global window
  
 	/**
+	 * jamrules - the current jamrules object
+	 */
+	var jamrules;
+	
+	/**
+	 * myRulesEngine - the FSM engine bound to the jamrules
+	 */
+	var myRulesEngine;
+	
+	/**
 	 * private propertiesConfiguration
 	 * 	a configuration set of the properties defines by an array of [aPropertyName][aPropertyValue] = status (1|0)
 	 * 		{	
@@ -94,26 +104,35 @@ function jamrules(aJqueryObj) {
     
     var matchRuleTemplate = 
     {
-		ruleMatch:
+		submachine:
 		{
-			propagate_event:'testMatch'
-		},
-		ruleDontMatch:
-		{
-			propagate_event:'testMatch'
-		},
-		DefaultState:
-		{
-			eventExemple:
+ 			ruleMatch:
+ 			{
+ 				enterState:
+ 				{
+ 					propagate_event:'testMatch'
+ 				}
+ 			},
+ 			ruleDontMatch:
+ 			{
+ 				enterState:
+ 				{
+	 				propagate_event:'testMatch'
+ 				}
+ 			},
+			DefaultState:
 			{
-		 		next_state_when: 'MatchPropertyName("priority")',
-		 		next_state:'ruleMatch',
-		 		propagate_event: 'ruleDontMatch',
-				
-			},
-			ruleDontMatch:
-			{
-				next_state:'ruleDontMatch'
+				eventExemple:
+				{
+			 		next_state_when: 'MatchPropertyName("priority")',
+			 		next_state:'ruleMatch',
+			 		propagate_event: 'ruleDontMatch',
+					
+				},
+				ruleDontMatch:
+				{
+					next_state:'ruleDontMatch'
+				}
 			}
 		}
  	};
@@ -127,29 +146,46 @@ function jamrules(aJqueryObj) {
             {
     		 	delegate_machines: 
     		 	{
-    		 		Priority1Match:{
-    		 			
-    		 			ruleMatch:
+    		 		/***
+    		 		 * submachine for testing
+    		 		 */
+    		 		PriorityTestMatch:
+    		 		{
+    		 			submachine:
     		 			{
-    		 				propagate_event:'testMatch'
-    		 			},
-    		 			ruleDontMatch:
-    		 			{
-    		 				propagate_event:'testMatch'
-    		 			},
-    		 			DefaultState:
-    		 			{
-    		 				priority:
-    		 				{
-    		 			 		next_state_when: 'MatchPropertyName("priority")',
-    		 			 		next_state:'ruleMatch',
-    		 			 		propagate_event: 'ruleDontMatch',
-    		 					
-    		 				},
-    		 				ruleDontMatch:
-    		 				{
-    		 					next_state:'ruleDontMatch'
-    		 				}
+        		 			
+        		 			ruleMatch:
+        		 			{
+        		 				enterState:
+        		 				{
+        		 					propagate_event:'testMatch'
+        		 				}
+        		 			},
+        		 			ruleDontMatch:
+        		 			{
+        		 				enterState:
+        		 				{
+            		 				propagate_event:'testMatch'
+        		 				}
+        		 			},
+        		 			DefaultState:
+        		 			{
+        		 				priority:
+        		 				{
+        		 			 		next_state_when: 'this.opts.jamrules.MatchPropertyName("priority")',
+        		 			 		next_state:'ruleMatch',
+        		 			 		propagate_event: 'ruletested',
+        		 					
+        		 				},
+        		 				/**
+        		 				 * if we're going there, that's mean the matching was wrong
+        		 				 */
+        		 				ruletested:
+        		 				{
+        		 					next_state:'ruleDontMatch'
+        		 				}
+        		 			}
+    		 				
     		 			}
     		 		},
     		 	},	  	
@@ -160,14 +196,10 @@ function jamrules(aJqueryObj) {
     		 			condition 			: '&&',
     		 			submachines			: 
     		 			{
-    		 				Priority1Match: 
+    		 				PriorityTestMatch: 
     		 				{
     							target_list: ['ruleDontMatch'],
     		 				},
-    		 				Rule2:
-    		 				{
-     							target_list: ['ruleDontMatch'],
-    		 				}
     			 		}
     		 		},
     		 		next_state:'ruleDontMatch',
@@ -202,7 +234,7 @@ function jamrules(aJqueryObj) {
             	updateElementsMatch:
                 {
                     init_function: function(){
-	                	if (this.opts.elementProfile.elementList[0].matched)
+	                	if (this.opts.elementProfile.elementsList[0].matched)
                     	for(aElement in this.opts.elementProfile) 
                     	{
                     		aElement.matched();
@@ -211,12 +243,12 @@ function jamrules(aJqueryObj) {
                     	this.opts.elementProfileId++;
                     },
 	            	propagate_event:'testRules',
-	                next_state:'waitTestRule',
+	                next_state:'waitTestRules',
                 },
 	        	updateElementsDontMatch:
 	            {
 	                init_function: function(){
-	                	if (this.opts.elementProfile.elementList[0].notmatched)
+	                	if (this.opts.elementProfile.elementsList[0].notmatched)
 	                	for(aElement in this.opts.elementProfile) 
 	                	{
 	                		aElement.notmatched();
@@ -225,28 +257,12 @@ function jamrules(aJqueryObj) {
 	                	this.opts.elementProfileId++;
 	                },
 	            	propagate_event:'testRules',
-	                next_state:'waitTestRule',
+	                next_state:'waitTestRules',
 	            }
 
             },
             waitTestRules:
             {
-            	/*
-            	 * internal event - starts the process to test the rules against the current configuration and the different element profiles
-            	 * event should send a 'dataFromCheckbox' data object as:
-            	 * {propertyName:<aPropertyName>,propertyValue:<aPropertyValue>,status:<aStatus>}
-            	 */
-    	        testRules:
-    	        {
-                    init_function: function(data,aEvent,dataFromCheckbox){
-                    	this.opts.elementProfileId++;
-                		this.opts.elementProfile=ElementProfiles[Object.keys(ElementProfiles)[this.opts.elementProfileId]];
-                		this.trigger(dataFromCheckbox.propertyName,dataFromCheckbox);
-                    },
-                    next_state_when:"this.opts.elementProfileId  < this.opts.maxElementProfiles",
-            		next_state:'TestRules',
-                    
-    	        },
             	/*
             	 * event to emit when a property changed in the configuration
             	 * Initializes the rule engine for testing the rules against the current configuration and the different element profiles
@@ -258,10 +274,30 @@ function jamrules(aJqueryObj) {
 		        {
 	                init_function: function(data,aEvent,dataFromCheckbox){
 	                	this.opts.elementProfileId=-1;
+	                	this.opts.dataFromCheckbox=dataFromCheckbox;
 	                	this.opts.maxElementProfiles = Object.keys(ElementProfiles).length;
-	                	if (this.opts.maxElementProfiles > 0) this.trigger('testRules',dataFromCheckbox);
+	                	if (this.opts.maxElementProfiles > 0) this.trigger('testRules');
 	                },
 		        },
+            	/*
+            	 * internal event - starts the process to test the rules against the current configuration and the different element profiles
+            	 * event should send a 'dataFromCheckbox' data object as:
+            	 * {propertyName:<aPropertyName>,propertyValue:<aPropertyValue>,status:<aStatus>}
+            	 */
+    	        testRules:
+    	        {
+                    next_state_when:"this.opts.elementProfileId  < this.opts.maxElementProfiles",
+            		next_state:'TestRules',
+            		out_function: function(data,aEvent){
+            			if (this.opts.elementProfileId  < this.opts.maxElementProfiles)
+            			{
+                        	this.opts.elementProfileId++;
+                    		this.opts.elementProfile=ElementProfiles[Object.keys(ElementProfiles)[this.opts.elementProfileId]];
+                    		this.trigger(this.opts.dataFromCheckbox.propertyName);
+            			}
+            		}
+                    
+    	        },
             },
     		DefaultState:
             {
@@ -272,30 +308,45 @@ function jamrules(aJqueryObj) {
             }
     };
     
-    /**
-     * private myRulesEngine - iFSM Engine
-     */
-    var myRulesEngine = aJqueryObj.iFSM(myRulesEngineStates);
-
     
     /**
      * Testing functions available for the rules
      * 	this = the iFSM engine
      */
     /**
-     * returns true if the property is set in the profile element and in the property set
+     * returns true if any property value is set in the profile element and in the property set
      */
     function MatchPropertyName(aPropertyName)
     {
-    	return (propertiesConfiguration[aPropertyName] && this.opts.elementProfile[aPropertyName]);
+    	if (propertiesConfiguration[aPropertyName] && myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName])
+    	{
+    		var found=false;
+    		for(aPropertyValue in propertiesConfiguration[aPropertyName]) 
+    		{
+    			found = found || propertiesConfiguration[aPropertyName][aPropertyValue];
+    			if (found) break;
+    		}
+    		if (found)
+    		{
+        		found = false;
+        		for(aPropertyValue in myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName]) 
+        		{
+        			found = found ||  myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName][aPropertyValue];
+        			if (found) return true;
+        		}
+    		}
+    	}
+    	return false;
     }
     function MatchProperty(aPropertyName,aPropertyValue)
     {
-    	return (
+    	if (
     			(propertiesConfiguration[aPropertyName] && this.opts.elementProfile[aPropertyName])
-    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] && this.opts.elementProfile[aPropertyName][aPropertyValue])
-    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] == this.opts.elementProfile[aPropertyName][aPropertyValue])
-    			);
+    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] && myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName][aPropertyValue])
+    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] == myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName][aPropertyValue])
+    			)
+    		return true;
+    	else return false;
     }
 
     
@@ -333,15 +384,16 @@ function jamrules(aJqueryObj) {
 	 * 
 	 */
     function addRule(aRuleName, aRuleEvent,aRuleTest,aRuleAction) {
-    	if (!myRulesEngineStates.TestRules.delegate_machines[aRuleName])
-    		myRulesEngineStates.TestRules.delegate_machines[aRuleName]=$.extend(true, {}, matchRuleTemplate);
+    	var testRules = myRulesEngine._stateDefinition.TestRules;
+    	if (!testRules.delegate_machines[aRuleName])
+    		testRules.delegate_machines[aRuleName]=$.extend(true, {}, matchRuleTemplate);
     	
-    	myRulesEngineStates.TestRules.delegate_machines[aRuleName]['DefaultState'][aRuleEvent]={
-			 		next_state_when: aRuleTest,
+    	testRules.delegate_machines[aRuleName]['submachine']['DefaultState'][aRuleEvent]={
+			 		next_state_when: 'this.opts.jamrules.'+aRuleTest,
  			 		next_state:'ruleMatch',
  			 		propagate_event: 'ruleDontMatch',
     	};
-    	myRulesEngineStates.TestRules.testMatch.next_state_on_target.submachines[aRuleName]={
+    	testRules.testMatch.next_state_on_target.submachines[aRuleName]={
     			target_list: ['ruleDontMatch']
     	};
     }
@@ -365,13 +417,6 @@ function jamrules(aJqueryObj) {
     	objectKey = getElementProfileKey(aElement);
     	addElementProfile(objectKey,aElement);
     	addElementToElementProfilesArray(objectKey,aElement);
-    }
-
-    
-	/**
-	 * boolean return true if the properties set is compliant with the property configuration and the defined rules
-	 */
-    function matchObject(aPropertiesSet) {
     }
 
     
@@ -400,7 +445,7 @@ function jamrules(aJqueryObj) {
 	 */
     function addElementToElementProfilesArray(objectKey,aElement)
     {
-    	ElementProfiles[objectKey]['elementList'].push(aElement);
+    	ElementProfiles[objectKey]['elementsList'].push(aElement);
     }
     
     /**
@@ -411,10 +456,19 @@ function jamrules(aJqueryObj) {
         console.debug(msg);
     }
  
-    aRetObject = {
-    		setProperty: setProperty
+    jamrules = {
+    			setProperty: setProperty
         	,	addElement:addElement
         	,	addRule:addRule
-        }; 
-    return (aRetObject);
+        	,	MatchPropertyName:MatchPropertyName
+        	,	MatchProperty:MatchProperty
+    }; 
+
+    aJqueryObj.iFSM(myRulesEngineStates,{debug:true,LogLevel:3,jamrules:jamrules});
+	myRulesEngine = aJqueryObj.getFSM(myRulesEngineStates); 
+
+	jamrules.ruleEngine = myRulesEngine;
+
+
+    return (jamrules);
 };
