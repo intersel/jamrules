@@ -31,19 +31,22 @@ function jamrules(aJqueryObj) {
     // variables and functions private unless attached to API below
     // 'this' refers to global window
  
-	/**
-	 * jamrules - the current jamrules object
-	 */
+    /**
+	 * @param jamrules - the current jamrules object giving access to its API
+     * @access public
+     */
 	var jamrules;
 	
 	/**
-	 * myRulesEngine - the FSM engine bound to the jamrules
+	 * @param myRulesEngine - the FSM engine bound to the jamrules
+	 * @access private 
 	 */
 	var myRulesEngine;
 	
 	/**
-	 * private propertiesConfiguration
-	 * 	a configuration set of the properties defines by an array of [aPropertyName][aPropertyValue] = status (1|0)
+	 * @param propertiesConfiguration
+	 * @access private 
+	 * @abstract a configuration set of the properties defines by an array of [aPropertyName][aPropertyValue] = status (1|0)
 	 * 		{	
 	 * 			<propertyName1>:{
 	 * 				type:<discreteValuesList>,
@@ -75,8 +78,9 @@ function jamrules(aJqueryObj) {
     var propertiesConfiguration = {};
 
     /**
-     * private ElementProfiles
-     * 	list of possible profiles
+     * @param ElementProfiles
+     * @access private 
+     * @abstract list of possible profiles
      * 	a profile is defined by a list of entries [objectKey]:{propertiesSet:<apropertiesSet>,elementsList:[]}
      * {
 	 * 		<objectKey1>:{
@@ -102,50 +106,69 @@ function jamrules(aJqueryObj) {
      */
     var ElementProfiles = {};
     
+    /**
+     * @param matchRuleTemplate
+     * @abstract template to create new rule in the state definition of the rules engine
+     */
     var matchRuleTemplate = 
     {
 		submachine:
 		{
- 			ruleMatch:
- 			{
- 				enterState:
- 				{
- 					propagate_event:'testMatch'
- 				},
- 			},
- 			ruleDontMatch:
- 			{
- 				enterState:
- 				{
-	 				propagate_event:'testMatch'
- 				}
- 			},
- 			DefaultState:
- 			{
-				eventExemple:
- 				{
- 			 		process_event_if: 'this.opts.jamrules.MatchPropertyName("priority")',
- 			 		propagate_event:'setRuleMatch',
- 			 		propagate_event_on_refused:'setRuleDontMatch',
- 			 		prevent_bubble:false
- 				},
- 				setRuleMatch:
- 				{
- 			 		next_state:'ruleMatch',
- 				},
- 				setRuleDontMatch:
- 				{
- 			 		next_state:'ruleDontMatch',
- 				}
- 			}
+				startTesting:
+	 			{
+	 				enterState:
+	 				{
+	 			 		next_state:'ruleMatch', //default state that will end the process
+	 				},
+	 			},
+	 			ruleMatch:
+	 			{
+	 				enterState:
+	 				{
+	 					propagate_event:'testRuleDone'
+	 				},
+	 			},
+	 			ruleDontMatch:
+	 			{
+	 				enterState:
+	 				{
+		 				propagate_event:'testRuleDone'
+	 				}
+	 			},
+	 			DefaultState:
+	 			{
+	 				startEventExample:
+ 					{
+	 					next_state:'startTesting',
+ 					},
+	 				ruleDontMatch:
+ 					{
+	 					next_state:'ruleDontMatch',
+ 					}
+	 			}
 		},
-		no_reinitialisation:true
-
  	};
     
     /**
-     * private
-     * 	myRulesEngineStates - states definition that handles the rule testing process 
+     * @param stateRuleTemplate
+     * @access private
+     * @abstract
+     */
+    var stateRuleTemplate =
+    {
+		enterState:
+		{
+	 		process_event_if: 'this.opts.jamrules.aMatchingTest()',
+	 		propagate_event_on_refused:'ruleDontMatch',
+	 		next_state:'testPriorityExist',
+	 		prevent_bubble:true
+		}
+    }
+    
+    /**
+     * @param myRulesEngineStates
+     * @access private
+     * @abstract states definition of the rule engine that handles the rule testing process 
      */
     var myRulesEngineStates = {
             TestRules:
@@ -161,71 +184,203 @@ function jamrules(aJqueryObj) {
     		 		 * submachine for testing
     		 		 /**/
     		 		/**/
-    		 		PriorityTestMatch:
+    		 		PriorityTestMatch1:
     		 		{
     		 			submachine:
     		 			{
         		 			
+    		 				startTesting:
+        		 			{
+        		 				enterState:
+        		 				{
+        		 			 		next_state:'testDisplayAll',
+        		 				},
+        		 			},
+    		 				testDisplayAll:
+        		 			{
+        		 				enterState:
+        		 				{
+        		 			 		process_event_if: 'this.opts.jamrules.ConfigurationPropertySet("activities","all")',
+        		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		next_state:'testPriorityExist',
+        		 			 		prevent_bubble:true
+        		 				},
+        		 			},
+        		 			testPriorityExist:
+				 			{
+				 				enterState:
+				 				{
+				 			 		process_event_if: 'this.opts.jamrules.MatchProperty("priority")',
+				 			 		propagate_event_on_refused:'ruleDontMatch',
+				 			 		next_state:'testPriorityValue',
+        		 			 		prevent_bubble:true
+				 				},
+				 			},
+				 			testPriorityValue:
+        		 			{
+        		 				enterState:
+        		 				{
+        		 			 		process_event_if: 'this.opts.jamrules.MatchPropertyValue("priority")',
+        		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		next_state:'ruleMatch',
+        		 			 		prevent_bubble:true
+        		 				},
+        		 			},
         		 			ruleMatch:
         		 			{
         		 				enterState:
         		 				{
-        		 					propagate_event:'testMatch'
+        		 					propagate_event:'testRuleDone'
         		 				},
         		 			},
         		 			ruleDontMatch:
         		 			{
         		 				enterState:
         		 				{
-            		 				propagate_event:'testMatch'
+            		 				propagate_event:'testRuleDone'
         		 				}
         		 			},
         		 			DefaultState:
         		 			{
-        		 				priority:
-        		 				{
-        		 			 		process_event_if: 'this.opts.jamrules.MatchPropertyName("priority")',
-        		 			 		propagate_event:'setRuleMatch',
-        		 			 		propagate_event_on_refused:'setRuleDontMatch',
-        		 			 		prevent_bubble:false
-        		 				},
-        		 				setRuleMatch:
-        		 				{
-        		 			 		next_state:'ruleMatch',
-        		 				},
-        		 				setRuleDontMatch:
-        		 				{
-        		 			 		next_state:'ruleDontMatch',
-        		 				}
+        		 				startEventExample:
+    		 					{
+        		 					next_state:'startTesting',
+    		 					},
+        		 				ruleDontMatch:
+    		 					{
+        		 					next_state:'ruleDontMatch',
+    		 					}
         		 			}
     		 				
     		 			},
-    		 			no_reinitialisation:true,
     		 		},
     		 		/**/
-    		 	},	  	
-    			testMatch:
+    		 		PriorityTestMatch2:
+    		 		{
+    		 			submachine:
+    		 			{
+        		 			
+    		 				startTesting:
+        		 			{
+        		 				enterState:
+        		 				{
+        		 			 		//next_state:'ruleMatch', //default state that will end the process
+        		 			 		next_state:'testDisplayAll',
+        		 				},
+        		 			},
+    		 				testDisplayAll:
+        		 			{
+        		 				enterState:
+        		 				{
+        		 			 		process_event_if: 'this.opts.jamrules.ConfigurationPropertySet("activities","compliant")',
+        		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		next_state:'testPriorityExist',
+        		 			 		prevent_bubble:true
+        		 				},
+        		 			},
+        		 			testPriorityExist:
+				 			{
+				 				enterState:
+				 				{
+				 			 		process_event_if: 'this.opts.jamrules.MatchProperty("priority")',
+				 			 		propagate_event_on_refused:'ruleDontMatch',
+				 			 		next_state:'testPriorityValue',
+        		 			 		prevent_bubble:true
+				 				},
+				 			},
+				 			testPriorityValue:
+        		 			{
+        		 				enterState:
+        		 				{
+        		 			 		process_event_if: 'this.opts.jamrules.MatchPropertyValue("priority")',
+        		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		next_state:'technicianCompliant',
+        		 			 		prevent_bubble:true
+        		 				},
+        		 			},
+        		 			technicianCompliant:
+        		 			{
+        		 				enterState:
+        		 				{
+        		 			 		process_event_if: 'this.opts.jamrules.MatchPropertiesValue("compliantTechnician","technician")',
+        		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		next_state:'ruleMatch',
+        		 			 		prevent_bubble:true
+        		 				},
+        		 			},
+        		 			ruleMatch:
+        		 			{
+        		 				enterState:
+        		 				{
+        		 					propagate_event:'testRuleDone'
+        		 				},
+        		 			},
+        		 			ruleDontMatch:
+        		 			{
+        		 				enterState:
+        		 				{
+            		 				propagate_event:'testRuleDone'
+        		 				}
+        		 			},
+        		 			DefaultState:
+        		 			{
+        		 				startEventExample:
+    		 					{
+        		 					next_state:'startTesting',
+    		 					},
+        		 				ruleDontMatch:
+    		 					{
+        		 					next_state:'ruleDontMatch',
+    		 					}
+        		 			}
+    		 				
+    		 			},
+    		 		},
+    		 	},	  
+    		 	/**
+    		 	 * Events of TestRules
+    		 	 */
+    		 	testRuleDone:
     		 	{
                     init_function: function(){
-                    	this.opts.submachineReturn++;
                     },
     		 		next_state_on_target: 
     		 		{
     		 			condition 			: '||',
     		 			submachines			: 
     		 			{
-    		 				/*
-    		 				PriorityTestMatch: 
+    		 				/**/
+    		 				PriorityTestMatch1: 
     		 				{
-    							target_list: ['ruleDontMatch'],
+    							target_list: ['ruleMatch'],
     		 				},
-    		 				*/
+    		 				PriorityTestMatch2: 
+    		 				{
+    							target_list: ['ruleMatch'],
+    		 				},
+    		 				/**/
     			 		}
     		 		},
-    		 		next_state:'ruleDontMatch',
-    				propagate_event:'testMatchResult'
+    		 		next_state:'ruleMatch',
+    				propagate_event:'giveMatchResult'
     		 	},
-    		 	testMatchResult:
+    		 	giveMatchResult:
+    		 	{
+                    init_function: function(data,aEvent,dataFromCheckbox){
+                    	alert("dont match");
+                    },
+                    propagate_event:'updateElementsDontMatch',
+                    next_state:'updateElements',
+    		 		
+    		 	},
+            	
+            },
+            /**
+             * State ruleDontMatch
+             */
+            ruleMatch:
+            {
+            	giveMatchResult:
     		 	{
                     init_function: function(data,aEvent,dataFromCheckbox){
                     	alert("match");
@@ -236,19 +391,9 @@ function jamrules(aJqueryObj) {
     		 	},
             	
             },
-            ruleDontMatch:
-            {
-    		 	testMatchResult:
-    		 	{
-                    init_function: function(data,aEvent,dataFromCheckbox){
-                    	alert("dont  match");
-                    },
-                    propagate_event:'updateElementsDontMatch',
-                    next_state:'updateElements',
-    		 		
-    		 	},
-            	
-            },
+            /**
+             * State updateElements
+             */
             updateElements:
             {
             	updateElementsMatch:
@@ -281,6 +426,9 @@ function jamrules(aJqueryObj) {
 	            }
 
             },
+            /**
+             * State waitTestRules
+             */
             waitTestRules:
             {
             	/*
@@ -331,39 +479,156 @@ function jamrules(aJqueryObj) {
     
     /**
      * Testing functions available for the rules
-     * 	this = the iFSM engine
      */
+    
     /**
-     * returns true if any property value is set in the profile element and in the property set
+     * @function MatchProperty
+	 * @access public 
+     * @abstract matching rule function, tests if at least a property value of a property is shared between the configuration and the element  
+     * @param aPropertyName: a property name
+     * 
+     * @return returns true if any property value for a given aPropertyName is set in the profile element and in the configuration property set
+     * @example
+     *  element.priority.priority1=1
+     *  element.technician.technician1=1
+     *  configuration.priority.priority1=1
+     *  configuration.priority.priority2=0
+     *  configuration.technician.technician1=0
+     *  configuration.technician.technician2=1
+     *  MatchProperty('priority') -> match
+     *  MatchProperty('technician') -> no match
      */
-    function MatchPropertyName(aPropertyName)
+    function MatchProperty(aPropertyName)
     {
-    	if (propertiesConfiguration[aPropertyName] && myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName])
+    	propertiesElementProfile = myRulesEngine.opts.elementProfile.propertiesSet;
+    	
+    	if (propertiesConfiguration[aPropertyName] && propertiesElementProfile[aPropertyName])
     	{
-    		var found=false;
-    		for(aPropertyValue in propertiesConfiguration[aPropertyName]) 
+    		for(aPropertyValue in propertiesElementProfile[aPropertyName]) 
     		{
-    			found = found || propertiesConfiguration[aPropertyName][aPropertyValue];
-    			if (found) break;
-    		}
-    		if (found)
-    		{
-        		found = false;
-        		for(aPropertyValue in myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName]) 
-        		{
-        			found = found ||  myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName][aPropertyValue];
-        			if (found) return true;
-        		}
+    			if (
+    					(propertiesConfiguration[aPropertyName][aPropertyValue])
+    				&&	(propertiesElementProfile[aPropertyName][aPropertyValue])
+//    				&& 	(propertiesElementProfile[aPropertyName][aPropertyValue] == propertiesConfiguration[aPropertyName][aPropertyValue])
+    				)
+    				return true;
     		}
     	}
     	return false;
     }
-    function MatchProperty(aPropertyName,aPropertyValue)
+    
+    /**
+     * @function MatchPropertyValue
+	 * @access public 
+     * @abstract matching rule function, tests if a given property value is set for configuration and the element   
+     * @param aPropertyName: a property name
+     * @param aPropertyValue: a value of aPropertyName 
+     *  
+     * @return returns true if the configuration for the aPropertyName.aPropertyValue == the one defined for the current elementProfile being tested
+     * @example
+     * element.priority.priority1=1
+     * element.technician.technician1=1
+     * configuration.priority.priority1=1
+     * configuration.technician.technician1=0
+     * MatchPropertyValue('priority','priority1') -> match
+     * MatchPropertyValue('technician','technician1') -> no match
+     */
+    function MatchPropertyValue(aPropertyName,aPropertyValue)
     {
+    	var propertiesElementProfile = myRulesEngine.opts.elementProfile.propertiesSet;
     	if (
-    			(propertiesConfiguration[aPropertyName] && this.opts.elementProfile[aPropertyName])
-    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] && myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName][aPropertyValue])
-    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] == myRulesEngine.opts.elementProfile.propertiesSet[aPropertyName][aPropertyValue])
+    			(propertiesConfiguration[aPropertyName] && propertiesElementProfile[aPropertyName])
+    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] && propertiesElementProfile[aPropertyName][aPropertyValue])
+//    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] == propertiesElementProfile[aPropertyName][aPropertyValue])
+    			)
+    		return true;
+    	else return false;
+    }
+    
+    /**
+     * @function public MatchPropertiesValue
+     * @abstract matching rule function, tests if a property value exists and is the same between a configurator property and the element property
+     * @param aConfigurationPropertyName: a configuration property name
+     * @param aElementPropertyName: a element property Name 
+     * @param aPropertyValue: a value that should match
+     *   
+     * @return returns true if aPropertyValue in aConfigurationPropertyName and in aElementPropertyName are both set
+     * @example:
+     *  element.priority.priority1=1
+     *  configuration.priority.priority1=0
+     *  configuration.activity.priority1=1
+     *  configuration.strawberry.priority2=1
+     *  MatchPropertiesValue('activity','priority','priority1') -> match
+     *  MatchPropertiesValue('strawberry','priority','priority1') -> no match
+     */
+    function MatchPropertiesValue(aConfigurationPropertyName,aElementPropertyName,aPropertyValue)
+    {
+    	var propertiesElementProfile = myRulesEngine.opts.elementProfile.propertiesSet;
+    	
+    	if (
+    			(propertiesConfiguration[aConfigurationPropertyName] && propertiesElementProfile[aElementPropertyName])
+    		&& 	(propertiesConfiguration[aConfigurationPropertyName][aPropertyValue] && propertiesElementProfile[aElementPropertyName][aPropertyValue])
+//    		&& 	(propertiesConfiguration[aConfigurationPropertyName][aPropertyValue] == propertiesElementProfile[aElementPropertyName][aPropertyValue])
+    		)
+    	{
+    		return true;
+    	}
+    	return false;
+    }
+    /**
+     * 
+     * @function MatchProperties
+	 * @access public 
+     * @abstract matching rule function, tests if at least a property value exists and is set between the configurator property and the element property
+     * @param aConfigurationPropertyName: a configuration property name
+     * @param aElementPropertyName: a element property Name 
+     *   
+     * @return returns true if it exists a value of aConfigurationPropertyName that is the same that in aElementPropertyName
+     * @example
+     *  element.priority.priority1=1
+     *  configuration.priority.priority1=0
+     *  configuration.activity.priority1=1
+     *  configuration.strawberry.priority2=1
+     *  MatchProperties('activity','priority') -> match
+     *  MatchProperties('strawberry','priority') -> no match
+     */
+    function MatchProperties(aConfigurationPropertyName,aElementPropertyName)
+    {
+    	propertiesElementProfile = myRulesEngine.opts.elementProfile.propertiesSet;
+
+    	if (
+    			(propertiesConfiguration[aConfigurationPropertyName] && propertiesElementProfile[aElementPropertyName])
+    		)
+    	{
+    		for(aElementPropertyValue in propertiesElementProfile[aElementPropertyName]) 
+    		{
+    			if (
+    					(propertiesElementProfile[aElementPropertyName][aElementPropertyValue])
+    				&&	(propertiesConfiguration[aConfigurationPropertyName][aElementPropertyValue])
+//    				&&	(propertiesElementProfile[aElementPropertyName][aElementPropertyValue] == propertiesConfiguration[aConfigurationPropertyName][aElementPropertyValue])
+    				)
+    			{
+       				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
+    /**
+     * @function public ConfigurationPropertySet 
+     * @param  aPropertyName: a configuration property name
+     * @param  aPropertyValue: a value of aPropertyName 
+     * @param  valueSet: [0|1(default)]
+     *   
+     * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+     */
+    function ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
+    {
+    	if (valueSet == undefined) valueSet=1;
+    	if (
+    				(propertiesConfiguration[aPropertyName])
+    			&& 	(propertiesConfiguration[aPropertyName][aPropertyValue])
     			)
     		return true;
     	else return false;
@@ -371,10 +636,13 @@ function jamrules(aJqueryObj) {
 
     
     /**
-	 * public function setProperty
-	 * - aPropertyName: name of the property that has changed
-	 * - aProperyValue: value of the property
-	 * - aStatus: 
+	 * @function setProperty
+	 * @access public 
+	 * @abstract set a property/property value status in the rules configurator
+	 * @param aPropertyName: name of the property that has changed
+	 * @param aProperyValue: value of the property
+	 * @param aStatus:
+	 * @return void 
 	 */
     function setProperty(aPropertyName,aPropertyValue,aStatus) {
     	log("setProperty(aPropertyName,aPropertyValue,aStatus):"+aPropertyName+','+aPropertyValue+','+aStatus);
@@ -393,41 +661,64 @@ function jamrules(aJqueryObj) {
     }
     
     
- 
 	/**
-	 * 
-	 * aRulesSetName: name of a rules set
-	 * aRuleName: a rule to define in the rules set
-	 * aRuleEvent: event to hear to test the rule
-	 * aRuleTest: a boolean test
-	 * aRuleAction: an action name to call on the elements that match the rule
+	 * @function createRulesSet - creates a rule set
+	 * @access public 
+	 * @param aRulesGroup: name of the rules set to create
+	 * @param aRuleEvents: [array] events to hear to test the rules group
 	 * 
 	 */
-    function addRule(aRuleName, aRuleEvent,aRuleTest,aRuleAction) {
+    function createRulesSet(aRulesGroup, aRuleEvents) {
     	var testRules = myRulesEngine._stateDefinition.TestRules;
-    	if (!testRules.delegate_machines[aRuleName])
+    	if (!testRules.delegate_machines[aRulesGroup])
     	{
-    		testRules.delegate_machines[aRuleName]=$.extend(true, {}, matchRuleTemplate);
-    	 	testRules.delegate_machines[aRuleName]['submachine']['DefaultState']['ruletested']={
-				next_state:'ruleDontMatch'
-			}
+    		testRules.delegate_machines[aRulesGroup]=$.extend(true, {}, matchRuleTemplate);
+
+    		aRuleEvents.forEach(function(aEvent) {
+        		testRules.delegate_machines[aRulesGroup][aEvent]=
+				{
+   					next_state:'startTesting',
+				};
+    		});    		
+
+    		testRules.testRuleDone.next_state_on_target.submachines[aRulesGroup]={
+        			target_list: ['ruleMatch']
+        	};
+    	}
+    }    
+ 
+	/**
+	 * @function addRule - add a new "and" rule in aRulesGroup
+	 * @access public 
+	 * @param aRuleName: a rule to define in the rules set
+	 * @param aRuleEvent: event to hear to test the rule
+	 * @param aRuleTest: a boolean test
+	 * 
+	 */
+    function addRule(aRulesGroup, aRuleName, aRuleTest) {
+    	var testRules = myRulesEngine._stateDefinition.TestRules;
+    	if (!testRules.delegate_machines[aRulesGroup])
+    	{	
+    		alert(aRulesGroup+" needs to be previously created with createRulesSet function");
+    		return;
     	}
     	
-	 	testRules.delegate_machines[aRuleName]['submachine']['DefaultState'][aRuleEvent]={
-			 		process_event_if: 'this.opts.jamrules.'+aRuleTest,
- 			 		propagate_event:'setRuleMatch',
- 			 		propagate_event_on_refused:'setRuleDontMatch',
- 			 		prevent_bubble:false
-    	};
-    	testRules.testMatch.next_state_on_target.submachines[aRuleName]={
-    			target_list: ['ruleDontMatch']
-    	};
+    	//create the new state called "aRuleName" for the rule
+	 	testRules.delegate_machines[aRulesGroup]['submachine'][aRuleName]=stateRuleTemplate;
+	 	// activate the test
+	 	testRules.delegate_machines[aRulesGroup]['submachine'].startTesting.enterState.process_event_if='this.opts.jamrules.'+aRuleTest;
+
+	 	// modify the rules chain
+	 	theNextRuleState = testRules.delegate_machines[aRulesGroup]['submachine'].startTesting.enterState.next_state;
+	 	testRules.delegate_machines[aRulesGroup]['submachine'][aRuleName].enterState.next_state=theNextRuleState;
+	 	testRules.delegate_machines[aRulesGroup]['submachine'].startTesting.enterState.next_state = aRuleName;
+	 	
     }
 
 	/**
-	 * addElement - add an element to the list of elements to test against rules
-	 * 
-	 * aElement: object
+	 * @function public addElement 
+	 * @abstract add an element to the list of elements to test against rules
+	 * @param aElement: object
 	 * {
 	 * 		propertiesSet:
 	 * 		[	
@@ -438,6 +729,7 @@ function jamrules(aJqueryObj) {
 	 * 		matched:<function name to call when a rule will match for the element>
 	 * 		notmatched:<function name to call when there is a change but element does not match any rules>
 	 * }
+	 * @example
 	 */
     function addElement(aElement) {
     	objectKey = getElementProfileKey(aElement);
@@ -447,8 +739,9 @@ function jamrules(aJqueryObj) {
 
     
     /**
-     * private function
-     * get the key to access to the element profile of an element
+     * @access private
+     * @abstract get the key to access to the element profile of an element
+     * @return a md5 key for a json object
 	 * 
 	 */
     function getElementProfileKey(aElement)
@@ -456,8 +749,8 @@ function jamrules(aJqueryObj) {
     	return $.md5(JSON.stringify(aElement.propertiesSet));
     }
     /**
-     * private function
-     * add a new element profile if the one defines by aElement does not exist
+     * @access private
+     * @abstract add a new element profile if the one defines by aElement does not exist
 	 * 
 	 */
     function addElementProfile(objectKey,aElement)
@@ -465,8 +758,8 @@ function jamrules(aJqueryObj) {
     	if (!ElementProfiles[objectKey]) ElementProfiles[objectKey]={propertiesSet:aElement.propertiesSet,elementsList:[]};
     }
     /**
-     * private function
-     * add a new element to the element profiles array
+     * @access private
+     * @abstract add a new element to the element profiles array
 	 * 
 	 */
     function addElementToElementProfilesArray(objectKey,aElement)
@@ -475,7 +768,8 @@ function jamrules(aJqueryObj) {
     }
     
     /**
-     * a private debug function
+     * @access private
+     * @abstract log a message on the console for debug
 	 * 
 	 */
     function log(msg) {
@@ -485,9 +779,13 @@ function jamrules(aJqueryObj) {
     jamrules = {
     			setProperty: setProperty
         	,	addElement:addElement
+        	,	createRulesSet:createRulesSet
         	,	addRule:addRule
-        	,	MatchPropertyName:MatchPropertyName
         	,	MatchProperty:MatchProperty
+        	,	MatchPropertyValue:MatchPropertyValue
+        	,	MatchProperties:MatchProperties
+        	,	MatchPropertiesValue:MatchPropertiesValue
+        	,	ConfigurationPropertySet:ConfigurationPropertySet
     }; 
 
     aJqueryObj.iFSM(myRulesEngineStates,{debug:true,LogLevel:3,jamrules:jamrules});

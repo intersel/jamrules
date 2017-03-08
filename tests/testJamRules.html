@@ -93,19 +93,7 @@
 	</section>
 
 	<script>
-	var rulesForPriorityLayer = new jamrules($('#filterbox'));
-	rulesForPriorityLayer.setProperty("priority","priority1",0)
-	rulesForPriorityLayer.setProperty("priority","priority2",0)
-	rulesForPriorityLayer.setProperty("technician","technician1",0)
-	rulesForPriorityLayer.setProperty("technician","technician2",0)
-	rulesForPriorityLayer.setProperty("compliantTechnician","technician1",0)
-	rulesForPriorityLayer.setProperty("compliantTechnician","technician2",0)
-	rulesForPriorityLayer.setProperty("activities","all",0)
-	rulesForPriorityLayer.setProperty("activities","compliant",0)
-
-	//rulesForPriorityLayer.addRule("PriorityMatch","priority",'MatchPropertyName("priority")');
-	//rulesForPriorityLayer.addRule("TechMatch","technician",'MatchPropertyName("technician")');
-	 
+	//configuration of an element
 	var el1={propertiesSet:{priority:{},technician:{},compliantTechnician:{}},matched:null,notmatched:null};
 	el1['propertiesSet']['priority']['priority1']=$("#el1-priority-un").prop('checked');
 	el1['propertiesSet']['priority']['priority2']=$("#el1-priority-deux").prop('checked');
@@ -113,10 +101,40 @@
 	el1['propertiesSet']['technician']['technician2']=$("#el1-technician2").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician1']=$("#el1-technician1-compliant").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician2']=$("#el1-technician2-compliant").prop('checked');
-			
-	 
-	rulesForPriorityLayer.addElement(el1);
+
+	// ---------------------------------
+	// Example of jamrules usage
+	// ---------------------------------
 	
+	//initialisation of jamrules and its configurator
+	var rulesForPriorityLayer = new jamrules($('#filterbox'));
+	rulesForPriorityLayer.setProperty("priority","priority1",0);
+	rulesForPriorityLayer.setProperty("priority","priority2",0);
+	rulesForPriorityLayer.setProperty("technician","technician1",0);
+	rulesForPriorityLayer.setProperty("technician","technician2",0);
+	rulesForPriorityLayer.setProperty("compliantTechnician","technician1",0);
+	rulesForPriorityLayer.setProperty("compliantTechnician","technician2",0);
+	rulesForPriorityLayer.setProperty("activities","all",0);
+	rulesForPriorityLayer.setProperty("activities","compliant",0);
+
+	// rules setting
+	//rulesForPriorityLayer.createRulesSet("PriorityMatch1",["activities","priority"]);
+	//rulesForPriorityLayer.addRule("PriorityMatch1","testDisplayAll",'ConfigurationPropertySet("activities","all")');
+	//rulesForPriorityLayer.addRule("PriorityMatch1","testPriorityExist",'MatchProperty("priority")');
+	//rulesForPriorityLayer.createRulesSet("PriorityMatch2",["activities","priority"]);
+	//rulesForPriorityLayer.addRule("PriorityMatch2","testDisplayAll",'ConfigurationPropertySet("activities","compliant")');
+	//rulesForPriorityLayer.addRule("PriorityMatch2","testPriorityExist",'MatchProperty("priority")');
+	//rulesForPriorityLayer.addRule("PriorityMatch2","technicianCompliant",'MatchProperties("compliantTechnician","technician")');
+	 
+	//add elements that we want to test if they match the rules
+	rulesForPriorityLayer.addElement(el1);
+
+	// test if element is compliant with tech1
+	rulesForPriorityLayer.setProperty("technician","technician1",1);
+	rulesForPriorityLayer.setProperty("activities","compliant",1);
+	
+	// ---------------------------------
+	// Test input FSM
 	var checkBoxFilterFSM = {
             DefaultState        :
             {
