@@ -159,8 +159,8 @@ function jamrules(aJqueryObj) {
     		 	{
     		 		/***
     		 		 * submachine for testing
-    		 		 */
-    		 		/*
+    		 		 /**/
+    		 		/**/
     		 		PriorityTestMatch:
     		 		{
     		 			submachine:
@@ -202,7 +202,7 @@ function jamrules(aJqueryObj) {
     		 			},
     		 			no_reinitialisation:true,
     		 		},
-    		 		*/
+    		 		/**/
     		 	},	  	
     			testMatch:
     		 	{

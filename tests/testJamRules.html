@@ -34,14 +34,16 @@
 			</label>
 
 		</section>
-		<label>
-			<input class="checkbox" id="display-on" type="checkbox" value="display.on">
-			Display Priority
-		</label>
-		<label>
-			<input class="checkbox" id="compliant-on" type="checkbox" value="compliant.on">
-			Technician Compliant
-		</label>
+		<section id='activities'>
+			<label>
+				<input class="checkbox" id="display-on" type="checkbox" value="all">
+				Display Priority
+			</label>
+			<label>
+				<input class="checkbox" id="compliant-on" type="checkbox" value="compliant">
+				Technician Compliant
+			</label>
+		</section>
 	</section> 
 	<section id="element1">
 		<h1>Elément 1</h1>
@@ -98,9 +100,11 @@
 	rulesForPriorityLayer.setProperty("technician","technician2",0)
 	rulesForPriorityLayer.setProperty("compliantTechnician","technician1",0)
 	rulesForPriorityLayer.setProperty("compliantTechnician","technician2",0)
+	rulesForPriorityLayer.setProperty("activities","all",0)
+	rulesForPriorityLayer.setProperty("activities","compliant",0)
 
-	rulesForPriorityLayer.addRule("PriorityMatch","priority",'MatchPropertyName("priority")');
-	rulesForPriorityLayer.addRule("TechMatch","technician",'MatchPropertyName("technician")');
+	//rulesForPriorityLayer.addRule("PriorityMatch","priority",'MatchPropertyName("priority")');
+	//rulesForPriorityLayer.addRule("TechMatch","technician",'MatchPropertyName("technician")');
 	 
 	var el1={propertiesSet:{priority:{},technician:{},compliantTechnician:{}},matched:null,notmatched:null};
 	el1['propertiesSet']['priority']['priority1']=$("#el1-priority-un").prop('checked');
