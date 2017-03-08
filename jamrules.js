@@ -26,11 +26,21 @@
  *
  * see README.md content or consult it on https://github.com/intersel/jamrules
  */
-function jamrules(aJqueryObj) {
+function jamrules(aJqueryObj,options) {
  
     // variables and functions private unless attached to API below
     // 'this' refers to global window
- 
+
+	var defaults = {
+			debug				: false,
+			LogLevel			: 2,
+		};
+	
+	// on charge les options passées en paramètre
+	if (options == undefined) options=null;
+	options = jQuery.extend( {}, defaults, options || {});
+
+	
     /**
 	 * @param jamrules - the current jamrules object giving access to its API
      * @access public
@@ -144,6 +154,7 @@ function jamrules(aJqueryObj) {
 	 				ruleDontMatch:
  					{
 	 					next_state:'ruleDontMatch',
+	 			 		prevent_bubble:true
  					}
 	 			}
 		},
@@ -160,8 +171,8 @@ function jamrules(aJqueryObj) {
 		{
 	 		process_event_if: 'this.opts.jamrules.aMatchingTest()',
 	 		propagate_event_on_refused:'ruleDontMatch',
+	 		propagate_event_on_localmachine:true,
 	 		next_state:'testPriorityExist',
-	 		prevent_bubble:true
 		}
     }
     
@@ -176,6 +187,13 @@ function jamrules(aJqueryObj) {
             	enterState:
             	{
                     init_function: function(){
+                    	if (!this.opts[this.currentState]) this.opts[this.currentState]={};
+                    	this.opts[this.currentState].nbRulesTested = 0;
+                    	this.opts[this.currentState].nbRulesToTest = Object.keys(this._stateDefinition[this.currentState]
+                    																	.testRuleDone
+                    																	.next_state_on_target
+                    																	.submachines).length;
+                    	this.opts.jamrules.log('nb rules to test:'+this.opts[this.currentState].nbRulesToTest);
                     },
             	},
     		 	delegate_machines: 
@@ -193,6 +211,9 @@ function jamrules(aJqueryObj) {
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 			 		next_state:'testDisplayAll',
         		 				},
         		 			},
@@ -200,36 +221,48 @@ function jamrules(aJqueryObj) {
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 			 		process_event_if: 'this.opts.jamrules.ConfigurationPropertySet("activities","all")',
         		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		propagate_event_on_localmachine:true,
         		 			 		next_state:'testPriorityExist',
-        		 			 		prevent_bubble:true
         		 				},
         		 			},
         		 			testPriorityExist:
 				 			{
 				 				enterState:
 				 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
 				 			 		process_event_if: 'this.opts.jamrules.MatchProperty("priority")',
 				 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		propagate_event_on_localmachine:true,
 				 			 		next_state:'testPriorityValue',
-        		 			 		prevent_bubble:true
 				 				},
 				 			},
 				 			testPriorityValue:
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 			 		process_event_if: 'this.opts.jamrules.MatchPropertyValue("priority")',
         		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		propagate_event_on_localmachine:true,
         		 			 		next_state:'ruleMatch',
-        		 			 		prevent_bubble:true
         		 				},
         		 			},
         		 			ruleMatch:
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 					propagate_event:'testRuleDone'
         		 				},
         		 			},
@@ -237,18 +270,31 @@ function jamrules(aJqueryObj) {
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
             		 				propagate_event:'testRuleDone'
         		 				}
         		 			},
         		 			DefaultState:
         		 			{
+
+        		 				activities:'startEventExample',
+        		 				priority:'startEventExample',
         		 				startEventExample:
     		 					{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 					next_state:'startTesting',
     		 					},
         		 				ruleDontMatch:
     		 					{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 					next_state:'ruleDontMatch',
+        		 			 		prevent_bubble:true
     		 					}
         		 			}
     		 				
@@ -265,6 +311,9 @@ function jamrules(aJqueryObj) {
         		 				enterState:
         		 				{
         		 			 		//next_state:'ruleMatch', //default state that will end the process
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 			 		next_state:'testDisplayAll',
         		 				},
         		 			},
@@ -272,46 +321,61 @@ function jamrules(aJqueryObj) {
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 			 		process_event_if: 'this.opts.jamrules.ConfigurationPropertySet("activities","compliant")',
         		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		propagate_event_on_localmachine:true,
         		 			 		next_state:'testPriorityExist',
-        		 			 		prevent_bubble:true
         		 				},
         		 			},
         		 			testPriorityExist:
 				 			{
 				 				enterState:
 				 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
 				 			 		process_event_if: 'this.opts.jamrules.MatchProperty("priority")',
 				 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		propagate_event_on_localmachine:true,
 				 			 		next_state:'testPriorityValue',
-        		 			 		prevent_bubble:true
 				 				},
 				 			},
 				 			testPriorityValue:
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 			 		process_event_if: 'this.opts.jamrules.MatchPropertyValue("priority")',
         		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		propagate_event_on_localmachine:true,
         		 			 		next_state:'technicianCompliant',
-        		 			 		prevent_bubble:true
         		 				},
         		 			},
         		 			technicianCompliant:
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 			 		process_event_if: 'this.opts.jamrules.MatchPropertiesValue("compliantTechnician","technician")',
         		 			 		propagate_event_on_refused:'ruleDontMatch',
+        		 			 		propagate_event_on_localmachine:true,
         		 			 		next_state:'ruleMatch',
-        		 			 		prevent_bubble:true
         		 				},
         		 			},
         		 			ruleMatch:
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 					propagate_event:'testRuleDone'
         		 				},
         		 			},
@@ -319,23 +383,36 @@ function jamrules(aJqueryObj) {
         		 			{
         		 				enterState:
         		 				{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
             		 				propagate_event:'testRuleDone'
         		 				}
         		 			},
         		 			DefaultState:
         		 			{
+        		 				activities:'startEventExample',
+        		 				priority:'startEventExample',
+        		 				compliantTechnician:'startEventExample',
         		 				startEventExample:
     		 					{
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
         		 					next_state:'startTesting',
     		 					},
         		 				ruleDontMatch:
     		 					{
         		 					next_state:'ruleDontMatch',
+        		                    init_function: function(data,aEvent,aPropertyConfiguration){
+        		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+        		                    },
     		 					}
         		 			}
     		 				
     		 			},
     		 		},
+    		 		/**/
     		 	},	  
     		 	/**
     		 	 * Events of TestRules
@@ -343,6 +420,8 @@ function jamrules(aJqueryObj) {
     		 	testRuleDone:
     		 	{
                     init_function: function(){
+                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
+                    	this.opts[this.currentState].nbRulesTested++;
                     },
     		 		next_state_on_target: 
     		 		{
@@ -362,14 +441,33 @@ function jamrules(aJqueryObj) {
     			 		}
     		 		},
     		 		next_state:'ruleMatch',
-    				propagate_event:'giveMatchResult'
+    				propagate_event:'giveMatchResult',
+ 			 		propagate_event_on_localmachine:true,
     		 	},
     		 	giveMatchResult:
     		 	{
-                    init_function: function(data,aEvent,dataFromCheckbox){
-                    	alert("dont match");
+                    init_function: function(data,aEvent,aPropertyConfiguration){
+                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
                     },
-                    propagate_event:'updateElementsDontMatch',
+                    process_event_if:'this.opts[this.currentState].nbRulesTested >= this.opts[this.currentState].nbRulesToTest',
+                    propagate_event:'giveMatchResult',
+                    next_state:'ruleDontMatch',
+ 			 		propagate_event_on_localmachine:true,
+    		 		
+    		 	},
+            	
+            },
+            /**
+             * State ruleMatch
+             */
+            ruleMatch:
+            {
+            	giveMatchResult:
+    		 	{
+                    init_function: function(data,aEvent,aPropertyConfiguration){
+                    	alert("match");
+                    },
+                    propagate_event:'updateElementsMatch',
                     next_state:'updateElements',
     		 		
     		 	},
@@ -378,14 +476,14 @@ function jamrules(aJqueryObj) {
             /**
              * State ruleDontMatch
              */
-            ruleMatch:
+            ruleDontMatch:
             {
             	giveMatchResult:
     		 	{
-                    init_function: function(data,aEvent,dataFromCheckbox){
-                    	alert("match");
+                    init_function: function(data,aEvent,aPropertyConfiguration){
+                    	alert("don't match");
                     },
-                    propagate_event:'updateElementsMatch',
+                    propagate_event:'updateElementsDontMatch',
                     next_state:'updateElements',
     		 		
     		 	},
@@ -435,21 +533,21 @@ function jamrules(aJqueryObj) {
             	 * event to emit when a property changed in the configuration
             	 * Initializes the rule engine for testing the rules against the current configuration and the different element profiles
             	 * 
-            	 * event should send a 'dataFromCheckbox' data object as:
+            	 * event should send a 'aPropertyConfiguration' data object as:
             	 * {propertyName:<aPropertyName>,propertyValue:<aPropertyValue>,status:<aStatus>}
             	 */
 	        	propertyChange:   
 		        {
-	                init_function: function(data,aEvent,dataFromCheckbox){
+	                init_function: function(data,aEvent,aPropertyConfiguration){
 	                	this.opts.elementProfileId=-1;
-	                	this.opts.dataFromCheckbox=dataFromCheckbox;
+	                	this.opts.aPropertyConfiguration=aPropertyConfiguration;
 	                	this.opts.maxElementProfiles = Object.keys(ElementProfiles).length;
 	                	if (this.opts.maxElementProfiles > 0) this.trigger('testRules');
 	                },
 		        },
             	/*
             	 * internal event - starts the process to test the rules against the current configuration and the different element profiles
-            	 * event should send a 'dataFromCheckbox' data object as:
+            	 * event should send a 'aPropertyConfiguration' data object as:
             	 * {propertyName:<aPropertyName>,propertyValue:<aPropertyValue>,status:<aStatus>}
             	 */
     	        testRules:
@@ -461,7 +559,7 @@ function jamrules(aJqueryObj) {
             			{
                         	this.opts.elementProfileId++;
                     		this.opts.elementProfile=ElementProfiles[Object.keys(ElementProfiles)[this.opts.elementProfileId]];
-                    		this.trigger(this.opts.dataFromCheckbox.propertyName);
+                    		this.trigger(this.opts.aPropertyConfiguration.propertyName);
             			}
             		}
                     
@@ -616,7 +714,9 @@ function jamrules(aJqueryObj) {
     }
     
     /**
-     * @function public ConfigurationPropertySet 
+     * @function ConfigurationPropertySet
+     * @access public 
+     * @abstract matching rule function, tests if the property in the configurator has its value set
      * @param  aPropertyName: a configuration property name
      * @param  aPropertyValue: a value of aPropertyName 
      * @param  valueSet: [0|1(default)]
@@ -768,7 +868,7 @@ function jamrules(aJqueryObj) {
     }
     
     /**
-     * @access private
+     * @access public
      * @abstract log a message on the console for debug
 	 * 
 	 */
@@ -786,9 +886,10 @@ function jamrules(aJqueryObj) {
         	,	MatchProperties:MatchProperties
         	,	MatchPropertiesValue:MatchPropertiesValue
         	,	ConfigurationPropertySet:ConfigurationPropertySet
+        	,	log:log
     }; 
 
-    aJqueryObj.iFSM(myRulesEngineStates,{debug:true,LogLevel:3,jamrules:jamrules});
+    aJqueryObj.iFSM(myRulesEngineStates,{debug:options.debug,LogLevel:options.LogLevel,jamrules:jamrules});
 	myRulesEngine = aJqueryObj.getFSM(myRulesEngineStates); 
 
 	jamrules.ruleEngine = myRulesEngine;

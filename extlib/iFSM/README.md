@@ -213,6 +213,7 @@ var aStateDefinition =
  		out_function: <a function(parameters, event, data)>,
  		properties_out_function: <parameters for out_function>,
  		prevent_bubble: <true|false(default)>
+ 		propagate_event_on_localmachine: <true|false(default)>
  		process_on_UItarget: <true|false(default)>
  		UI_event_bubble: <true|false(default)>
  	},
@@ -310,6 +311,7 @@ var aStateDefinition =
   - **propagate_event**: if defined to true, the current event is propagated to the next state
   				if it's the name of an event, the event is triggered
 				if it's an array of events, events are triggered in sequence
+  - **propagate_event_on_localmachine**: for submachines use, if defined and true, the events are not send to the root machine (default behaviour) but only to the submachine locally.
   - **prevent_bubble**: for submachines use, if defined and true, the current event will not bubble to its parent machine. By default, events bubble from submachines to their parent
   - **UI_event_bubble**: for graphic events use, if defined and true, the current event will bubble. By default, no UI event bubbling...
   - **process_on_UItarget**: if defined and true, the current event will be processed only if the event was directly targeting the UI jQuery object linked to the machine
@@ -376,6 +378,7 @@ SubMachine
 	- the events are sent to each defined submachines in the order
 	- once the event is processed by the submachines, it is bubbled to the upper machines
 	- it is possible to prevent the bubbling of events with the directive 'prevent_bubble' to true
+	- it is possible to propagate event only to the local submachine with the directive 'propagate_event_on_localmachine' to true
 	- a submachine works as the main one: 
 		- if no_reinitialisation == false (default), it is initialized each time we enter the main state
 		- a start event is triggered to it (if initialized)
@@ -385,6 +388,7 @@ SubMachine
 The public available variables
 ==============================
  - myFSM.currentState: current state name
+ - myFSM.eventCalled: current event name
  - myFSM.myUIObject: the jQuery object associated to the FSM
  - myFSM._stateDefinition: the definition of the states and events
  - myFSM._stateDefinition.[statename].[eventname].EventIteration - the number of times an event has been called

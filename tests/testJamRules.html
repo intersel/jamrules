@@ -107,7 +107,8 @@
 	// ---------------------------------
 	
 	//initialisation of jamrules and its configurator
-	var rulesForPriorityLayer = new jamrules($('#filterbox'));
+	var rulesForPriorityLayer = new jamrules($('#filterbox'),{debug:true});
+	/* initialisation if needed
 	rulesForPriorityLayer.setProperty("priority","priority1",0);
 	rulesForPriorityLayer.setProperty("priority","priority2",0);
 	rulesForPriorityLayer.setProperty("technician","technician1",0);
@@ -116,12 +117,12 @@
 	rulesForPriorityLayer.setProperty("compliantTechnician","technician2",0);
 	rulesForPriorityLayer.setProperty("activities","all",0);
 	rulesForPriorityLayer.setProperty("activities","compliant",0);
-
+	*/
 	// rules setting
 	//rulesForPriorityLayer.createRulesSet("PriorityMatch1",["activities","priority"]);
 	//rulesForPriorityLayer.addRule("PriorityMatch1","testDisplayAll",'ConfigurationPropertySet("activities","all")');
 	//rulesForPriorityLayer.addRule("PriorityMatch1","testPriorityExist",'MatchProperty("priority")');
-	//rulesForPriorityLayer.createRulesSet("PriorityMatch2",["activities","priority"]);
+	//rulesForPriorityLayer.createRulesSet("PriorityMatch2",["activities","priority","compliantTechnician"]);
 	//rulesForPriorityLayer.addRule("PriorityMatch2","testDisplayAll",'ConfigurationPropertySet("activities","compliant")');
 	//rulesForPriorityLayer.addRule("PriorityMatch2","testPriorityExist",'MatchProperty("priority")');
 	//rulesForPriorityLayer.addRule("PriorityMatch2","technicianCompliant",'MatchProperties("compliantTechnician","technician")');
@@ -129,8 +130,10 @@
 	//add elements that we want to test if they match the rules
 	rulesForPriorityLayer.addElement(el1);
 
+	// test if element is technician tech1
+	rulesForPriorityLayer.setProperty("activities","all",1);
+	rulesForPriorityLayer.setProperty("priority","priority1",1);
 	// test if element is compliant with tech1
-	rulesForPriorityLayer.setProperty("technician","technician1",1);
 	rulesForPriorityLayer.setProperty("activities","compliant",1);
 	
 	// ---------------------------------
