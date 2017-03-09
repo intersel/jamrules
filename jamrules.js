@@ -519,9 +519,11 @@ function jamrules(aJqueryObj,options) {
 	        	propertyChange:   
 		        {
 	                init_function: function(data,aEvent,aPropertyConfiguration){
+	                	//initialize the element profiles to process
 	                	this.opts.elementProfileId=-1;
 	                	this.opts.aPropertyConfiguration=aPropertyConfiguration;
 	                	this.opts.maxElementProfiles = Object.keys(ElementProfiles).length;
+	                	// start processing rules on the element profiles list
 	                	if (this.opts.maxElementProfiles > 0) this.trigger(this.opts.aPropertyConfiguration.propertyName); 
 	                },
 		        },
