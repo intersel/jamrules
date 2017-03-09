@@ -108,8 +108,9 @@
 	
 	//initialisation of jamrules and its configurator
 	var rulesForPriorityLayer = new jamrules($('#filterbox'),{debug:true});
-	/* initialisation if needed
-	rulesForPriorityLayer.setProperty("priority","priority1",0);
+	/* initialisation if needed*/
+	rulesForPriorityLayer.setProperty("activities","all",1);
+	/*
 	rulesForPriorityLayer.setProperty("priority","priority2",0);
 	rulesForPriorityLayer.setProperty("technician","technician1",0);
 	rulesForPriorityLayer.setProperty("technician","technician2",0);
@@ -131,11 +132,11 @@
 	rulesForPriorityLayer.addElement(el1);
 
 	// test if element is technician tech1
-	rulesForPriorityLayer.setProperty("activities","all",1);
-	rulesForPriorityLayer.setProperty("priority","priority1",1);
 	// test if element is compliant with tech1
+/*	rulesForPriorityLayer.setProperty("priority","priority1",1);
 	rulesForPriorityLayer.setProperty("activities","compliant",1);
-	
+	rulesForPriorityLayer.setProperty("priority","priority1",0);
+*/
 	// ---------------------------------
 	// Test input FSM
 	var checkBoxFilterFSM = {

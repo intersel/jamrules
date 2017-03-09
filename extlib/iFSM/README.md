@@ -237,6 +237,9 @@ var aStateDefinition =
  	},
  	<aEventName....>:
  	{
+ 	},
+ 	catchEvent:
+ 	{
  	}
  }
 }
@@ -265,6 +268,7 @@ var aStateDefinition =
 		- data sent:
 		    * newValue      - New value of the modified attribute
 		    * oldValue      - Previous value of the modified attribute
+	- 'catchEvent': if a received event is not defined in the state, catchEvent becomes the default event configurator
   An event can be the synonymous to an other event. Then give the name of the synomymous event instead of its definition.
   - **how_process_event** [default:{push}]: {immediate}||{push}||{delay:delay_value,preventcancel:[false(default)|true]}
   	- if delay is defined, the processing of the event is delayed and activated at 'delay'

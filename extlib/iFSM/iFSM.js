@@ -25,7 +25,7 @@
  * - 2014/09/11 - E.Podvin - 1.6.16 - fix on synonymous event that was not set when still defined in a previous state
  * - 2016/04/26 - E.Podvin - 1.6.17 - fix on delayed events
  * - 2016/04/26 - E.Podvin - 1.6.18 - fix on delayed events on "DefaultState"
- * - 2017/03/08 - E.Podvin - 1.7.0 - myFSM.eventCalled available for script + 'propagate_event_on_localmachine' directive
+ * - 2017/03/08 - E.Podvin - 1.7.0 - myFSM.eventCalled available for script + 'propagate_event_on_localmachine' directive + catchEvent
  * -----------------------------------------------------------------------------------------
  *
  * @copyright Intersel 2013-2017
@@ -773,14 +773,25 @@ fsm_manager.prototype.processEvent= function(anEvent,data,forceProcess) {
 	//is the event to be processed?
 	if (currentEventConfiguration == undefined)
 	{
+		this._log('processEvent: '+this.FSMName+':'+currentState+':'+anEvent+'-> take Event '+anEvent+' configuration from DefaultState (not present in current state)',2);
 		currentEventConfiguration = this._stateDefinition.DefaultState[anEvent];
 		if (currentEventConfiguration == undefined) {
-			this._log('processEvent: '+this.FSMName+':'+currentState+':'+anEvent+'-> Event '+anEvent+' does not exist --->EXIT',2);
+			if ( ['start','enterState','exitState'].indexOf(anEvent) < 0)
+			{
+				this._log('processEvent: '+this.FSMName+':'+currentState+':'+anEvent+'-> take Event '+anEvent+' configuration from catchEvent',2);
+				currentEventConfiguration = this._stateDefinition.DefaultState["catchEvent"];
+			}
+		}
+		
+		if (currentEventConfiguration == undefined) {
+			this._log('processEvent: '+this.FSMName+':'+currentState+':'+anEvent+'-> Event '+anEvent+' does not exist and no catchEvent --->EXIT',2);
 
 			this.cleanExitProcess();
 			return;
 		}
 		currentStateEvent = 'DefaultState';
+		//we create the dummy event in the default state if it does not exist 
+		if (!this._stateDefinition[currentStateEvent][anEvent]) this._stateDefinition[currentStateEvent][anEvent]={};
 	}
 
 	//is this a potential Pop State?
