@@ -1,0 +1,197 @@
+<html>
+	<head>
+		<title>testJamRules</title>
+	 	<meta charset="utf-8" />
+		<script type="text/javascript" src="../extlib/jQuery/jquery-2.2.4.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/iFSM.js"></script>
+		<script type="text/javascript" src="../extlib/jQuery-MD5/jquery.md5.js"></script>
+		<script type="text/javascript" src="../jamrules.js"></script>
+	</head>
+	<body>
+	<section id="filterbox">
+		<h1>Filter box</h1>
+		<section id='priority'>
+			<label>
+				<input class="checkbox" id="priority-un" type="checkbox" value="priority1">
+				Priority 1
+			</label>
+			<label>
+				<input class="checkbox" id="priority-deux" type="checkbox" value="priority2">
+				Priority 2
+			</label>
+
+		</section>
+		<section id='technician'>
+			<label>
+				<input class="checkbox" id="priority-un" type="checkbox" value="technician1">
+				Technician 1
+			</label>
+			<label>
+				<input class="checkbox" id="priority-deux" type="checkbox" value="technician2">
+				Technician 2
+			</label>
+
+		</section>
+		<section id='activities'>
+			<label>
+				<input class="checkbox" id="display-on" type="checkbox" value="all" checked>
+				Display Priority
+			</label>
+			<label>
+				<input class="checkbox" id="compliant-on" type="checkbox" value="compliant">
+				Technician Compliant
+			</label>
+		</section>
+	</section> 
+	<section id="element1">
+		<h1>Elément 1</h1>
+		<section id='priority' class="property">
+			<label>
+				<input class="checkbox" id="el1-priority-un" type="checkbox" value="priority1" checked>
+				Priority 1
+			</label>
+			<label>
+				<input class="checkbox" id="el1-priority-deux" type="checkbox" value="priority2">
+				Priority 2
+			</label>
+		</section>
+		<section id='technician' class='property'>
+			<label>
+				<input class="checkbox" id="el1-technician1" type="checkbox" value="technician1" checked>
+				Technician 1
+			</label>
+			<label>
+				<input class="checkbox" id="el1-technician2" type="checkbox" value="technician2">
+				Technician 2 
+			</label>
+		</section>
+		<section id='compliantTechnician' class='property'>
+			<label>
+				<input class="checkbox" id="el1-technician1-compliant" type="checkbox" value="technician1" checked>
+				Technician 1 Compliant
+			</label>
+			<label>
+				<input class="checkbox" id="el1-technician2-compliant" type="checkbox" value="technician2">
+				Technician 2 Compliant
+			</label>
+		</section>
+	</section>
+	<section id="result">
+		<h1>Result Matching</h1>
+		<label>
+			<input class="checkbox" id="el1-match" type="checkbox"  disabled>
+			Element 1 match?
+		</label>
+		<label>
+			<input class="checkbox" id="el2-match" type="checkbox" disabled>
+			Element 2 match?
+		</label>
+		<div id="debug">
+		</div>
+	</section>
+
+	<script>
+	//configuration of an element
+	var el1={propertiesSet:{priority:{},technician:{},compliantTechnician:{}},matched:null,notmatched:null};
+	el1['propertiesSet']['priority']['priority1']=$("#el1-priority-un").prop('checked');
+	el1['propertiesSet']['priority']['priority2']=$("#el1-priority-deux").prop('checked');
+	el1['propertiesSet']['technician']['technician1']=$("#el1-technician1").prop('checked');
+	el1['propertiesSet']['technician']['technician2']=$("#el1-technician2").prop('checked');
+	el1['propertiesSet']['compliantTechnician']['technician1']=$("#el1-technician1-compliant").prop('checked');
+	el1['propertiesSet']['compliantTechnician']['technician2']=$("#el1-technician2-compliant").prop('checked');
+	
+	el1.matched=function(){
+		$("#el1-match").prop('checked',true);
+	};
+	el1.notmatched=function(){
+		$("#el1-match").prop('checked',false);
+	};
+
+	// ---------------------------------
+	// Example of jamrules usage
+	// ---------------------------------
+	
+	//initialisation of jamrules and its configurator
+	var rulesForPriorityLayer = new jamrules($('#filterbox'),{debug:true});
+
+	/* initialisation if needed*/
+	// checked the input in the above html (#filterbox section) you'd like to have set in the configurator
+	// section id is a property name and input value is the value of the property and 'checked' the status
+	$("#filterbox section").each(function(){
+		var propertyName = this.id;
+		$(this).find("input.checkbox").each(function(){
+			rulesForPriorityLayer.setProperty(propertyName,$(this).val(),$(this).prop('checked'));
+		});
+	});
+	
+	// rules setting
+	rulesForPriorityLayer.createRulesSet("PriorityMatch1",["activities","priority"]);
+	rulesForPriorityLayer.addRule("PriorityMatch1","testPriorityExist",'MatchProperty("priority")');
+	rulesForPriorityLayer.addRule("PriorityMatch1","testActivityNotCompliant",'!ConfigurationPropertySet("activities","compliant")');
+	rulesForPriorityLayer.addRule("PriorityMatch1","testDisplayAll",'ConfigurationPropertySet("activities","all")');
+	
+	rulesForPriorityLayer.createRulesSet("PriorityMatch2",["activities","priority","technician"]);
+	rulesForPriorityLayer.addRule("PriorityMatch2","testPriorityExist",'MatchProperty("priority")');
+	rulesForPriorityLayer.addRule("PriorityMatch2","technicianCompliant",'MatchProperties("technician","compliantTechnician")');
+	rulesForPriorityLayer.addRule("PriorityMatch2","testActivityCompliant",'ConfigurationPropertySet("activities","compliant")');
+	rulesForPriorityLayer.addRule("PriorityMatch2","testDisplayAll",'ConfigurationPropertySet("activities","all")');
+	
+	// prepare the rule engine
+	rulesForPriorityLayer.compileRules();
+	
+	//add elements that we want to test if they match the rules
+	rulesForPriorityLayer.addElement(el1);
+
+	// test if element is technician tech1
+	// test if element is compliant with tech1
+/*	rulesForPriorityLayer.setProperty("priority","priority1",1);
+	rulesForPriorityLayer.setProperty("activities","compliant",1);
+	rulesForPriorityLayer.setProperty("priority","priority1",0);
+*/
+	// ---------------------------------
+	// Test input FSM
+	var checkBoxFilterFSM = {
+            DefaultState        :
+            {
+    	        click   :   
+    	        {
+                    init_function: function(){
+                    	this.opts
+                    	.filterBoxes
+                    	.trigger('filterChange',{
+    							 who:this.myUIObject
+    							,propertyName:this.myUIObject.parent().parent().attr('id')
+    							,propertyValue:this.myUIObject.attr('value')
+    							,status:this.myUIObject.prop('checked')
+    							,ruleEngine:this.opts.ruleEngine
+    					});
+                    },
+                    UI_event_bubble:true,
+    	        }
+            }
+        };
+    var filterBoxesFSM = {
+            DefaultState        :
+            {
+            	filterChange   :   
+    	        {
+                    init_function: function(data,aEvent,dataFromCheckbox){
+                    	$("#debug").html("who:"+dataFromCheckbox.who.attr('id')+"<br>propertyName:"+dataFromCheckbox.propertyName+"<br>propertyValue:"+dataFromCheckbox.propertyValue+"<br>status:"+dataFromCheckbox.status);
+                    	dataFromCheckbox.ruleEngine.setProperty(dataFromCheckbox.propertyName,dataFromCheckbox.propertyValue,dataFromCheckbox.status);
+                    }
+    	        }
+            }
+        };
+
+	$(document).ready(function() {
+		$('#filterbox').iFSM(filterBoxesFSM);
+		$('#filterbox input.checkbox').iFSM(checkBoxFilterFSM,{filterBoxes:$('#filterbox'),ruleEngine:rulesForPriorityLayer});
+	});
+
+    </script>
+	
+	</body>
+    
+</html>
