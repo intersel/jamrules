@@ -128,13 +128,18 @@ rulesEngine.setProperty("object2Color","white",1);
 ```
 
 #Available API
+
 ##Matching functions
+
 ###function MatchProperty(aPropertyName)
 tests if at least a property value of a property is shared between the configuration and the element
+
 ####parameters  
 * aPropertyName: a property name
+
 ####returns
 returns true if any property value for a given aPropertyName is set in the profile element and in the configuration property set
+
 ####Example
 
 * element.priority.priority1=1
@@ -148,11 +153,14 @@ returns true if any property value for a given aPropertyName is set in the profi
 
 ###function MatchPropertyValue(aPropertyName,aPropertyValue)
 tests if a given property value is set for configuration and the element 
+
 ####parameters  
 * aPropertyName: a property name
 * aPropertyValue: a value of aPropertyName 
+
 ####returns
 returns true if the configuration for the aPropertyName.aPropertyValue == the one defined for the current elementProfile being tested
+
 ####Example
 * element.priority.priority1=1
 * element.technician.technician1=1
