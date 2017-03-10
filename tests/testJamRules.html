@@ -101,6 +101,13 @@
 	el1['propertiesSet']['technician']['technician2']=$("#el1-technician2").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician1']=$("#el1-technician1-compliant").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician2']=$("#el1-technician2-compliant").prop('checked');
+	
+	el1.matched=function(){
+		$("#el1-match").prop('checked',true);
+	};
+	el1.notmatched=function(){
+		$("#el1-match").prop('checked',false);
+	};
 
 	// ---------------------------------
 	// Example of jamrules usage
@@ -108,7 +115,10 @@
 	
 	//initialisation of jamrules and its configurator
 	var rulesForPriorityLayer = new jamrules($('#filterbox'),{debug:true});
+
 	/* initialisation if needed*/
+	// checked the input in the above html (#filterbox section) you'd like to have set in the configurator
+	// section id is a property name and input value is the value of the property and 'checked' the status
 	$("#filterbox section").each(function(){
 		var propertyName = this.id;
 		$(this).find("input.checkbox").each(function(){
@@ -116,26 +126,21 @@
 		});
 	});
 	
-	/*
-	rulesForPriorityLayer.setProperty("priority","priority2",0);
-	rulesForPriorityLayer.setProperty("technician","technician1",0);
-	rulesForPriorityLayer.setProperty("technician","technician2",0);
-	rulesForPriorityLayer.setProperty("compliantTechnician","technician1",0);
-	rulesForPriorityLayer.setProperty("compliantTechnician","technician2",0);
-	rulesForPriorityLayer.setProperty("activities","all",0);
-	rulesForPriorityLayer.setProperty("activities","compliant",0);
-	*/
 	// rules setting
 	rulesForPriorityLayer.createRulesSet("PriorityMatch1",["activities","priority"]);
 	rulesForPriorityLayer.addRule("PriorityMatch1","testPriorityExist",'MatchProperty("priority")');
-	rulesForPriorityLayer.addRule("PriorityMatch1","testNotCompliant",'!ConfigurationPropertySet("activities","compliant")');
+	rulesForPriorityLayer.addRule("PriorityMatch1","testActivityNotCompliant",'!ConfigurationPropertySet("activities","compliant")');
 	rulesForPriorityLayer.addRule("PriorityMatch1","testDisplayAll",'ConfigurationPropertySet("activities","all")');
-	//rulesForPriorityLayer.createRulesSet("PriorityMatch2",["activities","priority","compliantTechnician"]);
-	//rulesForPriorityLayer.addRule("PriorityMatch2","testDisplayAll",'ConfigurationPropertySet("activities","compliant")');
-	//rulesForPriorityLayer.addRule("PriorityMatch2","testPriorityExist",'MatchProperty("priority")');
-	//rulesForPriorityLayer.addRule("PriorityMatch2","technicianCompliant",'MatchProperties("compliantTechnician","technician")');
-	 
+	
+	rulesForPriorityLayer.createRulesSet("PriorityMatch2",["activities","priority","technician"]);
+	rulesForPriorityLayer.addRule("PriorityMatch2","testPriorityExist",'MatchProperty("priority")');
+	rulesForPriorityLayer.addRule("PriorityMatch2","technicianCompliant",'MatchProperties("technician","compliantTechnician")');
+	rulesForPriorityLayer.addRule("PriorityMatch2","testActivityCompliant",'ConfigurationPropertySet("activities","compliant")');
+	rulesForPriorityLayer.addRule("PriorityMatch2","testDisplayAll",'ConfigurationPropertySet("activities","all")');
+	
+	// prepare the rule engine
 	rulesForPriorityLayer.compileRules();
+	
 	//add elements that we want to test if they match the rules
 	rulesForPriorityLayer.addElement(el1);
 

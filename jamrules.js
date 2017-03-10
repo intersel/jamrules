@@ -156,6 +156,10 @@ function jamrules(aJqueryObj,options) {
  					{
 	 					next_state:'ruleDontMatch',
 	 			 		prevent_bubble:true
+ 					},
+ 					testRuleDone:
+ 					{
+ 					//dummy to catch the event without being caught by catchevent!	
  					}
 	 			}
 		},
@@ -445,7 +449,8 @@ function jamrules(aJqueryObj,options) {
             	giveMatchResult:
     		 	{
                     init_function: function(data,aEvent,aPropertyConfiguration){
-                    	alert("match");
+                    	this._log('Element profile matched');
+                    	//alert("match");
                     },
                     propagate_event:'updateElementsMatch',
                     next_state:'updateElements',
@@ -461,7 +466,8 @@ function jamrules(aJqueryObj,options) {
             	giveMatchResult:
     		 	{
                     init_function: function(data,aEvent,aPropertyConfiguration){
-                    	alert("don't match");
+                    	this._log('Element profile did not match');
+                    	//alert("don't match");
                     },
                     propagate_event:'updateElementsDontMatch',
                     next_state:'updateElements',
@@ -478,9 +484,9 @@ function jamrules(aJqueryObj,options) {
                 {
                     init_function: function(){
 	                	if (this.opts.elementProfile.elementsList[0].matched)
-                    	for(aElement in this.opts.elementProfile) 
+                    	for(aElement in this.opts.elementProfile.elementsList) 
                     	{
-                    		aElement.matched();
+                    		this.opts.elementProfile.elementsList[aElement].matched();
                     	}
 
                     	this.opts.elementProfileId++;
@@ -492,9 +498,9 @@ function jamrules(aJqueryObj,options) {
 	            {
 	                init_function: function(){
 	                	if (this.opts.elementProfile.elementsList[0].notmatched)
-	                	for(aElement in this.opts.elementProfile) 
+	                	for(aElement in this.opts.elementProfile.elementsList) 
 	                	{
-	                		aElement.notmatched();
+	                		this.opts.elementProfile.elementsList[aElement].notmatched();
 	                	}
 	
 	                	this.opts.elementProfileId++;
