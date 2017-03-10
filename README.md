@@ -163,13 +163,19 @@ returns true if the configuration for the aPropertyName.aPropertyValue == the on
 
 ###function MatchPropertiesValue(aConfigurationPropertyName,aElementPropertyName,aPropertyValue)
 tests if a property value exists and is the same between a configurator property and the element property
+
 ####parameters  
+
 * aConfigurationPropertyName: a configuration property name
 * aElementPropertyName: a element property Name
 * aPropertyValue: a value of aPropertyName
+
 ####returns
+
 returns true if aPropertyValue in aConfigurationPropertyName and in aElementPropertyName are both set
+
 ####Example
+
 *  element.priority.priority1=1
 *  configuration.priority.priority1=0
 *  configuration.activity.priority1=1
@@ -179,11 +185,14 @@ returns true if aPropertyValue in aConfigurationPropertyName and in aElementProp
 
 ###function MatchProperties(aConfigurationPropertyName,aElementPropertyName)
 tests if at least a property value exists and is set between the configurator property and the element property
+
 ####parameters  
 * aConfigurationPropertyName: a configuration property name
 * aElementPropertyName: a element property Name
+
 ####returns
 returns true if it exists a value of aConfigurationPropertyName that is the same that in aElementPropertyName
+
 ####Example
 *  element.priority.priority1=1
 *  configuration.priority.priority1=0
@@ -194,6 +203,7 @@ returns true if it exists a value of aConfigurationPropertyName that is the same
 
 ###function ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
 matching rule function, tests if the property in the configurator has its value set
+
 ####parameters  
 * aPropertyName: a property name
 * aPropertyValue: a value of aPropertyName
@@ -201,6 +211,7 @@ matching rule function, tests if the property in the configurator has its value 
  
 ####returns
 returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+
 ####Example
 *  element.priority.priority1=1
 *  configuration.priority.priority1=0
