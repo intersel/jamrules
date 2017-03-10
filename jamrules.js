@@ -489,7 +489,6 @@ function jamrules(aJqueryObj,options) {
                     		this.opts.elementProfile.elementsList[aElement].matched();
                     	}
 
-                    	this.opts.elementProfileId++;
                     },
 	            	propagate_event:'testRules',
 	                next_state:'waitTestRules',
@@ -503,7 +502,6 @@ function jamrules(aJqueryObj,options) {
 	                		this.opts.elementProfile.elementsList[aElement].notmatched();
 	                	}
 	
-	                	this.opts.elementProfileId++;
 	                },
 	            	propagate_event:'testRules',
 	                next_state:'waitTestRules',
@@ -548,9 +546,9 @@ function jamrules(aJqueryObj,options) {
                     next_state_when:"this.opts.elementProfileId  < this.opts.maxElementProfiles",
             		next_state:'TestRules',
             		init_function: function(data,aEvent){
+                    	this.opts.elementProfileId++;
             			if (this.opts.elementProfileId  < this.opts.maxElementProfiles)
             			{
-                        	this.opts.elementProfileId++;
                     		this.opts.elementProfile=ElementProfiles[Object.keys(ElementProfiles)[this.opts.elementProfileId]];
                     		this.trigger(this.opts.aPropertyConfiguration.propertyName);
             			}
@@ -660,6 +658,19 @@ function jamrules(aJqueryObj,options) {
     {
     	var propertiesElementProfile = myRulesEngine.opts.elementProfile.propertiesSet;
     	
+    	//if undefined, means that we want that the property value of element profile is set in the configuration too 
+    	if (aPropertyValue==undefined) 
+    	{
+    		// we can process only if the property has only one value
+    		if (Object.keys(propertiesElementProfile[aElementPropertyName]).length==1 )
+    		{
+    			aPropertyValue = Object.keys(propertiesElementProfile[aElementPropertyName])[0];
+    			if (!propertiesElementProfile[aElementPropertyName][aPropertyValue]) return false;
+    		}
+    		else return false;
+    		
+    	}
+    	
     	if (
     			(propertiesConfiguration[aConfigurationPropertyName] && propertiesElementProfile[aElementPropertyName])
     		&& 	(propertiesConfiguration[aConfigurationPropertyName][aPropertyValue] && propertiesElementProfile[aElementPropertyName][aPropertyValue])
@@ -739,12 +750,16 @@ function jamrules(aJqueryObj,options) {
 	 * @param aPropertyName: name of the property that has changed
 	 * @param aProperyValue: value of the property
 	 * @param aStatus: [boolean] status of the property for this property value set or not
+	 * @param doTest: [boolean] [default:true] if false, configure the configurator but does not run the rules engine test
 	 * @return void 
 	 */
-    function setProperty(aPropertyName,aPropertyValue,aStatus) {
+    function setProperty(aPropertyName,aPropertyValue,aStatus, doTest) {
     	log("setProperty(aPropertyName,aPropertyValue,aStatus):"+aPropertyName+','+aPropertyValue+','+aStatus);
-    	if (!aStatus) aStatus=false;
+    	if (aStatus == undefined) aStatus=false;
+    	if (doTest == undefined) doTest=true;
+    	
     	var statusChanged = true;
+
     	if (	propertiesConfiguration[aPropertyName] 
     		&& 	propertiesConfiguration[aPropertyName][aPropertyValue] 
     		&& 	propertiesConfiguration[aPropertyName][aPropertyValue] == aStatus
@@ -754,7 +769,7 @@ function jamrules(aJqueryObj,options) {
     	if (!propertiesConfiguration[aPropertyName]) propertiesConfiguration[aPropertyName]={};
     	
     	propertiesConfiguration[aPropertyName][aPropertyValue]=aStatus;
-		if (myRulesEngine && statusChanged) myRulesEngine.trigger('propertyChange',{propertyName:aPropertyName,propertyValue:aPropertyValue,status:aStatus});
+		if (myRulesEngine && doTest && statusChanged) myRulesEngine.trigger('propertyChange',{propertyName:aPropertyName,propertyValue:aPropertyValue,status:aStatus});
 
     }
     

@@ -3,8 +3,8 @@
  * INTERSEL - 4 cité d'Hauteville - 75010 PARIS
  * RCS PARIS 488 379 660 - NAF 721Z
  *
- * Blapy
- * Abstract : transform your standard website into a web app'
+ * JamRules
+ * Abstract : a rule engine to see if your elements match a configuration
  * Remark :
  * -----------------------------------------------------------------------------------------
  * @copyright : Intersel 2017
