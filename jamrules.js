@@ -164,7 +164,7 @@ function jamrules(aJqueryObj,options) {
     /**
      * @param stateRuleTemplate
      * @access private
-     * @abstract
+     * @abstract template of a rule described in a subengine 
      */
     var stateRuleTemplate =
     {
@@ -173,7 +173,7 @@ function jamrules(aJqueryObj,options) {
 	 		process_event_if: 'this.opts.jamrules.aMatchingTest()',
 	 		propagate_event_on_refused:'ruleDontMatch',
 	 		propagate_event_on_localmachine:true,
-	 		next_state:'testPriorityExist',
+	 		next_state:'',
 		}
     }
     
@@ -202,7 +202,7 @@ function jamrules(aJqueryObj,options) {
     		 		/***
     		 		 * submachine for testing
     		 		 /**/
-    		 		/**/
+    		 		/* for test - close this comment to activate the test
     		 		PriorityTestMatch1:
     		 		{
     		 			submachine:
@@ -267,8 +267,8 @@ function jamrules(aJqueryObj,options) {
         		 			DefaultState:
         		 			{
 
-    		 					catchEvent:'startEventExample',
-        		 				startEventExample:
+			 					catchEvent:'startTestingRules',
+				 				startTestingRules:
     		 					{
         		                    init_function: function(data,aEvent,aPropertyConfiguration){
         		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
@@ -291,7 +291,7 @@ function jamrules(aJqueryObj,options) {
     		 				
     		 			},
     		 		},
-    		 		/**/
+    		 		/* for test - close this comment line to activate the test
     		 		PriorityTestMatch2:
     		 		{
     		 			submachine:
@@ -369,8 +369,8 @@ function jamrules(aJqueryObj,options) {
         		 			},
         		 			DefaultState:
         		 			{
-    		 					catchEvent:'startEventExample',
-        		 				startEventExample:
+			 					catchEvent:'startTestingRules',
+				 				startTestingRules:
     		 					{
         		                    init_function: function(data,aEvent,aPropertyConfiguration){
         		                    	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
@@ -408,7 +408,7 @@ function jamrules(aJqueryObj,options) {
     		 			condition 			: '||',
     		 			submachines			: 
     		 			{
-    		 				/**/
+    		 				/*for test - close this comment line to activate the test
     		 				PriorityTestMatch1: 
     		 				{
     							target_list: ['ruleMatch'],
@@ -532,7 +532,11 @@ function jamrules(aJqueryObj,options) {
             	 * event should send a 'aPropertyConfiguration' data object as:
             	 * {propertyName:<aPropertyName>,propertyValue:<aPropertyValue>,status:<aStatus>}
             	 */
+		        /*for test
 		        priority:'testRules',
+		        activities:'testRules',
+		        compliantTechnician:'testRules',
+		        /**/
     	        testRules:
     	        {
                     next_state_when:"this.opts.elementProfileId  < this.opts.maxElementProfiles",
@@ -728,11 +732,12 @@ function jamrules(aJqueryObj,options) {
 	 * @abstract set a property/property value status in the rules configurator
 	 * @param aPropertyName: name of the property that has changed
 	 * @param aProperyValue: value of the property
-	 * @param aStatus:
+	 * @param aStatus: [boolean] status of the property for this property value set or not
 	 * @return void 
 	 */
     function setProperty(aPropertyName,aPropertyValue,aStatus) {
     	log("setProperty(aPropertyName,aPropertyValue,aStatus):"+aPropertyName+','+aPropertyValue+','+aStatus);
+    	if (!aStatus) aStatus=false;
     	var statusChanged = true;
     	if (	propertiesConfiguration[aPropertyName] 
     		&& 	propertiesConfiguration[aPropertyName][aPropertyValue] 
@@ -743,7 +748,7 @@ function jamrules(aJqueryObj,options) {
     	if (!propertiesConfiguration[aPropertyName]) propertiesConfiguration[aPropertyName]={};
     	
     	propertiesConfiguration[aPropertyName][aPropertyValue]=aStatus;
-		if (statusChanged) myRulesEngine.trigger('propertyChange',{propertyName:aPropertyName,propertyValue:aPropertyValue,status:aStatus});
+		if (myRulesEngine && statusChanged) myRulesEngine.trigger('propertyChange',{propertyName:aPropertyName,propertyValue:aPropertyValue,status:aStatus});
 
     }
     
@@ -752,22 +757,22 @@ function jamrules(aJqueryObj,options) {
 	 * @function createRulesSet - creates a rule set
 	 * @access public 
 	 * @param aRulesGroup: name of the rules set to create
-	 * @param aRuleEvents: [array] events to hear to test the rules group
+	 * @param ruleEvents: [array] events to hear to test the rules group. Actually, should be names of properties that are used as events (see setProperty). 
+	 * a Rule Group is added in the "TestRules" state by adding a submachine in it
+	 * Rules added in a Rule Group are tested between them with the "AND" operator
+	 * Rule Groups are tested between them with the "OR" operator
+	 * The rule engine will react only to events defined in ruleEvents
 	 * 
 	 */
-    function createRulesSet(aRulesGroup, aRuleEvents) {
-    	var testRules = myRulesEngine._stateDefinition.TestRules;
-    	var waitTestRules = myRulesEngine._stateDefinition.waitTestRules;
+    function createRulesSet(aRulesGroup, ruleEvents) {
+    	log("createRulesSet(aRulesGroup, ruleEvents): "+aRulesGroup,+" - "+ruleEvents);
+    	var testRules = myRulesEngineStates.TestRules;
+    	var waitTestRules = myRulesEngineStates.waitTestRules;
     	if (!testRules.delegate_machines[aRulesGroup])
     	{
     		testRules.delegate_machines[aRulesGroup]=$.extend(true, {}, matchRuleTemplate);
 
-    		aRuleEvents.forEach(function(aEvent) {
-        		testRules.delegate_machines[aRulesGroup][aEvent]=
-				{
-   					next_state:'startTesting',
-				};
-        		
+    		ruleEvents.forEach(function(aEvent) {
         		waitTestRules[aEvent] = "testRules";
     		});    		
 
@@ -784,9 +789,11 @@ function jamrules(aJqueryObj,options) {
 	 * @param aRuleEvent: event to hear to test the rule
 	 * @param aRuleTest: a boolean test
 	 * 
+	 * 
 	 */
     function addRule(aRulesGroup, aRuleName, aRuleTest) {
-    	var testRules = myRulesEngine._stateDefinition.TestRules;
+    	log("addRule(aRulesGroup, aRuleName, aRuleTest): "+aRulesGroup+" - "+aRuleName+"-"+aRuleTest);
+    	var testRules = myRulesEngineStates.TestRules;
     	if (!testRules.delegate_machines[aRulesGroup])
     	{	
     		alert(aRulesGroup+" needs to be previously created with createRulesSet function");
@@ -794,9 +801,11 @@ function jamrules(aJqueryObj,options) {
     	}
     	
     	//create the new state called "aRuleName" for the rule
-	 	testRules.delegate_machines[aRulesGroup]['submachine'][aRuleName]=stateRuleTemplate;
+	 	testRules.delegate_machines[aRulesGroup]['submachine'][aRuleName]=$.extend(true, {}, stateRuleTemplate);
 	 	// activate the test
-	 	testRules.delegate_machines[aRulesGroup]['submachine'].startTesting.enterState.process_event_if='this.opts.jamrules.'+aRuleTest;
+	 	if (aRuleTest.charAt(0) == '!') aRuleTest = '!'+'this.opts.jamrules.'+aRuleTest.slice(1);
+	 	else aRuleTest = 'this.opts.jamrules.'+aRuleTest;
+	 	testRules.delegate_machines[aRulesGroup]['submachine'][aRuleName].enterState.process_event_if=aRuleTest;
 
 	 	// modify the rules chain
 	 	theNextRuleState = testRules.delegate_machines[aRulesGroup]['submachine'].startTesting.enterState.next_state;
@@ -822,11 +831,25 @@ function jamrules(aJqueryObj,options) {
 	 * @example
 	 */
     function addElement(aElement) {
+    	log("addElement");
     	objectKey = getElementProfileKey(aElement);
     	addElementProfile(objectKey,aElement);
     	addElementToElementProfilesArray(objectKey,aElement);
     }
 
+    /**
+     * @function compileRules
+     * @abstract initialize the rule engine - to do before action and after adding the rules
+     */
+    function compileRules()
+    {
+    	log("compileRules");
+        aJqueryObj.iFSM(myRulesEngineStates,{debug:options.debug,LogLevel:options.LogLevel,jamrules:jamrules});
+    	myRulesEngine = aJqueryObj.getFSM(myRulesEngineStates); 
+
+    	jamrules.ruleEngine = myRulesEngine;
+    	return jamrules;
+    }
     
     /**
      * @access private
@@ -871,6 +894,7 @@ function jamrules(aJqueryObj,options) {
         	,	addElement:addElement
         	,	createRulesSet:createRulesSet
         	,	addRule:addRule
+        	,	compileRules:compileRules
         	,	MatchProperty:MatchProperty
         	,	MatchPropertyValue:MatchPropertyValue
         	,	MatchProperties:MatchProperties
@@ -878,11 +902,6 @@ function jamrules(aJqueryObj,options) {
         	,	ConfigurationPropertySet:ConfigurationPropertySet
         	,	log:log
     }; 
-
-    aJqueryObj.iFSM(myRulesEngineStates,{debug:options.debug,LogLevel:options.LogLevel,jamrules:jamrules});
-	myRulesEngine = aJqueryObj.getFSM(myRulesEngineStates); 
-
-	jamrules.ruleEngine = myRulesEngine;
 
 
     return (jamrules);
