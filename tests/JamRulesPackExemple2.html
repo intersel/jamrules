@@ -1,0 +1,128 @@
+<html>
+	<head>
+		<title>JamRules Pack Example</title>
+	 	<meta charset="utf-8" />
+		<script type="text/javascript" src="../extlib/jQuery/jquery-2.2.4.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/iFSM.js"></script>
+		<script type="text/javascript" src="../extlib/jQuery-MD5/jquery.md5.js"></script>
+		<script type="text/javascript" src="../jamrules.js"></script>
+	</head>
+	<body>
+	
+	<div id="filterbox">
+		<h1>Raw test of jamrules</h1>
+		<div id="msg"></div>
+	</div>
+	<script>
+	
+	
+	
+	//initialisation of jamrules and its configurator
+	var rulesEngine = new jamrules($('#filterbox'),{debug:true});
+	
+	// rules setting
+
+	rulesEngine.createRulesSet("SameColorTrousersPack",["object1","object2"]);
+	// we'd like to test a pack for giving it a promo coupon because it has 2 trousers of same color
+	// so, do we have selected 'trouser' in our configurator in order to get only trouser packs 
+	// and does our current pack being tested have a trouser for object1 property?
+	rulesEngine.addRule("SameColorTrousersPack","O1Trouser",'MatchPropertyValue("object1","trouser")');
+	// yes? ok... do we have a trouser for object2 property too in our pack?
+	rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+	// yes? ok... is the color of the trouser is of same color?
+	rulesEngine.addRule("SameColorTrousersPack","O1O2SameColor",'ObjectPropertiesSameValue("object1Color","object2Color")');
+	// if gone up here implies that the pack has two trousers of same color...
+	// then jamrules will call the match function for this pack
+
+	// if not, let's try this rule
+	// let's try if we can give a promo for a trouser and a shirt
+	rulesEngine.createRulesSet("TrouserShirtPack",["object1","object2"]);
+	// so, do we have selected 'trouser' in our configurator in order to get and test only trouser packs 
+	// and does our current pack being tested have a trouser for object1 or object2 property?
+	rulesEngine.addRule("TrouserShirtPack","O1orO2Trouser",'MatchExternalRule(\'this.MatchPropertyValue("object1","trouser")||this.MatchPropertyValue("object2","trouser")\')');
+	// ok... are object1 or object2 a shirt in the pack?
+	rulesEngine.addRule("TrouserShirtPack","O1orO2Shirt",'MatchExternalRule(\'this.ObjectPropertySet("object1","shirt")||this.ObjectPropertySet("object2","shirt")\')');
+	
+	// prepare the rule engine
+	rulesEngine.compileRules();
+	
+	var msg;
+	//add objects that we want to test if they match the rules
+	var matched=function(){
+	            msg="<p style='color:green;font-weight:bold;'>This pack is selected and has a promo coupon</p>";
+	            $("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+	}
+	var matchedbis=function(){
+        msg="<p style='color:green;font-weight:bold;'>This pack is a BIS and is selected and has a promo coupon</p>";
+        $("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+	}
+	var matchedter=function(){
+        msg="<p style='color:green;font-weight:bold;'>This pack is a TER and is selected and has a promo coupon</p>";
+        $("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+	}
+	var notmatched=function(){
+	            msg="<p style='color:red'>This pack is not selected or has no coupon</p>";
+	            $("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+	}
+	var pack1={
+			propertiesSet:{
+				object1:{trouser:1}
+			,	object2:{trouser:1}
+			,	object1Color:{white:1}
+			,	object2Color:{white:1}
+			}			
+		,	matched:matched
+		,	notmatched:notmatched
+	};
+	var pack2={propertiesSet:{
+				object1:{trouser:1}
+			,	object2:{shirt:1}
+			,	object1Color:{white:1}
+			,	object2Color:{blue:1}
+			}
+		,	matched:matched
+		,	notmatched:notmatched
+	};
+	var pack3={propertiesSet:{
+				object1:{shirt:1}
+			,	object2:{shirt:1}
+			,	object1Color:{yellow:1}
+			,	object2Color:{blue:1}
+			}
+		,	matched:matched
+		,	notmatched:notmatched
+	};
+	var pack4={propertiesSet:{
+				object1:{shirt:1}
+			,	object2:{trouser:1}
+			,	object1Color:{white:1}
+			,	object2Color:{white:1}
+			}
+		,	matched:matched
+		,	notmatched:notmatched
+	};
+	rulesEngine.addObject(pack1);
+	rulesEngine.addObject(pack2);
+	rulesEngine.addObject(pack3);
+	rulesEngine.addObject(pack4);
+	
+	//
+	$("#msg").append("<h2>prepare configuration to get the pack with object1 being a trouser</h2>");
+	rulesEngine.selectConfigurationPropertyValue("object1","trouser",1);
+    $("#msg").append("<h3>configuration of the configurator:</h3><pre>"+JSON.stringify(rulesEngine.propertiesConfiguration)+"</pre>");
+
+	//reinit the configurator
+	rulesEngine.selectConfigurationPropertyValue("object1","trouser",0,false);
+	
+	//
+	$("#msg").append("<h2>prepare configuration to get pack with object2 being a trouser</h2>");
+	rulesEngine.selectConfigurationPropertyValue("object2","trouser",1);
+    $("#msg").append("<h3>configuration of the configurator:</h3><pre>"+JSON.stringify(rulesEngine.propertiesConfiguration)+"</pre>");
+
+</script>
+	
+	</body>
+    
+</html>

@@ -33,7 +33,7 @@ function jamrules(aJqueryObj,options) {
 
 	var defaults = {
 			debug				: false,
-			LogLevel			: 2,
+			LogLevel			: 1,
 		};
 	
 	// on charge les options passées en paramètre
@@ -532,6 +532,21 @@ function jamrules(aJqueryObj,options) {
 	                },
 		        },
             	/*
+            	 * event to emit to run a test without a change on the configurator
+            	 * 
+            	 */
+	        	runEngine:   
+		        {
+	                init_function: function(){
+	                	//initialize the element profiles to process
+	                	this.opts.objectProfileId=-1;
+	                	this.opts.aPropertyConfiguration={propertyName:'dummyEvent'};
+	                	this.opts.maxObjectProfiles = Object.keys(ObjectProfiles).length;
+	                	// start processing rules on the element profiles list
+	                	if (this.opts.maxObjectProfiles > 0) this.trigger('testRules'); 
+	                },
+		        },
+            	/*
             	 * internal event - starts the process to test the rules against the current configuration and the different element profiles
             	 * event should send a 'aPropertyConfiguration' data object as:
             	 * {propertyName:<aPropertyName>,propertyValue:<aPropertyValue>,status:<aStatus>}
@@ -884,7 +899,7 @@ function jamrules(aJqueryObj,options) {
      * @param  aPropertyName1: an element property name
      * @param  aPropertyName2: an other element property name
      *   
-     * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+     * @return returns boolean
      */
     function ObjectPropertiesSameValues(aPropertyName1,aPropertyName2)
     {
@@ -970,6 +985,18 @@ function jamrules(aJqueryObj,options) {
      */ 
     
     /**
+	 * @function runRulesEngine
+	 * @access public 
+	 * @abstract run the rules engine
+	 * @return void 
+	 */
+    function runRulesEngine() {
+    	log("runRulesEngine");
+		myRulesEngine.trigger('runEngine');
+
+    }
+    
+    /**
 	 * @function selectConfigurationPropertyValue
 	 * @access public 
 	 * @abstract set a property/property value status in the rules configurator
@@ -999,7 +1026,6 @@ function jamrules(aJqueryObj,options) {
 
     }
     
-    
 	/**
 	 * @function createRulesSet - creates a rule set
 	 * @access public 
@@ -1019,6 +1045,7 @@ function jamrules(aJqueryObj,options) {
     	{
     		testRules.delegate_machines[aRulesGroup]=$.extend(true, {}, matchRuleTemplate);
 
+    		if (ruleEvents)
     		ruleEvents.forEach(function(aEvent) {
         		waitTestRules[aEvent] = "testRules";
     		});    		
@@ -1032,9 +1059,9 @@ function jamrules(aJqueryObj,options) {
 	/**
 	 * @function addRule - add a new "and" rule in aRulesGroup
 	 * @access public 
+	 * @param aRulesGroup: a rule set name
 	 * @param aRuleName: a rule to define in the rules set
-	 * @param aRuleEvent: event to hear to test the rule
-	 * @param aRuleTest: a boolean test
+	 * @param aRuleTest: a boolean test to evaluate
 	 * 
 	 * 
 	 */
@@ -1128,7 +1155,7 @@ function jamrules(aJqueryObj,options) {
     }
     
     /**
-     * @access public
+     * @access private
      * @abstract log a message on the console for debug
 	 * 
 	 */
@@ -1138,12 +1165,12 @@ function jamrules(aJqueryObj,options) {
  
     jamrules = {
     			/** general API **/
-    			selectConfigurationPropertyValue: selectConfigurationPropertyValue
+    			runRulesEngine:runRulesEngine
+    		,	selectConfigurationPropertyValue: selectConfigurationPropertyValue
         	,	addObject:addObject
         	,	createRulesSet:createRulesSet
         	,	addRule:addRule
         	,	compileRules:compileRules
-        	,	log:log
         		/** Public variables **/
         	,	propertiesConfiguration:propertiesConfiguration
         		/** Test function for matchin **/ 

@@ -1,14 +1,24 @@
 # JamRules
-Javascript configurator to match rules on massive number of objects
+Javascript/jQuery configurator to match rules on massive number of objects
 
-#What is JamRules
+#What is JamRules?
 Let's say you have a set of objects with properties and you'd like to filter them according to a user configuration of these properties and specific rules of choices... then JamRules is for you!
 
-JamRules allows you to configure a set of parameters and a set of rules of matching, then it will test and select your objects accordingly to your configuration and the defined rules.
+JamRules is Javascript/jQuery library that allows you to configure a set of parameters and a set of rules of matching, then it will test and select your objects accordingly to your configuration and the defined rules.
 
-#Example
-Example: 
-##my set of objects 
+#Let's get started with an example...
+## Create a Jamrules object
+To run, jamrules needs to be bound to a DOM object that has an id defined on it.
+
+You create your jamrules object, then you'll call the function to create rules, add objects to test, run the test, ...
+
+```javascript
+
+	//initialisation of jamrules and its configurator
+	var rulesEngine = new jamrules($('body'));
+```
+ 
+##Define a set of objects 
 
 I sell red and white trousers and yellow and blue shirts through different kind of packs of 2 products:
   * packs of 2 trousers
@@ -16,160 +26,290 @@ I sell red and white trousers and yellow and blue shirts through different kind 
   * packs with two shirts
   * etc...
 
-For the example, we decide that an object is a "pack" with the following properties:
+For the example, we will translate this description defining the "pack" as our jamrules objects with the following properties:
 * property "object1" that can have the values "trouser" or "shirt"
 * property "object1color" that can have the values "blue" or "yellow" or "white"
 * property "object2" that can have the values "trouser" or "shirt"
 * property "object2color" that can have the values "blue" or "yellow" or "white"
 
-##my selection rules of objects
+Here is an exemple of how a pack should be defined for jamrules:
+```javascript
+	
+	var pack1={
+			propertiesSet:{
+				object1:{trouser:1}
+			,	object2:{shirt:1}
+			,	object1Color:{blue:1}
+			,	object2Color:{white:1}
+			}			
+	};
+	
+	rulesEngine.addObject(pack1);
+	
+```
+
+##Define the rules to select objects
 
 I want to give a promo coupon for packs that
   * have two trousers 
-  * or have a trouser with a shirt 
   * nothing if the trousers in the pack are of different colors
   * nothing for the other kind of packs
 
 We will translate these rules to have a coupon as following:
-* object1 and object2 have to be a trouser
+* object1 and object2 have to be trousers
   * AND
     * object1color has to be different from object2color
-OR
-* object1 has to be a trouser
-  * AND
-    * object2 has to be a shirt
-OR
-* object1 has to be a shirt
-  * AND
-    * object2 has to be a trouser
+
+In Jamrules, we'll describe these rules this way:
+```javascript
+
+	// rules setting
+	rulesEngine.createRulesSet("SameColorTrousersPack");
+		// we'd like to test a pack for giving it a promo coupon because it has 2 trousers of same color
+		// so, does our current pack being tested have a trouser for object1 property?
+		rulesEngine.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","trouser")');
+		// yes? ok... do we have a trouser for object2 property too in our pack?
+		rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+		// yes? ok... is the color of the trouser is of same color?
+		rulesEngine.addRule("SameColorTrousersPack","O1O2SameColor",'ObjectPropertiesSameValue("object1Color","object2Color")');
+		// if gone up here implies that the pack has two trousers of same color...
+		// then jamrules will call the match function for this pack
+
+
+	// prepare the rule engine
+	rulesEngine.compileRules();
+```
+
+## Test your objects against the rules... 
 
 Which packs should have a promo code?
 
 Jamrules will be able to tell you!
 * add the objects to test in jamrules
-* configure Jamrules configurator to select some packs, like select the packs that has a white trouser and a blue shirt.
 * run the test: 
-  * jamrules will tell to the packs that have a white trouser and a blue shirts if they have a coupon. 
+  * jamrules will tell to the packs that have a two trousers with the same color that they have a coupon. 
   * It will tell to the others packs that they don't match the selection or the rules.
 
 JamRules will select the packs that match the configuration if it respects the rules in order to give them the promo code.
 
-Of course, that's a simple example but you can imagine how rules and kind of packs can become numerous and answers may become quickly hard to give... 
 
-Hereafter how to configure JamRules
+### Give the function to call if objects match
 
-## Demos
-no demo available :-( will come quickly!
-
-## Create the JamRules object - jamrules
+To do that, just define a "match" function on your object like in this example:
 
 ```javascript
+	
+	var pack1.matched=function(){
+		alert("it matches");
+	}
+```
+
+You can define a "notmatched" that will be called if the tested object did not match the rules...
+
+### Run the test 
+
+* You need first to "compile" your rules. You need to do that anytimes you change your rules...
+* Then run the engine...
+
+```javascript
+
+		// prepare the rule engine
+		rulesEngine.compileRules();
+		
+		//
+		$("#msg").append("<h2>run the test to get the packs that match the rules... </h2>");
+		rulesEngine.runRulesEngine();
+```
+
+## Example conclusion
+Of course, that's a simple example but you can now create your own rules with all the complexity you'd like... 
+
+# Demos
+no demo available :-( will come quickly!
+
+# Create the javascript JamRules object - jamrules
+
+```javascript
+
       //initialisation of jamrules and its configurator
       var rulesEngine = new jamrules($('#filterbox'),{debug:true});
 ```
 
-## Create rules - createRulesSet/addRule
+# The JamRules Objects
+In order to test objects with jamrules, you need to format your data in this format:
+
+```javascript
+{
+	propertiesSet:{
+		<propertyName1>:{<propertyValue1:<0|1>,<propertyValue2:<0|1>, ...},
+		<propertyName2>:{<propertyValue1:<0|1>,<propertyValue2:<0|1>, ...},
+		...
+	}	
+}
+```
+
+# The JamRules Configurator
+The JamRules configurator is a special object that can be used in a rule to test a configuration of properties that have been set.
+
+For example, let's say we have white and black trousers.
+If you'd like to get only the white trousers, you can set a configurator property "color" with a "white" property value set to 1.
+Then you'll be able to test this configurator property against your objects.
+
+The **selectConfigurationPropertyValue** function allows to create and edit such entry in the configurator.
+
+
 ```javascript
 
-	rulesEngine.createRulesSet("SameColorTrousoursPack",["object1","object2","object1Color","object2Color"]);
-	//promo if 2 trousers bought
-	rulesEngine.addRule("SameColorTrousoursPack","FirstTrouser",'MatchPropertyValue("object1","trouser")');
-	rulesEngine.addRule("SameColorTrousoursPack","FirstTrouser",'MatchPropertyValue("object2","trouser")');
-	// and have same color
-	rulesEngine.addRule("SameColorTrousoursPack","SameColor1",'MatchPropertiesSameValue("object1Color","object1Color")');
-	rulesEngine.addRule("SameColorTrousoursPack","SameColor2",'MatchPropertiesSameValue("object1Color","object2Color")');
-	rulesEngine.addRule("SameColorTrousoursPack","SameColor3",'MatchPropertiesSameValue("object2Color","object1Color")');
 
-	//promo if a trouser and a shirt
-	rulesEngine.createRulesSet("TrouserShirtPack",["object1","object2"]);
-	rulesEngine.addRule("TrouserShirtPack","O1Trouser",'MatchPropertyValue("object1","trouser")');
-	rulesEngine.addRule("TrouserShirtPack","O2Shirt"	,'MatchPropertyValue("object2","shirt")');
-	rulesEngine.addRule("TrouserShirtPack","O1Shirt"	,'MatchPropertyValue("object1","shirt")');
-	rulesEngine.addRule("TrouserShirtPack","O2Trouser",'MatchPropertyValue("object2","trouser")');
+	rulesEngine.createRulesSet("SameTrousers");
+	// tells to select objects that have their property "color" to "white" when the configurator has its "color/white" property set 
+	rulesEngine.addRule("SameTrousers","O1WhiteTrouser",'MatchPropertyValue("color","white")');
+	...
+	
+	rulesEngine.selectConfigurationPropertyValue("color","white",1);
 
 ```
 
-## Compile the rules - compileRules
+There are several matching functions that helps the tests between a configuration in the configurator and the properties of an object:
+* MatchProperty
+* MatchPropertyValue
+* MatchProperties
+* MatchPropertiesSameValue
+* MatchPropertiesSameValues
+* ConfigurationPropertySet
+* ConfigurationPropertiesSameValue
+* ConfigurationPropertiesSameValues
+* MatchExternalRule
+ 
 
+# The JamRules rules
+
+##Rules set
+Jamrules tests sets of rules. 
+
+It declares an object "matched" as soon as the first set of rules is compliant with the properties of the object.
+
+Rules are defined within a rules set.
+
+A rule set is validated when all its rules are validated. 
+
+If not, Jamrules will try the following rules set.
+
+If none of the rules sets are validated, then the object is declared "unmatched".
+
+we use the **createRulesSet** function to create a rules set, and the **addRule** function to add a rule in a rule set.
+
+##Rules
+
+A rule declares a test to try.
+
+The test can use information on the object properties, the configurator or any other information you'd like...
+
+JamRules has several matching functions ready to use as:
+* ObjectPropertySet: tests the value of the property of the object currently tested
+* ObjectPropertiesSameValue: tests the value of one property against another property...
+* ... 
+
+##Example 
 ```javascript
-
-	rulesEngine.compileRules();
+		rulesEngine.createRulesSet("SameTrousers");
+		rulesEngine.addRule("SameTrousers","O1Trouser",'ObjectPropertySet("object1","trouser")');
+		rulesEngine.addRule("SameTrousers","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+		rulesEngine.createRulesSet("SameShirts",["object1","object2"]);
+		rulesEngine.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","shirt")');
+		rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
 ```
+# The JamRules API
 
-## Add your objects to test - addObject
+##addObject(anObject)
+Add an object to the list of objects to test against rules.
 
+###parameters  
+* anObject: a object to test in jamrule 
+
+###Example
 ```javascript
-
-	var matched=function(){
-	            msg="pack has coupon";
-	            alert(msg);
-	}
-	var notMatched=function(){
-	            msg="pack has no coupon";
-	            alert(msg);
-	}
-	var pack1={propertiesSet:
-				{object1:{trouser:1}}
-			,	{object2:{trouser:1}}
-			,	{object1Color:{white:1}}
-			,	{object2Color:{white:1}}
-			,	matched:matched
-			,	notmatched:notmatched
+var anObject = {
+		propertiesSet : {
+			object1Color : {
+				white : 1
+			},
+		},
+		matched : myMatchFunction,
+		notmatched : null
 	};
-	var pack2={propertiesSet:
-				{object1:{trouser:1}}
-			,	{object2:{shirt:1}}
-			,	{object1Color:{white:1}}
-			,	{object2Color:{blue:1}}
-			,	matched:matched
-			,	notmatched:notmatched
-	};
-	var pack3={propertiesSet:
-				{object1:{shirt:1}}
-			,	{object2:{shirt:1}}
-			,	{object1Color:{yellow:1}}
-			,	{object2Color:{blue:1}}
-			,	matched:matched
-			,	notmatched:notmatched
-	};
-	rulesEngine.addObject(pack1);
-	rulesEngine.addObject(pack2);
-	rulesEngine.addObject(pack3);
+rulesEngine.addObject(onObject);
 ```
-## Create the configuration to test
+
+##createRulesSet(aRulesGroup, ruleEvents) 
+Creates a rule set.
+###parameters  
+* aRulesGroup: name of the rules set to create
+* ruleEvents: [array] events to hear to test the rules group. Actually, should be names of properties that are used as events (see selectConfigurationPropertyValue). 
+
+###Example
 ```javascript
-//prepare configuration for test "2 white trousers"
-rulesEngine.selectConfigurationPropertyValue("object1","trouser",1,false);
-rulesEngine.selectConfigurationPropertyValue("object2","trouser",1,false);
-rulesEngine.selectConfigurationPropertyValue("object1Color","white",1,false);
-// will select pack1 and call its 'matched' function, 
-//will not match with pack2 and pack3 and call their 'unmatched' function
-rulesEngine.selectConfigurationPropertyValue("object2Color","white",1); 
-
-//prepare configuration "a white trousers and blue shirt"
-rulesEngine.selectConfigurationPropertyValue("object1","trouser",1,false);
-rulesEngine.selectConfigurationPropertyValue("object2","shirt",1,false);
-rulesEngine.selectConfigurationPropertyValue("object1Color","white",1,false);
-rulesEngine.selectConfigurationPropertyValue("object2Color","blue",1,false);
-// will select pack2 and call its 'matched' function, 
-//will not match with pack1 and pack3 and call their 'unmatched' function
-rulesEngine.selectConfigurationPropertyValue("object2Color","white",1); 
+		rulesEngine.createRulesSet("SameTrousers");
 ```
 
-#Available API
+##addRule(aRulesGroup, aRuleName, aRuleTest)
+Add a new "and" rule in aRulesGroup.
 
-##Matching functions
+###parameters  
+* aRulesGroup: a rule set name
+* aRuleName: a rule to define in the rules set
+* aRuleTest: a boolean test to evaluate
 
-###function MatchProperty(aPropertyName)
-tests if at least a property value of a property is shared between the configuration and the object
+###Example
+```javascript
+		rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+```
 
-####parameters  
+##compileRules
+Initialize the rule engine - to do before action and after adding the rules
+
+###Example
+
+```javascript
+		// prepare the rule engine
+		rulesEngine.compileRules();
+```
+
+##runRulesEngine
+Run the rules engine.
+
+###Example
+```javascript
+		rulesEngine.runRulesEngine();
+```
+
+##selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus, doTest)
+Set a property/property value status in the rules configurator
+
+###parameters  
+* aPropertyName: name of the property that has changed
+* aProperyValue: value of the property
+* aStatus: <boolean> status of the property for this property value set or not
+* doTest: <boolean> <default:true> if false, configure the configurator but does not run the rules engine test
+
+###Example
+```javascript
+	rulesEngine.selectConfigurationPropertyValue("object1","trouser",1);
+```
+
+
+#The Available Matching Functions
+
+##function MatchProperty(aPropertyName)
+Tests if at least a property value of a property is shared between the configuration and the object
+
+###parameters  
 * aPropertyName: a property name
 
-####returns
-returns true if any property value for a given aPropertyName is set in the profile object and in the configuration property set
+###returns
+Returns true if any property value for a given aPropertyName is set in the profile object and in the configuration property set
 
-####Example
+###Example
 
 * object.priority.priority1=1
 * object.technician.technician1=1
@@ -180,17 +320,17 @@ returns true if any property value for a given aPropertyName is set in the profi
 * MatchProperty('priority') -> match
 * MatchProperty('technician') -> no match
 
-###function MatchPropertyValue(aPropertyName,aPropertyValue)
-tests if a given property value is set for configuration and the object 
+##function MatchPropertyValue(aPropertyName,aPropertyValue)
+Tests if a given property value is set for configuration and the object 
 
-####parameters  
+###parameters  
 * aPropertyName: a property name
 * aPropertyValue: a value of aPropertyName 
 
-####returns
-returns true if the configuration for the aPropertyName.aPropertyValue == the one defined for the current object profile being tested
+###returns
+Returns true if the configuration for the aPropertyName.aPropertyValue == the one defined for the current objectProfile being tested
 
-####Example
+###Example
 * object.priority.priority1=1
 * object.technician.technician1=1
 * configuration.priority.priority1=1
@@ -198,39 +338,62 @@ returns true if the configuration for the aPropertyName.aPropertyValue == the on
 * MatchPropertyValue('priority','priority1') -> match
 * MatchPropertyValue('technician','technician1') -> no match
 
-###function MatchPropertiesSameValue(aConfigurationPropertyName,anObjectPropertyName,aPropertyValue)
-tests if a property value exists and is the same between a configurator property and the object property
+##function MatchPropertiesSameValue(aConfigurationPropertyName,anObjectPropertyName,aPropertyValue)
+Tests if a property value of a property is set for the configurator and the object
 
-####parameters  
+###parameters  
 
 * aConfigurationPropertyName: a configuration property name
 * anObjectPropertyName: a object property Name
-* aPropertyValue: a value of aPropertyName
+* aPropertyValue: [option] a value that should match. if undefined, test if at least one of the property values of property is set in Object and in configuration
 
-####returns
+###returns
 
-returns true if aPropertyValue in aConfigurationPropertyName and in anObjectPropertyName are both set
+Returns true if aPropertyValue in aConfigurationPropertyName and in anObjectPropertyName are both set.
 
-####Example
+###Example
 
 *  object.priority.priority1=1
 *  configuration.priority.priority1=0
 *  configuration.activity.priority1=1
 *  configuration.strawberry.priority2=1
 *  MatchPropertiesSameValue('activity','priority','priority1') -> match
-*  MatchPropertiesSameValue('strawberry','priority','priority1') -> no match 
+*  MatchPropertiesSameValue('strawberry','priority','priority1') -> no match
+*  MatchPropertiesSameValue('activity','priority') -> match
+*  MatchPropertiesSameValue('strawberry','priority') -> no match
 
-###function MatchProperties(aConfigurationPropertyName,anObjectPropertyName)
-tests if at least a property value exists and is set between the configurator property and the object property
+##function MatchPropertiesSameValues(aConfigurationPropertyName,anObjectPropertyName)
+tests the property values set for the configurator's property and the object's property and if they are the same between the two
 
-####parameters  
+###parameters  
+
 * aConfigurationPropertyName: a configuration property name
 * anObjectPropertyName: a object property Name
 
-####returns
+###returns
+
+Returns true if all properties values of aConfigurationPropertyName and of anObjectPropertyName are both set
+
+###Example
+
+*  object.priority.priority1=1
+*  configuration.priority.priority1=0
+*  configuration.activity.priority1=1
+*  configuration.strawberry.priority2=1
+*  MatchPropertiesSameValues('activity','priority') -> match
+*  MatchPropertiesSameValues('strawberry','priority','priority1') -> no match
+
+##function MatchProperties(aConfigurationPropertyName,anObjectPropertyName)
+Tests if at least a property value exists and is set between the configurator property and the object property
+
+###parameters  
+* aConfigurationPropertyName: a configuration property name
+* anObjectPropertyName: a object property Name
+
+###returns
 returns true if it exists a value of aConfigurationPropertyName that is the same that in anObjectPropertyName
 
-####Example
+###Example
 *  object.priority.priority1=1
 *  configuration.priority.priority1=0
 *  configuration.activity.priority1=1
@@ -238,24 +401,139 @@ returns true if it exists a value of aConfigurationPropertyName that is the same
 *  MatchProperties('activity','priority') -> match
 *  MatchProperties('strawberry','priority') -> no match
 
-###function ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
+##function ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
 matching rule function, tests if the property in the configurator has its value set
 
-####parameters  
+###parameters  
 * aPropertyName: a property name
 * aPropertyValue: a value of aPropertyName
 * valueSet: [0|1(default)]
  
-####returns
+###returns
 returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
 
-####Example
+###Example
 *  object.priority.priority1=1
 *  configuration.priority.priority1=0
 *  configuration.activity.priority1=1
 *  configuration.strawberry.priority2=1
 *  MatchProperties('activity','priority') -> match
 *  MatchProperties('strawberry','priority') -> no match
+
+##function ObjectPropertySet(aPropertyName,aPropertyValue,valueSet)
+tests if the property in theObjectPropertySett has its value set
+
+###parameters  
+
+* aPropertyName: an element property name
+* aPropertyValue: a value of aPropertyName 
+* valueSet: [0|1(default)]
+
+###returns
+
+Returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+
+###Example
+
+##function ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
+tests if the property in the configurator has its value set
+
+###parameters  
+
+* aPropertyName: an element property name
+* aPropertyValue: a value of aPropertyName 
+* valueSet: [0|1(default)]
+
+###returns
+
+Returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+
+###Example
+
+##function ObjectPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
+Tests if the property in the element has the same value as an other element property
+
+###parameters  
+
+* aPropertyName1: an element property name
+* aPropertyName2: an other element property name
+* aPropertyValue: a value of aPropertyName 
+
+###returns
+
+Returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+
+###Example
+
+##function ObjectPropertiesSameValues(aPropertyName1,aPropertyName2)
+Tests if the property in the element has the same values as an other element property
+
+###parameters  
+
+* aPropertyName1: an element property name
+* aPropertyName2: an other element property name
+
+###returns
+
+Returns boolean
+
+###Example
+
+##function ConfigurationPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
+tests if the property in the configuration has the same value as an other configuration property
+
+###parameters  
+
+* aPropertyName1: an element property name
+* aPropertyName2: an other element property name
+* aPropertyValue: a value of aPropertyName 
+
+###returns
+
+Returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+
+###Example
+
+##function ConfigurationPropertiesSameValues(aPropertyName1,aPropertyName2)
+Tests if the property in the element has the same values as an other element property
+
+###parameters  
+
+* aPropertyName1: an element property name
+* aPropertyName2: an other element property name
+
+###returns
+
+Returns boolean
+
+###Example
+
+##function MatchExternalRule(aRule)
+Tests the given rule and return true/false according to the test.
+
+###parameters  
+
+aRule: a statement to evaluate during the rule test
+
+you can use these variables to access to the properties of the configurator or of the object
+* propertiesObjectProfile : properties of the current object being tested
+* propertiesConfiguration : properties set in the configurator
+
+you can use the other matching functions prefixing them with "this.<matchingFunction>"
+ex: this.MatchPropertiesSameValue('strawberry','priority','priority1')
+
+###returns
+
+Returns boolean
+
+###Example
+
+* object.priority.priority1=1
+* object.technician.technician1=1
+* configuration.priority.priority1=1
+* configuration.technician.technician1=0
+* MatchExternalRule('propertiesObjectProfile\[priority\]==propertiesConfiguration\[priority\]') -> match
+* MatchExternalRule('propertiesObjectProfile\[technician\]\[technician1\]==propertiesConfiguration\[technician\]\[technician1\]') -> not match
 
 #Install JamRules
 
