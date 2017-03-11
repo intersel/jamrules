@@ -22,7 +22,7 @@
 	//initialisation of jamrules and its configurator
 	var rulesForPriorityLayer = new jamrules($('#filterbox'),{debug:true});
 	/* initialisation of the configurator if needed*/
-	rulesForPriorityLayer.setProperty("priority","priority1",1);
+	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",1);
 	
 	// rules setting
 	rulesForPriorityLayer.createRulesSet("PriorityMatch1",["activities","priority"]);
@@ -39,9 +39,9 @@
 	// prepare the rule engine
 	rulesForPriorityLayer.compileRules();
 	
-	//add elements that we want to test if they match the rules
+	//add objects that we want to test if they match the rules
 	var el1={propertiesSet:{priority:{priority1:1 },compliantTechnician:{technician1:1}},matched:null,notmatched:null};
-	rulesForPriorityLayer.addElement(el1);
+	rulesForPriorityLayer.addObject(el1);
 	el1.matched=function(){
 		msg="el1 matched for "+msg;
 		//alert(msg);
@@ -56,27 +56,27 @@
 
 	//activate activities to display all in the configurator
 	var msg = "set activities->all->on"
-	rulesForPriorityLayer.setProperty("activities","all",1);
+	rulesForPriorityLayer.selectConfigurationPropertyValue("activities","all",1);
 	//-> match
 	// activate priority / priority1 
 	msg = "set priority->priority1->on"
-	rulesForPriorityLayer.setProperty("priority","priority1",1);
+	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",1);
 	//-> match
 	// activate technician / technician1 
 	msg = "set technician->technician1->on"
-	rulesForPriorityLayer.setProperty("technician","technician1",1);
+	rulesForPriorityLayer.selectConfigurationPropertyValue("technician","technician1",1);
 	//-> match
 	// activate display activities compliant
 	msg = "set activities->compliant->on"
-	rulesForPriorityLayer.setProperty("activities","compliant",1);
+	rulesForPriorityLayer.selectConfigurationPropertyValue("activities","compliant",1);
 	//-> match
 	//deactivate priority/priority1
 	msg = "set priority->priority1->off"
-	rulesForPriorityLayer.setProperty("priority","priority1",0);
+	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",0);
 	//-> not match
 	// deactivate display activities compliant
 	msg = "set activities->compliant->off"
-	rulesForPriorityLayer.setProperty("activities","compliant",0);
+	rulesForPriorityLayer.selectConfigurationPropertyValue("activities","compliant",0);
 	//-> match
 
 </script>

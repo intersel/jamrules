@@ -88,10 +88,10 @@ function jamrules(aJqueryObj,options) {
     var propertiesConfiguration = {};
 
     /**
-     * @param ElementProfiles
+     * @param ObjectProfiles
      * @access private 
      * @abstract list of possible profiles
-     * 	a profile is defined by a list of entries [objectKey]:{propertiesSet:<apropertiesSet>,elementsList:[]}
+     * 	a profile is defined by a list of entries [objectKey]:{propertiesSet:<apropertiesSet>,objectsList:[]}
      * {
 	 * 		<objectKey1>:{
 	 * 			propertiesSet:
@@ -114,7 +114,7 @@ function jamrules(aJqueryObj,options) {
 	 *  	....
 	 *  }
      */
-    var ElementProfiles = {};
+    var ObjectProfiles = {};
     
     /**
      * @param matchRuleTemplate
@@ -452,8 +452,8 @@ function jamrules(aJqueryObj,options) {
                     	this._log('Element profile matched');
                     	//alert("match");
                     },
-                    propagate_event:'updateElementsMatch',
-                    next_state:'updateElements',
+                    propagate_event:'updateObjectsMatch',
+                    next_state:'updateObjects',
     		 		
     		 	},
             	
@@ -466,40 +466,40 @@ function jamrules(aJqueryObj,options) {
             	giveMatchResult:
     		 	{
                     init_function: function(data,aEvent,aPropertyConfiguration){
-                    	this._log('Element profile did not match');
+                    	this._log('Object profile did not match');
                     	//alert("don't match");
                     },
-                    propagate_event:'updateElementsDontMatch',
-                    next_state:'updateElements',
+                    propagate_event:'updateObjectsDontMatch',
+                    next_state:'updateObjects',
     		 		
     		 	},
             	
             },
             /**
-             * State updateElements
+             * State updateObjects
              */
-            updateElements:
+            updateObjects:
             {
-            	updateElementsMatch:
+            	updateObjectsMatch:
                 {
                     init_function: function(){
-	                	if (this.opts.elementProfile.elementsList[0].matched)
-                    	for(aElement in this.opts.elementProfile.elementsList) 
+	                	if (this.opts.objectProfile.objectsList[0].matched)
+                    	for(anObject in this.opts.objectProfile.objectsList) 
                     	{
-                    		this.opts.elementProfile.elementsList[aElement].matched();
+                    		this.opts.objectProfile.objectsList[anObject].matched();
                     	}
 
                     },
 	            	propagate_event:'testRules',
 	                next_state:'waitTestRules',
                 },
-	        	updateElementsDontMatch:
+	        	updateObjectsDontMatch:
 	            {
 	                init_function: function(){
-	                	if (this.opts.elementProfile.elementsList[0].notmatched)
-	                	for(aElement in this.opts.elementProfile.elementsList) 
+	                	if (this.opts.objectProfile.objectsList[0].notmatched)
+	                	for(anObject in this.opts.objectProfile.objectsList) 
 	                	{
-	                		this.opts.elementProfile.elementsList[aElement].notmatched();
+	                		this.opts.objectProfile.objectsList[anObject].notmatched();
 	                	}
 	
 	                },
@@ -524,11 +524,11 @@ function jamrules(aJqueryObj,options) {
 		        {
 	                init_function: function(data,aEvent,aPropertyConfiguration){
 	                	//initialize the element profiles to process
-	                	this.opts.elementProfileId=-1;
+	                	this.opts.objectProfileId=-1;
 	                	this.opts.aPropertyConfiguration=aPropertyConfiguration;
-	                	this.opts.maxElementProfiles = Object.keys(ElementProfiles).length;
+	                	this.opts.maxObjectProfiles = Object.keys(ObjectProfiles).length;
 	                	// start processing rules on the element profiles list
-	                	if (this.opts.maxElementProfiles > 0) this.trigger(this.opts.aPropertyConfiguration.propertyName); 
+	                	if (this.opts.maxObjectProfiles > 0) this.trigger(this.opts.aPropertyConfiguration.propertyName); 
 	                },
 		        },
             	/*
@@ -543,13 +543,13 @@ function jamrules(aJqueryObj,options) {
 		        /**/
     	        testRules:
     	        {
-                    next_state_when:"this.opts.elementProfileId  < this.opts.maxElementProfiles",
+                    next_state_when:"this.opts.objectProfileId  < this.opts.maxObjectProfiles",
             		next_state:'TestRules',
             		init_function: function(data,aEvent){
-                    	this.opts.elementProfileId++;
-            			if (this.opts.elementProfileId  < this.opts.maxElementProfiles)
+                    	this.opts.objectProfileId++;
+            			if (this.opts.objectProfileId  < this.opts.maxObjectProfiles)
             			{
-                    		this.opts.elementProfile=ElementProfiles[Object.keys(ElementProfiles)[this.opts.elementProfileId]];
+                    		this.opts.objectProfile=ObjectProfiles[Object.keys(ObjectProfiles)[this.opts.objectProfileId]];
                     		this.trigger(this.opts.aPropertyConfiguration.propertyName);
             			}
             		},
@@ -571,19 +571,21 @@ function jamrules(aJqueryObj,options) {
     
     
     /**
+     * ----------------------------------------- 
      * Testing functions available for the rules
+     * ----------------------------------------- 
      */
     
     /**
      * @function MatchProperty
 	 * @access public 
-     * @abstract matching rule function, tests if at least a property value of a property is shared between the configuration and the element  
+     * @abstract matching rule function, tests if at least a property value of a property is shared between the configuration and the object  
      * @param aPropertyName: a property name
      * 
-     * @return returns true if any property value for a given aPropertyName is set in the profile element and in the configuration property set
+     * @return returns true if any property value for a given aPropertyName is set in the profile object and in the configuration property set
      * @example
-     *  element.priority.priority1=1
-     *  element.technician.technician1=1
+     *  object.priority.priority1=1
+     *  object.technician.technician1=1
      *  configuration.priority.priority1=1
      *  configuration.priority.priority2=0
      *  configuration.technician.technician1=0
@@ -593,16 +595,16 @@ function jamrules(aJqueryObj,options) {
      */
     function MatchProperty(aPropertyName)
     {
-    	propertiesElementProfile = myRulesEngine.opts.elementProfile.propertiesSet;
+    	propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
     	
-    	if (propertiesConfiguration[aPropertyName] && propertiesElementProfile[aPropertyName])
+    	if (propertiesConfiguration[aPropertyName] && propertiesObjectProfile[aPropertyName])
     	{
-    		for(aPropertyValue in propertiesElementProfile[aPropertyName]) 
+    		for(aPropertyValue in propertiesObjectProfile[aPropertyName]) 
     		{
     			if (
     					(propertiesConfiguration[aPropertyName][aPropertyValue])
-    				&&	(propertiesElementProfile[aPropertyName][aPropertyValue])
-//    				&& 	(propertiesElementProfile[aPropertyName][aPropertyValue] == propertiesConfiguration[aPropertyName][aPropertyValue])
+    				&&	(propertiesObjectProfile[aPropertyName][aPropertyValue])
+//    				&& 	(propertiesObjectProfile[aPropertyName][aPropertyValue] == propertiesConfiguration[aPropertyName][aPropertyValue])
     				)
     				return true;
     		}
@@ -613,14 +615,14 @@ function jamrules(aJqueryObj,options) {
     /**
      * @function MatchPropertyValue
 	 * @access public 
-     * @abstract matching rule function, tests if a given property value is set for configuration and the element   
+     * @abstract matching rule function, tests if a given property value is set for configuration and the object   
      * @param aPropertyName: a property name
      * @param aPropertyValue: a value of aPropertyName 
      *  
-     * @return returns true if the configuration for the aPropertyName.aPropertyValue == the one defined for the current elementProfile being tested
+     * @return returns true if the configuration for the aPropertyName.aPropertyValue == the one defined for the current objectProfile being tested
      * @example
-     * element.priority.priority1=1
-     * element.technician.technician1=1
+     * object.priority.priority1=1
+     * object.technician.technician1=1
      * configuration.priority.priority1=1
      * configuration.technician.technician1=0
      * MatchPropertyValue('priority','priority1') -> match
@@ -628,53 +630,90 @@ function jamrules(aJqueryObj,options) {
      */
     function MatchPropertyValue(aPropertyName,aPropertyValue)
     {
-    	var propertiesElementProfile = myRulesEngine.opts.elementProfile.propertiesSet;
+    	var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
     	if (
-    			(propertiesConfiguration[aPropertyName] && propertiesElementProfile[aPropertyName])
-    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] && propertiesElementProfile[aPropertyName][aPropertyValue])
-//    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] == propertiesElementProfile[aPropertyName][aPropertyValue])
+    			(propertiesConfiguration[aPropertyName] && propertiesObjectProfile[aPropertyName])
+    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] && propertiesObjectProfile[aPropertyName][aPropertyValue])
+//    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] == propertiesObjectProfile[aPropertyName][aPropertyValue])
     			)
     		return true;
     	else return false;
     }
     
     /**
-     * @function public MatchPropertiesValue
-     * @abstract matching rule function, tests if a property value exists and is the same between a configurator property and the element property
+     * @function MatchExternalRule
+	 * @access public 
+     * @abstract matching rule function, tests the given rule and return true/false according to the test   
+     * @param aRule: a statement to evaluate
+     * 			you can use these variables to access to the properties of the configurator or of the object
+     * 			* propertiesObjectProfile : properties of the current object being tested
+     * 			* propertiesConfiguration : properties set in the configurator
+     * 			you can use the other matching functions prefixing them with "this.<matchingFunction>"
+     * 			ex: this.MatchPropertiesSameValue('strawberry','priority','priority1')
+     *  
+     * @return boolean
+     * @example
+     * object.priority.priority1=1
+     * object.technician.technician1=1
+     * configuration.priority.priority1=1
+     * configuration.technician.technician1=0
+     * MatchExternalRule('propertiesObjectProfile[priority]==propertiesConfiguration[priority]') -> match
+     * MatchExternalRule('propertiesObjectProfile[technician][technician1]==propertiesConfiguration[technician][technician1]') -> not match
+     */
+    function MatchExternalRule(aRule)
+    {
+    	var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	
+    	var resultTest = eval(aRule);
+    	
+    	return resultTest;
+    }
+
+    /**
+     * @function public MatchPropertiesSameValue
+     * @abstract matching rule function, tests if a property value of a property is set for the configurator and the object
      * @param aConfigurationPropertyName: a configuration property name
-     * @param aElementPropertyName: a element property Name 
-     * @param aPropertyValue: a value that should match
+     * @param anObjectPropertyName: a object property Name 
+     * @param aPropertyValue: [option] a value that should match
+     * 				if undefined, test if at least one of the property values of property is set in Object and in configuration
      *   
-     * @return returns true if aPropertyValue in aConfigurationPropertyName and in aElementPropertyName are both set
+     * @return returns true if aPropertyValue in aConfigurationPropertyName and in anObjectPropertyName are both set
      * @example:
-     *  element.priority.priority1=1
+     *  object.priority.priority1=1
      *  configuration.priority.priority1=0
      *  configuration.activity.priority1=1
      *  configuration.strawberry.priority2=1
-     *  MatchPropertiesValue('activity','priority','priority1') -> match
-     *  MatchPropertiesValue('strawberry','priority','priority1') -> no match
+     *  MatchPropertiesSameValue('activity','priority','priority1') -> match
+     *  MatchPropertiesSameValue('strawberry','priority','priority1') -> no match
+     *  MatchPropertiesSameValue('activity','priority') -> match
+     *  MatchPropertiesSameValue('strawberry','priority') -> no match
      */
-    function MatchPropertiesValue(aConfigurationPropertyName,aElementPropertyName,aPropertyValue)
+    function MatchPropertiesSameValue(aConfigurationPropertyName,anObjectPropertyName,aPropertyValue)
     {
-    	var propertiesElementProfile = myRulesEngine.opts.elementProfile.propertiesSet;
+    	var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
     	
-    	//if undefined, means that we want that the property value of element profile is set in the configuration too 
+    	//if undefined, means that we want that one of the property value of object is set in the configuration too 
     	if (aPropertyValue==undefined) 
     	{
-    		// we can process only if the property has only one value
-    		if (Object.keys(propertiesElementProfile[aElementPropertyName]).length==1 )
+    		for(aPropertyValue in propertiesObjectProfile[anObjectPropertyName]) 
     		{
-    			aPropertyValue = Object.keys(propertiesElementProfile[aElementPropertyName])[0];
-    			if (!propertiesElementProfile[aElementPropertyName][aPropertyValue]) return false;
+    	    	if (
+    	    			(propertiesConfiguration[aConfigurationPropertyName] && propertiesObjectProfile[anObjectPropertyName])
+    	    		&& 	(propertiesConfiguration[aConfigurationPropertyName][aPropertyValue] && propertiesObjectProfile[anObjectPropertyName][aPropertyValue])
+//    	    		&& 	(propertiesConfiguration[aConfigurationPropertyName][aPropertyValue] == propertiesObjectProfile[anObjectPropertyName][aPropertyValue])
+    	    		)
+    	    	{
+    	    		return true;
+    	    	}
     		}
-    		else return false;
+    		
+    		return false;
     		
     	}
-    	
-    	if (
-    			(propertiesConfiguration[aConfigurationPropertyName] && propertiesElementProfile[aElementPropertyName])
-    		&& 	(propertiesConfiguration[aConfigurationPropertyName][aPropertyValue] && propertiesElementProfile[aElementPropertyName][aPropertyValue])
-//    		&& 	(propertiesConfiguration[aConfigurationPropertyName][aPropertyValue] == propertiesElementProfile[aElementPropertyName][aPropertyValue])
+    	else if (
+    			(propertiesConfiguration[aConfigurationPropertyName] && propertiesObjectProfile[anObjectPropertyName])
+    		&& 	(propertiesConfiguration[aConfigurationPropertyName][aPropertyValue] && propertiesObjectProfile[anObjectPropertyName][aPropertyValue])
+//    		&& 	(propertiesConfiguration[aConfigurationPropertyName][aPropertyValue] == propertiesObjectProfile[anObjectPropertyName][aPropertyValue])
     		)
     	{
     		return true;
@@ -682,36 +721,66 @@ function jamrules(aJqueryObj,options) {
     	return false;
     }
     /**
+     * @function public MatchPropertiesSameValues
+     * @abstract matching rule function, tests the property values set for the configurator's property and the object's property and if they are the same between the two
+     * @param aConfigurationPropertyName: a configuration property name
+     * @param anObjectPropertyName: a object property Name 
+     *   
+     * @return returns true if all properties values of aConfigurationPropertyName and of anObjectPropertyName are both set
+     * @example:
+     *  object.priority.priority1=1
+     *  configuration.priority.priority1=0
+     *  configuration.activity.priority1=1
+     *  configuration.strawberry.priority2=1
+     *  MatchPropertiesSameValues('activity','priority') -> match
+     *  MatchPropertiesSameValues('strawberry','priority','priority1') -> no match
+     */
+    function MatchPropertiesSameValues(aConfigurationPropertyName,anObjectPropertyName)
+    {
+    	
+    	var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	
+		// we can process only if the property has only one value
+		for(aPropertyValue in propertiesObjectProfile[anObjectPropertyName]) 
+		{
+			//one of the value is not ok=> does not share their values setting
+	    	if (!MatchPropertiesSameValue(aConfigurationPropertyName,anObjectPropertyName,aPropertyValue))
+	    		return false;
+		}
+    		
+   		return true;
+    }
+    /**
      * 
      * @function MatchProperties
 	 * @access public 
-     * @abstract matching rule function, tests if at least a property value exists and is set between the configurator property and the element property
+     * @abstract matching rule function, tests if at least a property value exists and is set between the configurator property and the object property
      * @param aConfigurationPropertyName: a configuration property name
-     * @param aElementPropertyName: a element property Name 
+     * @param anObjectPropertyName: a object property Name 
      *   
-     * @return returns true if it exists a value of aConfigurationPropertyName that is the same that in aElementPropertyName
+     * @return returns true if it exists a value of aConfigurationPropertyName that is the same one in anObjectPropertyName
      * @example
-     *  element.priority.priority1=1
+     *  object.priority.priority1=1
      *  configuration.priority.priority1=0
      *  configuration.activity.priority1=1
      *  configuration.strawberry.priority2=1
      *  MatchProperties('activity','priority') -> match
      *  MatchProperties('strawberry','priority') -> no match
      */
-    function MatchProperties(aConfigurationPropertyName,aElementPropertyName)
+    function MatchProperties(aConfigurationPropertyName,anObjectPropertyName)
     {
-    	propertiesElementProfile = myRulesEngine.opts.elementProfile.propertiesSet;
+    	propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
 
     	if (
-    			(propertiesConfiguration[aConfigurationPropertyName] && propertiesElementProfile[aElementPropertyName])
+    			(propertiesConfiguration[aConfigurationPropertyName] && propertiesObjectProfile[anObjectPropertyName])
     		)
     	{
-    		for(aElementPropertyValue in propertiesElementProfile[aElementPropertyName]) 
+    		for(anObjectPropertyValue in propertiesObjectProfile[anObjectPropertyName]) 
     		{
     			if (
-    					(propertiesElementProfile[aElementPropertyName][aElementPropertyValue])
-    				&&	(propertiesConfiguration[aConfigurationPropertyName][aElementPropertyValue])
-//    				&&	(propertiesElementProfile[aElementPropertyName][aElementPropertyValue] == propertiesConfiguration[aConfigurationPropertyName][aElementPropertyValue])
+    					(propertiesObjectProfile[anObjectPropertyName][anObjectPropertyValue])
+    				&&	(propertiesConfiguration[aConfigurationPropertyName][anObjectPropertyValue])
+//    				&&	(propertiesObjectProfile[anObjectPropertyName][anObjectPropertyValue] == propertiesConfiguration[aConfigurationPropertyName][anObjectPropertyValue])
     				)
     			{
        				return true;
@@ -737,14 +806,171 @@ function jamrules(aJqueryObj,options) {
     	if (
     				(propertiesConfiguration[aPropertyName])
     			&& 	(propertiesConfiguration[aPropertyName][aPropertyValue])
+    			&&	valueSet
     			)
     		return true;
     	else return false;
     }
 
+    /**
+     * @function ObjectPropertySet
+     * @access public 
+     * @abstract matching rule function, tests if the property in theObjectPropertySett has its value set
+     * @param  aPropertyName: an element property name
+     * @param  aPropertyValue: a value of aPropertyName 
+     * @param  valueSet: [0|1(default)]
+     *   
+     * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+     */
+    function ObjectPropertySet(aPropertyName,aPropertyValue,valueSet)
+    {
+    	propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	
+    	if (valueSet == undefined) valueSet=1;
+    	if (
+    				(propertiesObjectProfile[aPropertyName])
+    			&& 	(propertiesObjectProfile[aPropertyName][aPropertyValue])
+    			&&	valueSet
+    			)
+    		return true;
+    	else return false;
+    }
     
     /**
-	 * @function setProperty
+     * @function ObjectPropertiesSameValue
+     * @access public 
+     * @abstract matching rule function, tests if the property in the element has the same value as an other element property
+     * @param  aPropertyName1: an element property name
+     * @param  aPropertyName2: an other element property name
+     * @param  aPropertyValue: a value of aPropertyName 
+     *   
+     * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+     */
+    function ObjectPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
+    {
+    	propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	
+    	//if undefined, means that we want that one of the property value of object is set in the configuration too 
+    	if (aPropertyValue==undefined) 
+    	{
+    		for(aPropertyValue in propertiesObjectProfile[aPropertyName1]) 
+    		{
+    	    	if (
+    	    			(propertiesObjectProfile[aPropertyName2])
+    	    		&& 	(propertiesObjectProfile[aPropertyName1][aPropertyValue] && propertiesObjectProfile[aPropertyName2][aPropertyValue])
+    	    		)
+    	    	{
+    	    		return true;
+    	    	}
+    		}
+    		
+    		return false;
+    		
+    	}
+    	else if (
+    				(propertiesObjectProfile[aPropertyName1])
+    			&& 	(propertiesObjectProfile[aPropertyName1][aPropertyValue])
+    			&&	(propertiesObjectProfile[aPropertyName2])
+    			&& 	(propertiesObjectProfile[aPropertyName2][aPropertyValue])
+    			)
+    		return true;
+    	else return false;
+    }
+    
+    /**
+     * @function ObjectPropertiesSameValues
+     * @access public 
+     * @abstract matching rule function, tests if the property in the element has the same values as an other element property
+     * @param  aPropertyName1: an element property name
+     * @param  aPropertyName2: an other element property name
+     *   
+     * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+     */
+    function ObjectPropertiesSameValues(aPropertyName1,aPropertyName2)
+    {
+		var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+		
+		// we can process only if the property has only one value
+		for(aPropertyValue in propertiesObjectProfile[aPropertyName1]) 
+		{
+			//one of the value is not ok=> does not share their values setting
+	    	if (!ObjectPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue))
+	    		return false;
+		}
+			
+		return true;
+    }
+    
+    
+    /**
+     * @function ConfigurationPropertiesSameValue
+     * @access public 
+     * @abstract matching rule function, tests if the property in the configuration has the same value as an other configuration property
+     * @param  aPropertyName1: an element property name
+     * @param  aPropertyNam2: an other element property name
+     * @param  aPropertyValue: a value of aPropertyName 
+     *   
+     * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+     */
+    function ConfigurationPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
+    {
+    	//if undefined, means that we want that one of the property value of object is set in the configuration too 
+    	if (aPropertyValue==undefined) 
+    	{
+    		for(aPropertyValue in propertiesConfiguration[aPropertyName1]) 
+    		{
+    	    	if (
+    	    			(propertiesConfiguration[aPropertyName2])
+    	    		&& 	(propertiesConfiguration[aPropertyName1][aPropertyValue] && propertiesConfiguration[aPropertyName2][aPropertyValue])
+    	    		)
+    	    	{
+    	    		return true;
+    	    	}
+    		}
+    		
+    		return false;
+    		
+    	}
+    	else if (
+    				(propertiesConfiguration[aPropertyName1])
+    			&& 	(propertiesConfiguration[aPropertyName1][aPropertyValue])
+    			&&	(propertiesConfiguration[aPropertyName2])
+    			&& 	(propertiesConfiguration[aPropertyName2][aPropertyValue])
+    			)
+    		return true;
+    	else return false;
+    }
+
+    /**
+     * @function ConfigurationPropertiesSameValues
+     * @access public 
+     * @abstract matching rule function, tests if the property in the element has the same values as an other element property
+     * @param  aPropertyName1: an element property name
+     * @param  aPropertyName2: an other element property name
+     *   
+     * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
+     */
+    function ConfigurationPropertiesSameValues(aPropertyName1,aPropertyName2)
+    {
+		// we can process only if the property has only one value
+		for(aPropertyValue in propertiesConfiguration[aPropertyName1]) 
+		{
+			//one of the value is not ok=> does not share their values setting
+	    	if (!ConfigurationPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue))
+	    		return false;
+		}
+			
+		return true;
+    }
+
+    /**
+     * ----------------------------------------- 
+     * GENERAL API FUNCTIONS 
+     * -----------------------------------------
+     */ 
+    
+    /**
+	 * @function selectConfigurationPropertyValue
 	 * @access public 
 	 * @abstract set a property/property value status in the rules configurator
 	 * @param aPropertyName: name of the property that has changed
@@ -753,8 +979,8 @@ function jamrules(aJqueryObj,options) {
 	 * @param doTest: [boolean] [default:true] if false, configure the configurator but does not run the rules engine test
 	 * @return void 
 	 */
-    function setProperty(aPropertyName,aPropertyValue,aStatus, doTest) {
-    	log("setProperty(aPropertyName,aPropertyValue,aStatus):"+aPropertyName+','+aPropertyValue+','+aStatus);
+    function selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus, doTest) {
+    	log("selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus):"+aPropertyName+','+aPropertyValue+','+aStatus);
     	if (aStatus == undefined) aStatus=false;
     	if (doTest == undefined) doTest=true;
     	
@@ -778,7 +1004,7 @@ function jamrules(aJqueryObj,options) {
 	 * @function createRulesSet - creates a rule set
 	 * @access public 
 	 * @param aRulesGroup: name of the rules set to create
-	 * @param ruleEvents: [array] events to hear to test the rules group. Actually, should be names of properties that are used as events (see setProperty). 
+	 * @param ruleEvents: [array] events to hear to test the rules group. Actually, should be names of properties that are used as events (see selectConfigurationPropertyValue). 
 	 * a Rule Group is added in the "TestRules" state by adding a submachine in it
 	 * Rules added in a Rule Group are tested between them with the "AND" operator
 	 * Rule Groups are tested between them with the "OR" operator
@@ -836,9 +1062,9 @@ function jamrules(aJqueryObj,options) {
     }
 
 	/**
-	 * @function public addElement 
-	 * @abstract add an element to the list of elements to test against rules
-	 * @param aElement: object
+	 * @function public addObject 
+	 * @abstract add an object to the list of objects to test against rules
+	 * @param anObject: object
 	 * {
 	 * 		propertiesSet:
 	 * 		[	
@@ -846,16 +1072,16 @@ function jamrules(aJqueryObj,options) {
 	 * 			<propertyName2>.<propertyValue2>:true|false
 	 * 			....
 	 * 		]
-	 * 		matched:<function name to call when a rule will match for the element>
-	 * 		notmatched:<function name to call when there is a change but element does not match any rules>
+	 * 		matched:<function name to call when a rule will match for the object>
+	 * 		notmatched:<function name to call when there is a change but object does not match any rules>
 	 * }
 	 * @example
 	 */
-    function addElement(aElement) {
-    	log("addElement");
-    	objectKey = getElementProfileKey(aElement);
-    	addElementProfile(objectKey,aElement);
-    	addElementToElementProfilesArray(objectKey,aElement);
+    function addObject(anObject) {
+    	log("addObject");
+    	objectKey = getObjectProfileKey(anObject);
+    	addObjectProfile(objectKey,anObject);
+    	addObjectToObjectProfilesArray(objectKey,anObject);
     }
 
     /**
@@ -874,31 +1100,31 @@ function jamrules(aJqueryObj,options) {
     
     /**
      * @access private
-     * @abstract get the key to access to the element profile of an element
+     * @abstract get the key to access to the object profile of an object
      * @return a md5 key for a json object
 	 * 
 	 */
-    function getElementProfileKey(aElement)
+    function getObjectProfileKey(anObject)
     {
-    	return $.md5(JSON.stringify(aElement.propertiesSet));
+    	return $.md5(JSON.stringify(anObject.propertiesSet));
     }
     /**
      * @access private
-     * @abstract add a new element profile if the one defines by aElement does not exist
+     * @abstract add a new object profile if the one defines by anObject does not exist
 	 * 
 	 */
-    function addElementProfile(objectKey,aElement)
+    function addObjectProfile(objectKey,anObject)
     {
-    	if (!ElementProfiles[objectKey]) ElementProfiles[objectKey]={propertiesSet:aElement.propertiesSet,elementsList:[]};
+    	if (!ObjectProfiles[objectKey]) ObjectProfiles[objectKey]={propertiesSet:anObject.propertiesSet,objectsList:[]};
     }
     /**
      * @access private
      * @abstract add a new element to the element profiles array
 	 * 
 	 */
-    function addElementToElementProfilesArray(objectKey,aElement)
+    function addObjectToObjectProfilesArray(objectKey,anObject)
     {
-    	ElementProfiles[objectKey]['elementsList'].push(aElement);
+    	ObjectProfiles[objectKey]['objectsList'].push(anObject);
     }
     
     /**
@@ -911,17 +1137,28 @@ function jamrules(aJqueryObj,options) {
     }
  
     jamrules = {
-    			setProperty: setProperty
-        	,	addElement:addElement
+    			/** general API **/
+    			selectConfigurationPropertyValue: selectConfigurationPropertyValue
+        	,	addObject:addObject
         	,	createRulesSet:createRulesSet
         	,	addRule:addRule
         	,	compileRules:compileRules
+        	,	log:log
+        		/** Public variables **/
+        	,	propertiesConfiguration:propertiesConfiguration
+        		/** Test function for matchin **/ 
         	,	MatchProperty:MatchProperty
         	,	MatchPropertyValue:MatchPropertyValue
         	,	MatchProperties:MatchProperties
-        	,	MatchPropertiesValue:MatchPropertiesValue
+        	,	MatchPropertiesSameValue:MatchPropertiesSameValue
+        	,	MatchPropertiesSameValues:MatchPropertiesSameValues
+        	,	ObjectPropertySet:ObjectPropertySet
         	,	ConfigurationPropertySet:ConfigurationPropertySet
-        	,	log:log
+        	,	ObjectPropertiesSameValue:ObjectPropertiesSameValue
+        	,	ObjectPropertiesSameValues:ObjectPropertiesSameValues
+        	,	ConfigurationPropertiesSameValue:ConfigurationPropertiesSameValue
+        	,	ConfigurationPropertiesSameValues:ConfigurationPropertiesSameValues
+        	,	MatchExternalRule
     }; 
 
 
