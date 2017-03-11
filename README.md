@@ -300,7 +300,7 @@ Set a property/property value status in the rules configurator
 
 #The Available Matching Functions
 
-##function MatchProperty(aPropertyName)
+## MatchProperty(aPropertyName)
 Tests if at least a property value of a property is shared between the configuration and the object
 
 ###parameters  
@@ -320,7 +320,7 @@ Returns true if any property value for a given aPropertyName is set in the profi
 * MatchProperty('priority') -> match
 * MatchProperty('technician') -> no match
 
-##function MatchPropertyValue(aPropertyName,aPropertyValue)
+## MatchPropertyValue(aPropertyName,aPropertyValue)
 Tests if a given property value is set for configuration and the object 
 
 ###parameters  
@@ -338,7 +338,7 @@ Returns true if the configuration for the aPropertyName.aPropertyValue == the on
 * MatchPropertyValue('priority','priority1') -> match
 * MatchPropertyValue('technician','technician1') -> no match
 
-##function MatchPropertiesSameValue(aConfigurationPropertyName,anObjectPropertyName,aPropertyValue)
+## MatchPropertiesSameValue(aConfigurationPropertyName,anObjectPropertyName,aPropertyValue)
 Tests if a property value of a property is set for the configurator and the object
 
 ###parameters  
@@ -362,7 +362,7 @@ Returns true if aPropertyValue in aConfigurationPropertyName and in anObjectProp
 *  MatchPropertiesSameValue('activity','priority') -> match
 *  MatchPropertiesSameValue('strawberry','priority') -> no match
 
-##function MatchPropertiesSameValues(aConfigurationPropertyName,anObjectPropertyName)
+## MatchPropertiesSameValues(aConfigurationPropertyName,anObjectPropertyName)
 tests the property values set for the configurator's property and the object's property and if they are the same between the two
 
 ###parameters  
@@ -383,7 +383,7 @@ Returns true if all properties values of aConfigurationPropertyName and of anObj
 *  MatchPropertiesSameValues('activity','priority') -> match
 *  MatchPropertiesSameValues('strawberry','priority','priority1') -> no match
 
-##function MatchProperties(aConfigurationPropertyName,anObjectPropertyName)
+## MatchProperties(aConfigurationPropertyName,anObjectPropertyName)
 Tests if at least a property value exists and is set between the configurator property and the object property
 
 ###parameters  
@@ -401,7 +401,7 @@ returns true if it exists a value of aConfigurationPropertyName that is the same
 *  MatchProperties('activity','priority') -> match
 *  MatchProperties('strawberry','priority') -> no match
 
-##function ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
+## ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
 matching rule function, tests if the property in the configurator has its value set
 
 ###parameters  
@@ -420,7 +420,7 @@ returns true if the configuration for the aPropertyName.aPropertyValue == valueS
 *  MatchProperties('activity','priority') -> match
 *  MatchProperties('strawberry','priority') -> no match
 
-##function ObjectPropertySet(aPropertyName,aPropertyValue,valueSet)
+## ObjectPropertySet(aPropertyName,aPropertyValue,valueSet)
 tests if the property in theObjectPropertySett has its value set
 
 ###parameters  
@@ -435,7 +435,7 @@ Returns true if the configuration for the aPropertyName.aPropertyValue == valueS
 
 ###Example
 
-##function ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
+## ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
 tests if the property in the configurator has its value set
 
 ###parameters  
@@ -450,7 +450,7 @@ Returns true if the configuration for the aPropertyName.aPropertyValue == valueS
 
 ###Example
 
-##function ObjectPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
+## ObjectPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
 Tests if the property in the element has the same value as an other element property
 
 ###parameters  
@@ -465,7 +465,7 @@ Returns true if the configuration for the aPropertyName.aPropertyValue == valueS
 
 ###Example
 
-##function ObjectPropertiesSameValues(aPropertyName1,aPropertyName2)
+## ObjectPropertiesSameValues(aPropertyName1,aPropertyName2)
 Tests if the property in the element has the same values as an other element property
 
 ###parameters  
@@ -479,7 +479,7 @@ Returns boolean
 
 ###Example
 
-##function ConfigurationPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
+## ConfigurationPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
 tests if the property in the configuration has the same value as an other configuration property
 
 ###parameters  
@@ -494,7 +494,7 @@ Returns true if the configuration for the aPropertyName.aPropertyValue == valueS
 
 ###Example
 
-##function ConfigurationPropertiesSameValues(aPropertyName1,aPropertyName2)
+## ConfigurationPropertiesSameValues(aPropertyName1,aPropertyName2)
 Tests if the property in the element has the same values as an other element property
 
 ###parameters  
@@ -508,7 +508,7 @@ Returns boolean
 
 ###Example
 
-##function MatchExternalRule(aRule)
+## MatchExternalRule(aRule)
 Tests the given rule and return true/false according to the test.
 
 ###parameters  
