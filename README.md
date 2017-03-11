@@ -537,17 +537,22 @@ Returns boolean
 
 #Install JamRules
 
-#LIBRARY DEPENDENCIES
+#Library Dependencies
 
 To work properly, you need to include the following javascript library:
-* jQuery (>= 1.10) `<script type="text/javascript" src="extlib/jquery-1.10.2.min.js"></script>`
-* doTimeout by ["Cowboy" Ben Alman](http://benalman.com/projects/jquery-dotimeout-plugin/)
-	* this library brings some very usefull feature on the usual javascript setTimeout function like Debouncing, Delays & Polling Loops, Hover Intent...
-	* `<script type="text/javascript" src="extlib/jquery.dotimeout.js"></script>`
-* attrchange by Selvakumar Arumugam](http://meetselva.github.io/attrchange/) 
-	* a simple jQuery function to bind a listener function to any HTML object on attribute change
-	* `<script type="text/javascript" src="extlib/jquery.attrchange.js"></script>`
-	
+* jQuery (>= 1.10) `<script type="text/javascript" src="extlib/jQuery/jquery-2.2.4.js"></script>`
+* [iFSM by intersel](https://github.com/intersel/iFSM/). 
+  * This library manages finite state machines and needs these libraries:
+    * doTimeout by ["Cowboy" Ben Alman](http://benalman.com/projects/jquery-dotimeout-plugin/)
+	  * this library brings some very usefull feature on the usual javascript setTimeout function like Debouncing, Delays & Polling Loops, Hover Intent...
+	  * `<script type="text/javascript" src="extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>`
+    * attrchange by Selvakumar Arumugam](http://meetselva.github.io/attrchange/) 
+	  * a simple jQuery function to bind a listener function to any HTML object on attribute change
+	  * `<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>`
+* [jquery.MD5](https://github.com/placemarker/jQuery-MD5)
+  * gives the MD5 function used in jamrules 
+  * `<script type="text/javascript" src="extlib/jQuery-MD5/jquery.md5.js"></script>`
+  
 #Official website
 
 #FAQ
