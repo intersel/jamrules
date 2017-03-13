@@ -28,15 +28,23 @@
 	
 	// rules setting
 
-	rulesEngineBlack.createRulesSet("blackColor",["test"]);
-	rulesEngineBlack.addRule("blackColor","matchBlack",'MatchProperty("dotColor")');
+	rulesEngineBlack.createRulesSet("blackDotColor1",["test"]);
+	rulesEngineBlack.addRule("blackDotColor1","matchBlack1",'MatchProperty("dotColor1")');
+	rulesEngineBlack.createRulesSet("blackDotColor2",["test"]);
+	rulesEngineBlack.addRule("blackDotColor2","matchBlack2",'MatchProperty("dotColor2")');
+	rulesEngineBlack.createRulesSet("blackDotColor3",["test"]);
+	rulesEngineBlack.addRule("blackDotColor3","matchBlack3",'MatchProperty("dotColor3")');
+	rulesEngineBlack.createRulesSet("blackDotColor4",["test"]);
+	rulesEngineBlack.addRule("blackDotColor4","matchBlack4",'MatchProperty("dotColor4")');
 
-	rulesEngineWhite.createRulesSet("whiteColor",["test"]);
-	rulesEngineWhite.addRule("whiteColor","testWColor1",'MatchProperty("dotColor")');
+	rulesEngineWhite.createRulesSet("whiteDotColor1",["test"]);
+	rulesEngineWhite.addRule("whiteColor","testWColor1",'!MatchProperty("dotColor1")');
 	
 	rulesEngineWin.createRulesSet("winAllColor",["test"]);
-	rulesEngineBlack.addRule("blackColor","matchBlack",'MatchProperty("dotColor")');
-	rulesEngineBlack.addRule("blackColor","nbDot",'MatchExternalRule("this.nbBlackDot==4")');
+	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor1")');
+	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor2")');
+	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor3")');
+	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor4")');
 
 	// prepare the rule engine
 	rulesEngine.compileRules();

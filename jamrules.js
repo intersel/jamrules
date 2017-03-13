@@ -406,6 +406,8 @@ function jamrules(aJqueryObj,options) {
                     init_function: function(){
                     	this.opts.jamrules.log("-->"+this.currentState+' '+this.receivedEvent);
                     	this.opts.TestRules.nbRulesTested++;
+
+                    	this.opts.reason={};
                     },
     		 		next_state_on_target: 
     		 		{
@@ -427,6 +429,7 @@ function jamrules(aJqueryObj,options) {
     		 		next_state:'ruleMatch',
     				propagate_event:'giveMatchResult',
  			 		propagate_event_on_localmachine:true,
+
     		 	},
     		 	giveMatchResult:
     		 	{
@@ -471,6 +474,21 @@ function jamrules(aJqueryObj,options) {
                     },
                     propagate_event:'updateObjectsDontMatch',
                     next_state:'updateObjects',
+ 			 		out_function: function() {
+                    	this.opts.reason={};
+ 			 			for(aSubMachine in this._stateDefinition.TestRules.delegate_machines) 
+ 			 			{
+ 			 				this.opts.jamrules.log("-->"+aSubMachine);
+ 			 				this.opts.reason[aSubMachine]=this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.currentState;
+ 			 				this.opts.reason[aSubMachine]+=':'+this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.lastState;
+ 			 			}
+ 			 			var thisme=this
+ 			 			$.each(this.opts.reason,function(index,value) {
+ 			 				if (value.indexOf("DefaultState")==-1)
+ 			 					thisme.opts.jamrules.log("Don't Match reason: State "+index+" --> "+value);
+ 			 			});
+ 			 			
+ 			 		},
     		 		
     		 	},
             	
@@ -492,6 +510,19 @@ function jamrules(aJqueryObj,options) {
                     },
 	            	propagate_event:'testRules',
 	                next_state:'waitTestRules',
+ 			 		out_function: function() {
+ 			 			for(aSubMachine in this._stateDefinition.TestRules.delegate_machines) 
+ 			 			{
+ 			 				this.opts.jamrules.log("-->"+aSubMachine);
+ 			 				this.opts.reason[aSubMachine]=this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.currentState;
+//not needed 				this.opts.reason[aSubMachine]+=':'+this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.lastState;
+ 			 			}
+ 			 			var thisme=this
+ 			 			$.each(this.opts.reason,function(index,value) {
+ 			 				if (value.indexOf("DefaultState")==-1)
+ 			 					thisme.opts.jamrules.log("Match reason: State "+index+" --> "+value);
+ 			 			});
+ 			 		},
                 },
 	        	updateObjectsDontMatch:
 	            {
@@ -1171,6 +1202,7 @@ function jamrules(aJqueryObj,options) {
         	,	createRulesSet:createRulesSet
         	,	addRule:addRule
         	,	compileRules:compileRules
+        	,	log:log
         		/** Public variables **/
         	,	propertiesConfiguration:propertiesConfiguration
         		/** Test function for matchin **/ 
