@@ -401,25 +401,6 @@ returns true if it exists a value of aConfigurationPropertyName that is the same
 *  MatchProperties('activity','priority') -> match
 *  MatchProperties('strawberry','priority') -> no match
 
-## ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
-matching rule function, tests if the property in the configurator has its value set
-
-###parameters  
-* aPropertyName: a property name
-* aPropertyValue: a value of aPropertyName
-* valueSet: [0|1(default)]
- 
-###returns
-returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
-
-###Example
-*  object.priority.priority1=1
-*  configuration.priority.priority1=0
-*  configuration.activity.priority1=1
-*  configuration.strawberry.priority2=1
-*  MatchProperties('activity','priority') -> match
-*  MatchProperties('strawberry','priority') -> no match
-
 ## ObjectPropertySet(aPropertyName,aPropertyValue,valueSet)
 tests if the property in theObjectPropertySett has its value set
 
