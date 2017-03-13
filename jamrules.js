@@ -475,19 +475,6 @@ function jamrules(aJqueryObj,options) {
                     propagate_event:'updateObjectsDontMatch',
                     next_state:'updateObjects',
  			 		out_function: function() {
-                    	this.opts.reason={};
- 			 			for(aSubMachine in this._stateDefinition.TestRules.delegate_machines) 
- 			 			{
- 			 				this.opts.jamrules.log("-->"+aSubMachine);
- 			 				this.opts.reason[aSubMachine]=this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.currentState;
- 			 				this.opts.reason[aSubMachine]+=':'+this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.lastState;
- 			 			}
- 			 			var thisme=this
- 			 			$.each(this.opts.reason,function(index,value) {
- 			 				if (value.indexOf("DefaultState")==-1)
- 			 					thisme.opts.jamrules.log("Don't Match reason: State "+index+" --> "+value);
- 			 			});
- 			 			
  			 		},
     		 		
     		 	},
@@ -501,16 +488,6 @@ function jamrules(aJqueryObj,options) {
             	updateObjectsMatch:
                 {
                     init_function: function(){
-	                	if (this.opts.objectProfile.objectsList[0].matched)
-                    	for(anObject in this.opts.objectProfile.objectsList) 
-                    	{
-                    		this.opts.objectProfile.objectsList[anObject].matched();
-                    	}
-
-                    },
-	            	propagate_event:'testRules',
-	                next_state:'waitTestRules',
- 			 		out_function: function() {
  			 			for(aSubMachine in this._stateDefinition.TestRules.delegate_machines) 
  			 			{
  			 				this.opts.jamrules.log("-->"+aSubMachine);
@@ -522,15 +499,39 @@ function jamrules(aJqueryObj,options) {
  			 				if (value.indexOf("DefaultState")==-1)
  			 					thisme.opts.jamrules.log("Match reason: State "+index+" --> "+value);
  			 			});
+
+ 			 			if (this.opts.objectProfile.objectsList[0].matched)
+                    	for(anObject in this.opts.objectProfile.objectsList) 
+                    	{
+                    		this.opts.objectProfile.objectsList[anObject].matched(thisme.opts.reason);
+                    	}
+
+                    },
+	            	propagate_event:'testRules',
+	                next_state:'waitTestRules',
+ 			 		out_function: function() {
  			 		},
                 },
 	        	updateObjectsDontMatch:
 	            {
 	                init_function: function(){
-	                	if (this.opts.objectProfile.objectsList[0].notmatched)
+                    	this.opts.reason={};
+ 			 			for(aSubMachine in this._stateDefinition.TestRules.delegate_machines) 
+ 			 			{
+ 			 				this.opts.jamrules.log("-->"+aSubMachine);
+ 			 				this.opts.reason[aSubMachine]=this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.currentState;
+ 			 				this.opts.reason[aSubMachine]+=':'+this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.lastState;
+ 			 			}
+ 			 			var thisme=this
+ 			 			$.each(this.opts.reason,function(index,value) {
+ 			 				if (value.indexOf("DefaultState")==-1)
+ 			 					thisme.opts.jamrules.log("Don't Match reason: State "+index+" --> "+value);
+ 			 			});
+
+ 			 			if (this.opts.objectProfile.objectsList[0].notmatched)
 	                	for(anObject in this.opts.objectProfile.objectsList) 
 	                	{
-	                		this.opts.objectProfile.objectsList[anObject].notmatched();
+	                		this.opts.objectProfile.objectsList[anObject].notmatched(thisme.opts.reason);
 	                	}
 	
 	                },

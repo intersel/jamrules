@@ -27,10 +27,14 @@
 			msg="<p style='color:green;font-weight:bold;'>This pack has a promo coupon</p>";
 			$("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
 		};
-		var notmatched=function(){
+		var notmatched=function(reason){
 			var msg;
 			msg="<p style='color:red'>This pack is has no coupon</p>";
 			$("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+			$.each(reason,function(index,value) {
+	 				if (value.indexOf("DefaultState")==-1)
+	 					$("#msg").append('reason:'+index+' '+reason[index]);
+	 			});
 		};
 
 		var pack1 = {
