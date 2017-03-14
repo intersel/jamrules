@@ -10,7 +10,7 @@ JamRules is Javascript/jQuery library that allows you to configure a set of para
 ## Create a Jamrules object
 To run, jamrules needs to be bound to a DOM object that has an id defined on it.
 
-You create your jamrules object, then you'll call the function to create rules, add objects to test, run the test, ...
+You have to first create your jamrules object, then you'll be able to call its functions to create rules, add objects to test, run the test, ...
 
 ```javascript
 
