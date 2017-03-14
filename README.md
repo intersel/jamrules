@@ -14,8 +14,8 @@ You create your jamrules object, then you'll call the function to create rules, 
 
 ```javascript
 
-	//initialisation of jamrules and its configurator
-	var rulesEngine = new jamrules($('body'));
+//initialisation of jamrules and its configurator
+var rulesEngine = new jamrules($('body'));
 ```
  
 ## Define a set of objects 
@@ -35,16 +35,16 @@ For the example, we will translate this description defining the "pack" as our j
 Here is an exemple of how a pack should be defined for jamrules:
 ```javascript
 	
-	var pack1={
-			propertiesSet:{
-				object1:{trouser:1}
-			,	object2:{shirt:1}
-			,	object1Color:{blue:1}
-			,	object2Color:{white:1}
-			}			
-	};
-	
-	rulesEngine.addObject(pack1);
+var pack1={
+		propertiesSet:{
+			object1:{trouser:1}
+		,	object2:{shirt:1}
+		,	object1Color:{blue:1}
+		,	object2Color:{white:1}
+		}			
+};
+
+rulesEngine.addObject(pack1);
 	
 ```
 
@@ -63,21 +63,21 @@ We will translate these rules to have a coupon as following:
 In Jamrules, we'll describe these rules this way:
 ```javascript
 
-	// rules setting
-	rulesEngine.createRulesSet("SameColorTrousersPack");
-		// we'd like to test a pack for giving it a promo coupon because it has 2 trousers of same color
-		// so, does our current pack being tested have a trouser for object1 property?
-		rulesEngine.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","trouser")');
-		// yes? ok... do we have a trouser for object2 property too in our pack?
-		rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
-		// yes? ok... is the color of the trouser is of same color?
-		rulesEngine.addRule("SameColorTrousersPack","O1O2SameColor",'ObjectPropertiesSameValue("object1Color","object2Color")');
-		// if gone up here implies that the pack has two trousers of same color...
-		// then jamrules will call the match function for this pack
+// rules setting
+rulesEngine.createRulesSet("SameColorTrousersPack");
+	// we'd like to test a pack for giving it a promo coupon because it has 2 trousers of same color
+	// so, does our current pack being tested have a trouser for object1 property?
+	rulesEngine.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","trouser")');
+	// yes? ok... do we have a trouser for object2 property too in our pack?
+	rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+	// yes? ok... is the color of the trouser is of same color?
+	rulesEngine.addRule("SameColorTrousersPack","O1O2SameColor",'ObjectPropertiesSameValue("object1Color","object2Color")');
+	// if gone up here implies that the pack has two trousers of same color...
+	// then jamrules will call the match function for this pack
 
 
-	// prepare the rule engine
-	rulesEngine.compileRules();
+// prepare the rule engine
+rulesEngine.compileRules();
 ```
 
 ## Test your objects against the rules... 
@@ -99,9 +99,9 @@ To do that, just define a "match" function on your object like in this example:
 
 ```javascript
 	
-	var pack1.matched=function(){
-		alert("it matches");
-	}
+var pack1.matched=function(){
+	alert("it matches");
+}
 ```
 
 You can define a "notmatched" that will be called if the tested object did not match the rules...
@@ -113,12 +113,12 @@ You can define a "notmatched" that will be called if the tested object did not m
 
 ```javascript
 
-		// prepare the rule engine
-		rulesEngine.compileRules();
-		
-		//
-		$("#msg").append("<h2>run the test to get the packs that match the rules... </h2>");
-		rulesEngine.runRulesEngine();
+// prepare the rule engine
+rulesEngine.compileRules();
+
+//
+$("#msg").append("<h2>run the test to get the packs that match the rules... </h2>");
+rulesEngine.runRulesEngine();
 ```
 
 ## Example conclusion
@@ -131,8 +131,8 @@ no demo available :-( will come quickly!
 
 ```javascript
 
-      //initialisation of jamrules and its configurator
-      var rulesEngine = new jamrules($('#filterbox'),{debug:true});
+//initialisation of jamrules and its configurator
+var rulesEngine = new jamrules($('#filterbox'),{debug:true});
 ```
 
 # The JamRules Objects
@@ -161,12 +161,12 @@ The **selectConfigurationPropertyValue** function allows to create and edit such
 ```javascript
 
 
-	rulesEngine.createRulesSet("SameTrousers");
-	// tells to select objects that have their property "color" to "white" when the configurator has its "color/white" property set 
-	rulesEngine.addRule("SameTrousers","O1WhiteTrouser",'MatchPropertyValue("color","white")');
-	...
-	
-	rulesEngine.selectConfigurationPropertyValue("color","white",1);
+rulesEngine.createRulesSet("SameTrousers");
+// tells to select objects that have their property "color" to "white" when the configurator has its "color/white" property set 
+rulesEngine.addRule("SameTrousers","O1WhiteTrouser",'MatchPropertyValue("color","white")');
+...
+
+rulesEngine.selectConfigurationPropertyValue("color","white",1);
 
 ```
 
@@ -212,12 +212,12 @@ JamRules has several matching functions ready to use as:
 
 ## Example 
 ```javascript
-		rulesEngine.createRulesSet("SameTrousers");
-		rulesEngine.addRule("SameTrousers","O1Trouser",'ObjectPropertySet("object1","trouser")');
-		rulesEngine.addRule("SameTrousers","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
-		rulesEngine.createRulesSet("SameShirts",["object1","object2"]);
-		rulesEngine.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","shirt")');
-		rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+rulesEngine.createRulesSet("SameTrousers");
+rulesEngine.addRule("SameTrousers","O1Trouser",'ObjectPropertySet("object1","trouser")');
+rulesEngine.addRule("SameTrousers","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+rulesEngine.createRulesSet("SameShirts",["object1","object2"]);
+rulesEngine.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","shirt")');
+rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
 ```
 # The JamRules API
 
@@ -249,7 +249,7 @@ Creates a rule set.
 
 ### Example
 ```javascript
-		rulesEngine.createRulesSet("SameTrousers");
+rulesEngine.createRulesSet("SameTrousers");
 ```
 
 ## addRule(aRulesGroup, aRuleName, aRuleTest)
@@ -262,7 +262,7 @@ Add a new "and" rule in aRulesGroup.
 
 ### Example
 ```javascript
-		rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
 ```
 
 ## compileRules
@@ -271,8 +271,8 @@ Initialize the rule engine - to do before action and after adding the rules
 ### Example
 
 ```javascript
-		// prepare the rule engine
-		rulesEngine.compileRules();
+// prepare the rule engine
+rulesEngine.compileRules();
 ```
 
 ## runRulesEngine
@@ -280,7 +280,7 @@ Run the rules engine.
 
 ### Example
 ```javascript
-		rulesEngine.runRulesEngine();
+rulesEngine.runRulesEngine();
 ```
 
 ## selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus, doTest)
