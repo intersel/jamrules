@@ -1,12 +1,12 @@
 # JamRules
 Javascript/jQuery configurator to match rules on massive number of objects
 
-#What is JamRules?
+# What is JamRules?
 Let's say you have a set of objects with properties and you'd like to filter them according to a user configuration of these properties and specific rules of choices... then JamRules is for you!
 
 JamRules is Javascript/jQuery library that allows you to configure a set of parameters and a set of rules of matching, then it will test and select your objects accordingly to your configuration and the defined rules.
 
-#Let's get started with an example...
+# Let's get started with an example...
 ## Create a Jamrules object
 To run, jamrules needs to be bound to a DOM object that has an id defined on it.
 
@@ -18,7 +18,7 @@ You create your jamrules object, then you'll call the function to create rules, 
 	var rulesEngine = new jamrules($('body'));
 ```
  
-##Define a set of objects 
+## Define a set of objects 
 
 I sell red and white trousers and yellow and blue shirts through different kind of packs of 2 products:
   * packs of 2 trousers
@@ -48,7 +48,7 @@ Here is an exemple of how a pack should be defined for jamrules:
 	
 ```
 
-##Define the rules to select objects
+## Define the rules to select objects
 
 I want to give a promo coupon for packs that
   * have two trousers 
@@ -184,7 +184,7 @@ There are several matching functions that helps the tests between a configuratio
 
 # The JamRules rules
 
-##Rules set
+## Rules set
 Jamrules tests sets of rules. 
 
 It declares an object "matched" as soon as the first set of rules is compliant with the properties of the object.
@@ -199,7 +199,7 @@ If none of the rules sets are validated, then the object is declared "unmatched"
 
 we use the **createRulesSet** function to create a rules set, and the **addRule** function to add a rule in a rule set.
 
-##Rules
+## Rules
 
 A rule declares a test to try.
 
@@ -210,7 +210,7 @@ JamRules has several matching functions ready to use as:
 * ObjectPropertiesSameValue: tests the value of one property against another property...
 * ... 
 
-##Example 
+## Example 
 ```javascript
 		rulesEngine.createRulesSet("SameTrousers");
 		rulesEngine.addRule("SameTrousers","O1Trouser",'ObjectPropertySet("object1","trouser")');
@@ -221,13 +221,13 @@ JamRules has several matching functions ready to use as:
 ```
 # The JamRules API
 
-##addObject(anObject)
+## addObject(anObject)
 Add an object to the list of objects to test against rules.
 
-###parameters  
+### parameters  
 * anObject: a object to test in jamrule 
 
-###Example
+### Example
 ```javascript
 var anObject = {
 		propertiesSet : {
@@ -241,75 +241,75 @@ var anObject = {
 rulesEngine.addObject(onObject);
 ```
 
-##createRulesSet(aRulesGroup, ruleEvents) 
+## createRulesSet(aRulesGroup, ruleEvents) 
 Creates a rule set.
-###parameters  
+### parameters  
 * aRulesGroup: name of the rules set to create
 * ruleEvents: [array] events to hear to test the rules group. Actually, should be names of properties that are used as events (see selectConfigurationPropertyValue). 
 
-###Example
+### Example
 ```javascript
 		rulesEngine.createRulesSet("SameTrousers");
 ```
 
-##addRule(aRulesGroup, aRuleName, aRuleTest)
+## addRule(aRulesGroup, aRuleName, aRuleTest)
 Add a new "and" rule in aRulesGroup.
 
-###parameters  
+### parameters  
 * aRulesGroup: a rule set name
 * aRuleName: a rule to define in the rules set
 * aRuleTest: a boolean test to evaluate
 
-###Example
+### Example
 ```javascript
 		rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
 ```
 
-##compileRules
+## compileRules
 Initialize the rule engine - to do before action and after adding the rules
 
-###Example
+### Example
 
 ```javascript
 		// prepare the rule engine
 		rulesEngine.compileRules();
 ```
 
-##runRulesEngine
+## runRulesEngine
 Run the rules engine.
 
-###Example
+### Example
 ```javascript
 		rulesEngine.runRulesEngine();
 ```
 
-##selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus, doTest)
+## selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus, doTest)
 Set a property/property value status in the rules configurator
 
-###parameters  
+### parameters  
 * aPropertyName: name of the property that has changed
 * aProperyValue: value of the property
 * aStatus: <boolean> status of the property for this property value set or not
 * doTest: <boolean> <default:true> if false, configure the configurator but does not run the rules engine test
 
-###Example
+### Example
 ```javascript
 	rulesEngine.selectConfigurationPropertyValue("object1","trouser",1);
 ```
 
 
-#The Available Matching Functions
+# The Available Matching Functions
 
 ## MatchProperty(aPropertyName)
 Tests if at least a property value of a property is shared between the configuration and the object
 
-###parameters  
+### parameters  
 * aPropertyName: a property name
 
-###returns
+### returns
 Returns true if any property value for a given aPropertyName is set in the profile object and in the configuration property set
 
-###Example
+### Example
 
 * object.priority.priority1=1
 * object.technician.technician1=1
@@ -323,14 +323,14 @@ Returns true if any property value for a given aPropertyName is set in the profi
 ## MatchPropertyValue(aPropertyName,aPropertyValue)
 Tests if a given property value is set for configuration and the object 
 
-###parameters  
+### parameters  
 * aPropertyName: a property name
 * aPropertyValue: a value of aPropertyName 
 
-###returns
+### returns
 Returns true if the configuration for the aPropertyName.aPropertyValue == the one defined for the current objectProfile being tested
 
-###Example
+### Example
 * object.priority.priority1=1
 * object.technician.technician1=1
 * configuration.priority.priority1=1
@@ -341,17 +341,17 @@ Returns true if the configuration for the aPropertyName.aPropertyValue == the on
 ## MatchPropertiesSameValue(aConfigurationPropertyName,anObjectPropertyName,aPropertyValue)
 Tests if a property value of a property is set for the configurator and the object
 
-###parameters  
+### parameters  
 
 * aConfigurationPropertyName: a configuration property name
 * anObjectPropertyName: a object property Name
 * aPropertyValue: [option] a value that should match. if undefined, test if at least one of the property values of property is set in Object and in configuration
 
-###returns
+### returns
 
 Returns true if aPropertyValue in aConfigurationPropertyName and in anObjectPropertyName are both set.
 
-###Example
+### Example
 
 *  object.priority.priority1=1
 *  configuration.priority.priority1=0
@@ -365,16 +365,16 @@ Returns true if aPropertyValue in aConfigurationPropertyName and in anObjectProp
 ## MatchPropertiesSameValues(aConfigurationPropertyName,anObjectPropertyName)
 tests the property values set for the configurator's property and the object's property and if they are the same between the two
 
-###parameters  
+### parameters  
 
 * aConfigurationPropertyName: a configuration property name
 * anObjectPropertyName: a object property Name
 
-###returns
+### returns
 
 Returns true if all properties values of aConfigurationPropertyName and of anObjectPropertyName are both set
 
-###Example
+### Example
 
 *  object.priority.priority1=1
 *  configuration.priority.priority1=0
@@ -386,14 +386,14 @@ Returns true if all properties values of aConfigurationPropertyName and of anObj
 ## MatchProperties(aConfigurationPropertyName,anObjectPropertyName)
 Tests if at least a property value exists and is set between the configurator property and the object property
 
-###parameters  
+### parameters  
 * aConfigurationPropertyName: a configuration property name
 * anObjectPropertyName: a object property Name
 
-###returns
+### returns
 returns true if it exists a value of aConfigurationPropertyName that is the same that in anObjectPropertyName
 
-###Example
+### Example
 *  object.priority.priority1=1
 *  configuration.priority.priority1=0
 *  configuration.activity.priority1=1
@@ -404,95 +404,95 @@ returns true if it exists a value of aConfigurationPropertyName that is the same
 ## ObjectPropertySet(aPropertyName,aPropertyValue,valueSet)
 tests if the property in theObjectPropertySett has its value set
 
-###parameters  
+### parameters  
 
 * aPropertyName: an element property name
 * aPropertyValue: a value of aPropertyName 
 * valueSet: [0|1(default)]
 
-###returns
+### returns
 
 Returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
 
-###Example
+### Example
 
 ## ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
 tests if the property in the configurator has its value set
 
-###parameters  
+### parameters  
 
 * aPropertyName: an element property name
 * aPropertyValue: a value of aPropertyName 
 * valueSet: [0|1(default)]
 
-###returns
+### returns
 
 Returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
 
-###Example
+### Example
 
 ## ObjectPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
 Tests if the property in the element has the same value as an other element property
 
-###parameters  
+### parameters  
 
 * aPropertyName1: an element property name
 * aPropertyName2: an other element property name
 * aPropertyValue: a value of aPropertyName 
 
-###returns
+### returns
 
 Returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
 
-###Example
+### Example
 
 ## ObjectPropertiesSameValues(aPropertyName1,aPropertyName2)
 Tests if the property in the element has the same values as an other element property
 
-###parameters  
+### parameters  
 
 * aPropertyName1: an element property name
 * aPropertyName2: an other element property name
 
-###returns
+### returns
 
 Returns boolean
 
-###Example
+### Example
 
 ## ConfigurationPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
 tests if the property in the configuration has the same value as an other configuration property
 
-###parameters  
+### parameters  
 
 * aPropertyName1: an element property name
 * aPropertyName2: an other element property name
 * aPropertyValue: a value of aPropertyName 
 
-###returns
+### returns
 
 Returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
 
-###Example
+### Example
 
 ## ConfigurationPropertiesSameValues(aPropertyName1,aPropertyName2)
 Tests if the property in the element has the same values as an other element property
 
-###parameters  
+### parameters  
 
 * aPropertyName1: an element property name
 * aPropertyName2: an other element property name
 
-###returns
+### returns
 
 Returns boolean
 
-###Example
+### Example
 
 ## MatchExternalRule(aRule)
 Tests the given rule and return true/false according to the test.
 
-###parameters  
+### parameters  
 
 aRule: a statement to evaluate during the rule test
 
@@ -503,11 +503,11 @@ you can use these variables to access to the properties of the configurator or o
 you can use the other matching functions prefixing them with "this.<matchingFunction>"
 ex: this.MatchPropertiesSameValue('strawberry','priority','priority1')
 
-###returns
+### returns
 
 Returns boolean
 
-###Example
+### Example
 
 * object.priority.priority1=1
 * object.technician.technician1=1
