@@ -516,9 +516,9 @@ Returns boolean
 * MatchExternalRule('propertiesObjectProfile\[priority\]==propertiesConfiguration\[priority\]') -> match
 * MatchExternalRule('propertiesObjectProfile\[technician\]\[technician1\]==propertiesConfiguration\[technician\]\[technician1\]') -> not match
 
-#Install JamRules
+# Install JamRules
 
-#Library Dependencies
+# Library Dependencies
 
 To work properly, you need to include the following javascript library:
 * jQuery (>= 1.10) `<script type="text/javascript" src="extlib/jQuery/jquery-2.2.4.js"></script>`
@@ -534,10 +534,10 @@ To work properly, you need to include the following javascript library:
   * gives the MD5 function used in jamrules 
   * `<script type="text/javascript" src="extlib/jQuery-MD5/jquery.md5.js"></script>`
   
-#Official website
+# Official website
 
-#FAQ
+# FAQ
 
-#Contact
+# Contact
 If you have any ideas, feedback, requests or bug reports, you can reach me at github@intersel.org, 
 or via my website: http://www.intersel.fr
