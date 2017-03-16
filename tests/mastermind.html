@@ -38,8 +38,34 @@
 	rulesEngineBlack.addRule("blackDotColor4","matchBlack4",'MatchProperty("dotColor4")');
 
 	rulesEngineWhite.createRulesSet("whiteDotColor1",["test"]);
-	rulesEngineWhite.addRule("whiteColor","testWColor1",'!MatchProperty("dotColor1")');
+	rulesEngineWhite.addRule("whiteDotColor1","testWColor1",'!MatchProperty("dotColor1")');
+	rulesEngineWhite.addRule("whiteDotColor1"
+			,"testifWColor1"
+			,'MatchExternalRule(\'this.MatchProperties("dotColor2","dotColor1")||MatchExternalRule(\'this.MatchProperties("dotColor3","dotColor1")||MatchExternalRule(\'this.MatchProperties("dotColor4","dotColor1")\')'
+	);
 	
+	rulesEngineWhite.createRulesSet("whiteDotColor2",["test"]);
+	rulesEngineWhite.addRule("whiteDotColor2","testWColor2",'!MatchProperty("dotColor2")');
+	rulesEngineWhite.addRule("whiteDotColor2"
+			,"testifWColor2"
+			,'MatchExternalRule(\'this.MatchProperties("dotColor1","dotColor2")||MatchExternalRule(\'this.MatchProperties("dotColor3","dotColor2")||MatchExternalRule(\'this.MatchProperties("dotColor4","dotColor2")\')'
+	);
+
+	rulesEngineWhite.createRulesSet("whiteDotColor3",["test"]);
+	rulesEngineWhite.addRule("whiteDotColor2","testWColor2",'!MatchProperty("dotColor2")');
+	rulesEngineWhite.addRule("whiteDotColor2"
+			,"testifWColor2"
+			,'MatchExternalRule(\'this.MatchProperties("dotColor1","dotColor3")||MatchExternalRule(\'this.MatchProperties("dotColor2","dotColor3")||MatchExternalRule(\'this.MatchProperties("dotColor4","dotColor3")\')'
+	);
+	rulesEngineWhite.createRulesSet("whiteDotColor4",["test"]);
+	rulesEngineWhite.addRule("whiteDotColor2","testWColor2",'!MatchProperty("dotColor2")');
+	rulesEngineWhite.addRule("whiteDotColor2"
+			,"testifWColor2"
+			,'MatchExternalRule(\'this.MatchProperties("dotColor1","dotColor4")||MatchExternalRule(\'this.MatchProperties("dotColor2","dotColor4")||MatchExternalRule(\'this.MatchProperties("dotColor3","dotColor4")\')'
+	);
+
+			
+			
 	rulesEngineWin.createRulesSet("winAllColor",["test"]);
 	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor1")');
 	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor2")');
@@ -50,17 +76,27 @@
 	rulesEngine.compileRules();
 	
 	var msg;
+	var nbMatch=0;
+	
 	//add objects that we want to test if they match the rules
 	var matched=function(){
-	            $("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
-	}
-	var matchedbis=function(){
-        msg="<p style='color:green;font-weight:bold;'>This pack is a BIS and is selected and has a promo coupon</p>";
-        $("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
-	}
-	var matchedter=function(){
-        msg="<p style='color:green;font-weight:bold;'>This pack is a TER and is selected and has a promo coupon</p>";
-        $("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+		switch(currentRules)
+		{
+		case 'winAllColor':
+		    $("#msg").append("<h3>C'est gagné!!</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+			break;
+		case 'whiteDotColor1':
+		case 'whiteDotColor2':
+		case 'whiteDotColor3':
+		case 'whiteDotColor4':
+		    $("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+			break;
+		case 'blackDotColor1':
+		case 'blackDotColor2':
+		case 'blackDotColor3':
+		case 'blackDotColor4':
+			break;
+		}
 	}
 	var notmatched=function(){
 	            msg="<p style='color:red'>This pack is not selected or has no coupon</p>";
