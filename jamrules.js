@@ -612,7 +612,8 @@ function jamrules(aJqueryObj,options) {
     		 	testRuleDone:
     		 	{
     		 		//dummy to catch it
-    		 	}
+    		 	},
+
             }
     };
     
@@ -1024,6 +1025,11 @@ function jamrules(aJqueryObj,options) {
 	 */
     function runRulesEngine() {
     	log("runRulesEngine");
+    	if (!myRulesEngine)
+    	{
+    		if (options.debug) alert("Rules engine is not started. Call first compile rules (cf compileRules())");
+    		return;
+    	}
 		myRulesEngine.trigger('runEngine');
 
     }
@@ -1055,6 +1061,12 @@ function jamrules(aJqueryObj,options) {
     	
     	propertiesConfiguration[aPropertyName][aPropertyValue]=aStatus;
 		if (myRulesEngine && doTest && statusChanged) myRulesEngine.trigger('propertyChange',{propertyName:aPropertyName,propertyValue:aPropertyValue,status:aStatus});
+		else if (!myRulesEngine)
+    	{
+    		if (options.debug) alert("Rules engine is not started. Call first compile rules (cf compileRules())");
+    		return;
+    	}
+
 
     }
     
