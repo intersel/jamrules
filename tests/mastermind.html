@@ -22,9 +22,9 @@
 	//initialisation of jamrules and its configurator
 	var rulesEngineBlack = new jamrules($('#filterbox'),{debug:true});
 	var rulesEngineWhite = new jamrules($('#filterbox'),{debug:true});
-	var rulesEngineWin = new jamrules($('#filterbox'),{debug:true});
+	var rulesEngineWin = new jamrules($('#filterbox'),{debug:true,LogLevel:3});
 	
-	vat nbFoundDotColor=0;
+	var nbFoundDotColor=0;
 	
 	// rules setting
 
@@ -36,6 +36,7 @@
 	rulesEngineBlack.addRule("blackDotColor3","matchBlack3",'MatchProperty("dotColor3")');
 	rulesEngineBlack.createRulesSet("blackDotColor4",["test"]);
 	rulesEngineBlack.addRule("blackDotColor4","matchBlack4",'MatchProperty("dotColor4")');
+
 
 	rulesEngineWhite.createRulesSet("whiteDotColor1",["test"]);
 	rulesEngineWhite.addRule("whiteDotColor1","testWColor1",'!MatchProperty("dotColor1")');
@@ -66,20 +67,21 @@
 
 			
 			
-	rulesEngineWin.createRulesSet("winAllColor",["test"]);
-	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor1")');
-	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor2")');
-	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor3")');
-	rulesEngineBlack.addRule("winAllColor","matchBlack",'MatchProperty("dotColor4")');
+	rulesEngineWin.createRulesSet("winAllColor",["dotColor1","dotColor2","dotColor3","dotColor4"]);
+	rulesEngineWin.addRule("winAllColor","matchBlack1",'MatchProperty("dotColor1")');
+	rulesEngineWin.addRule("winAllColor","matchBlack2",'MatchProperty("dotColor2")');
+	rulesEngineWin.addRule("winAllColor","matchBlack3",'MatchProperty("dotColor3")');
+	rulesEngineWin.addRule("winAllColor","matchBlack4",'MatchProperty("dotColor4")');
 
 	// prepare the rule engine
-	rulesEngine.compileRules();
+	rulesEngineWin.compileRules();
 	
 	var msg;
 	var nbMatch=0;
 	
 	//add objects that we want to test if they match the rules
 	var matched=function(){
+        msg="<p style='color:green'>This selection is not bad...</p>";
 		switch(currentRules)
 		{
 		case 'winAllColor':
@@ -99,63 +101,43 @@
 		}
 	}
 	var notmatched=function(){
-	            msg="<p style='color:red'>This pack is not selected or has no coupon</p>";
+	            msg="<p style='color:red'>This selection is not good...</p>";
 	            $("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
 	}
-	var pack1={
+	var test1={
 			propertiesSet:{
-				object1:{trouser:1}
-			,	object2:{trouser:1}
-			,	object1Color:{white:1}
-			,	object2Color:{white:1}
+				dotColor1:{red:1}
+			,	dotColor2:{yellow:1}
+			,	dotColor3:{white:1}
+			,	dotColor4:{red:1}
 			}			
 		,	matched:matched
 		,	notmatched:notmatched
 	};
-	var pack2={propertiesSet:{
-				object1:{trouser:1}
-			,	object2:{shirt:1}
-			,	object1Color:{white:1}
-			,	object2Color:{blue:1}
-			}
-		,	matched:matched
-		,	notmatched:notmatched
-	};
-	var pack3={propertiesSet:{
-				object1:{shirt:1}
-			,	object2:{shirt:1}
-			,	object1Color:{yellow:1}
-			,	object2Color:{blue:1}
-			}
-		,	matched:matched
-		,	notmatched:notmatched
-	};
-	var pack4={propertiesSet:{
-				object1:{shirt:1}
-			,	object2:{trouser:1}
-			,	object1Color:{white:1}
-			,	object2Color:{white:1}
-			}
-		,	matched:matched
-		,	notmatched:notmatched
-	};
-	rulesEngine.addObject(pack1);
-	rulesEngine.addObject(pack2);
-	rulesEngine.addObject(pack3);
-	rulesEngine.addObject(pack4);
-	
-	//
-	$("#msg").append("<h2>prepare configuration to get the pack with object1 being a trouser</h2>");
-	rulesEngine.selectConfigurationPropertyValue("object1","trouser",1);
-    $("#msg").append("<h3>configuration of the configurator:</h3><pre>"+JSON.stringify(rulesEngine.propertiesConfiguration)+"</pre>");
 
-	//reinit the configurator
-	rulesEngine.selectConfigurationPropertyValue("object1","trouser",0,false);
+	var test2={
+			propertiesSet:{
+				dotColor1:{red:1}
+			,	dotColor2:{blue:1}
+			,	dotColor3:{red:1}
+			,	dotColor4:{yellow:1}
+			}			
+		,	matched:matched
+		,	notmatched:notmatched
+	};
+
+	rulesEngineWin.addObject(test1);
+	rulesEngineWin.addObject(test2);
 	
 	//
-	$("#msg").append("<h2>prepare configuration to get pack with object2 being a trouser</h2>");
-	rulesEngine.selectConfigurationPropertyValue("object2","trouser",1);
-    $("#msg").append("<h3>configuration of the configurator:</h3><pre>"+JSON.stringify(rulesEngine.propertiesConfiguration)+"</pre>");
+	$("#msg").append("<h2>prepare configuration of Mastermind </h2>");
+	currentRules = 'winAllColor';
+	rulesEngineWin.selectConfigurationPropertyValue("dotColor1","red",1,false);
+	rulesEngineWin.selectConfigurationPropertyValue("dotColor2","blue",1,false);
+	rulesEngineWin.selectConfigurationPropertyValue("dotColor3","red",1,false);
+	rulesEngineWin.selectConfigurationPropertyValue("dotColor4","yellow",1,true);
+    $("#msg").append("<h3>configuration of the configurator:</h3><pre>"+JSON.stringify(rulesEngineWin.propertiesConfiguration)+"</pre>");
+
 
 </script>
 	
