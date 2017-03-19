@@ -95,16 +95,20 @@ JamRules will select the packs that match the configuration if it respects the r
 
 ### Give the function to call if objects match
 
-To do that, just define a "match" function on your object like in this example:
+To do that, just define a "matched" function on your object like in this example:
 
 ```javascript
 	
-var pack1.matched=function(){
+var pack1.matched=function(aRuleEngine){
 	alert("it matches");
 }
 ```
 
 You can define a "notmatched" that will be called if the tested object did not match the rules...
+
+aRuleEngine variable gives you access to the rule engine that has called the matched/unmatched function.
+
+You may find why the object does not match by accessing aRuleEngine.opts.reason.
 
 ### Run the test 
 

@@ -503,7 +503,7 @@ function jamrules(aJqueryObj,options) {
  			 			if (this.opts.objectProfile.objectsList[0].matched)
                     	for(anObject in this.opts.objectProfile.objectsList) 
                     	{
-                    		this.opts.objectProfile.objectsList[anObject].matched(thisme.opts.reason);
+                    		this.opts.objectProfile.objectsList[anObject].matched(thisme.opts.jamrules);
                     	}
 
                     },
@@ -531,7 +531,7 @@ function jamrules(aJqueryObj,options) {
  			 			if (this.opts.objectProfile.objectsList[0].notmatched)
 	                	for(anObject in this.opts.objectProfile.objectsList) 
 	                	{
-	                		this.opts.objectProfile.objectsList[anObject].notmatched(thisme.opts.reason);
+	                		this.opts.objectProfile.objectsList[anObject].notmatched(thisme.opts.jamrules);
 	                	}
 	
 	                },
@@ -1070,7 +1070,7 @@ function jamrules(aJqueryObj,options) {
 	 * 
 	 */
     function createRulesSet(aRulesGroup, ruleEvents) {
-    	log("createRulesSet(aRulesGroup, ruleEvents): "+aRulesGroup,+" - "+ruleEvents);
+    	log("createRulesSet(aRulesGroup, ruleEvents): "+aRulesGroup+" - "+ruleEvents);
     	var testRules = myRulesEngineStates.TestRules;
     	var waitTestRules = myRulesEngineStates.waitTestRules;
     	if (!testRules.delegate_machines[aRulesGroup])
@@ -1086,6 +1086,10 @@ function jamrules(aJqueryObj,options) {
         			target_list: ['ruleMatch']
         	};
     	}
+    	else
+    	{
+    		log("createRulesSet: "+aRulesGroup+" still declared! nothing done");
+    	}
     }    
  
 	/**
@@ -1094,19 +1098,28 @@ function jamrules(aJqueryObj,options) {
 	 * @param aRulesGroup: a rule set name
 	 * @param aRuleName: a rule to define in the rules set
 	 * @param aRuleTest: a boolean test to evaluate
+	 * @param overloadRule: boolean (default: false), if aRuleName exists, will overload it
 	 * 
 	 * 
 	 */
-    function addRule(aRulesGroup, aRuleName, aRuleTest) {
+    function addRule(aRulesGroup, aRuleName, aRuleTest, overloadRule) {
     	log("addRule(aRulesGroup, aRuleName, aRuleTest): "+aRulesGroup+" - "+aRuleName+"-"+aRuleTest);
     	var testRules = myRulesEngineStates.TestRules;
+    	
+    	if (!overloadRule) overloadRule=false;
+    	
     	if (!testRules.delegate_machines[aRulesGroup])
     	{	
-    		alert(aRulesGroup+" needs to be previously created with createRulesSet function");
+    		if (options.debug) alert(aRulesGroup+" needs to be previously created with createRulesSet function");
     		return;
     	}
     	
     	//create the new state called "aRuleName" for the rule
+    	if (!overloadRule && testRules.delegate_machines[aRulesGroup]['submachine'][aRuleName])
+    	{	
+    		if (options.debug) alert(aRuleName+" still exists and can not be overloaded");
+    		return;
+    	}
 	 	testRules.delegate_machines[aRulesGroup]['submachine'][aRuleName]=$.extend(true, {}, stateRuleTemplate);
 	 	// activate the test
 	 	if (aRuleTest.charAt(0) == '!') aRuleTest = '!'+'this.opts.jamrules.'+aRuleTest.slice(1);
@@ -1192,6 +1205,7 @@ function jamrules(aJqueryObj,options) {
 	 * 
 	 */
     function log(msg) {
+    	if (!options.debug) return;
         console.debug(msg);
     }
  
@@ -1206,6 +1220,7 @@ function jamrules(aJqueryObj,options) {
         	,	log:log
         		/** Public variables **/
         	,	propertiesConfiguration:propertiesConfiguration
+        	,	options:options
         		/** Test function for matchin **/ 
         	,	MatchProperty:MatchProperty
         	,	MatchPropertyValue:MatchPropertyValue
@@ -1218,7 +1233,7 @@ function jamrules(aJqueryObj,options) {
         	,	ObjectPropertiesSameValues:ObjectPropertiesSameValues
         	,	ConfigurationPropertiesSameValue:ConfigurationPropertiesSameValue
         	,	ConfigurationPropertiesSameValues:ConfigurationPropertiesSameValues
-        	,	MatchExternalRule
+        	,	MatchExternalRule:MatchExternalRule
     }; 
 
 
