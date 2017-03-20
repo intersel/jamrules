@@ -24,7 +24,10 @@
 	var rulesEngineBlack2 = new jamrules($('#filterbox'),{debug:true,name:"rulesEngineBlack2"});
 	var rulesEngineBlack3 = new jamrules($('#filterbox'),{debug:true,name:"rulesEngineBlack3"});
 	var rulesEngineBlack4 = new jamrules($('#filterbox'),{debug:true,name:"rulesEngineBlack4"});
-	var rulesEngineWhite = new jamrules($('#filterbox'),{debug:true,name:"rulesEngineWhite"});
+	var rulesEngineWhite1 = new jamrules($('#filterbox'),{debug:true,name:"rulesEngineWhite1"});
+	var rulesEngineWhite2 = new jamrules($('#filterbox'),{debug:true,name:"rulesEngineWhite2"});
+	var rulesEngineWhite3 = new jamrules($('#filterbox'),{debug:true,name:"rulesEngineWhite3"});
+	var rulesEngineWhite4 = new jamrules($('#filterbox'),{debug:true,name:"rulesEngineWhite4"});
 	var rulesEngineWin = new jamrules($('#filterbox'),{debug:true,LogLevel:3,name:"rulesEngineWin"});
 	
 	var nbFoundDotColor=0;
@@ -46,35 +49,38 @@
 	rulesEngineBlack4.compileRules();
 
 
-	rulesEngineWhite.createRulesSet("whiteDotColor1",["dotColor1"]);
-	rulesEngineWhite.addRule("whiteDotColor1","testWColor1",'!MatchProperty("dotColor1")');
-	rulesEngineWhite.addRule("whiteDotColor1"
+	rulesEngineWhite1.createRulesSet("whiteDotColor1",["dotColor1","dotColor2","dotColor3","dotColor4"]);
+	rulesEngineWhite1.addRule("whiteDotColor1","testWColor1",'!MatchProperty("dotColor1")');
+	rulesEngineWhite1.addRule("whiteDotColor1"
 			,"testifWColor1"
 			,'MatchExternalRule(\'this.MatchProperties("dotColor2","dotColor1")||this.MatchProperties("dotColor3","dotColor1")||this.MatchProperties("dotColor4","dotColor1")\')'
 	);
-	rulesEngineWhite.createRulesSet("whiteDotColor2",["dotColor2"]);
-	rulesEngineWhite.addRule("whiteDotColor2","testWColor2",'!MatchProperty("dotColor2")');
-	rulesEngineWhite.addRule("whiteDotColor2"
+	rulesEngineWhite2.createRulesSet("whiteDotColor2",["dotColor1","dotColor2","dotColor3","dotColor4"]);
+	rulesEngineWhite2.addRule("whiteDotColor2","testWColor2",'!MatchProperty("dotColor2")');
+	rulesEngineWhite2.addRule("whiteDotColor2"
 			,"testifWColor2"
 			,'MatchExternalRule(\'this.MatchProperties("dotColor1","dotColor2")||this.MatchProperties("dotColor3","dotColor2")||this.MatchProperties("dotColor4","dotColor2")\')'
 	);
 
-	rulesEngineWhite.createRulesSet("whiteDotColor3",["dotColor3"]);
-	rulesEngineWhite.addRule("whiteDotColor3","testWColor3",'!MatchProperty("dotColor3")');
-	rulesEngineWhite.addRule("whiteDotColor3"
-			,"testifWColor2"
+	rulesEngineWhite3.createRulesSet("whiteDotColor3",["dotColor1","dotColor2","dotColor3","dotColor4"]);
+	rulesEngineWhite3.addRule("whiteDotColor3","testWColor3",'!MatchProperty("dotColor3")');
+	rulesEngineWhite3.addRule("whiteDotColor3"
+			,"testifWColor3"
 			,'MatchExternalRule(\'this.MatchProperties("dotColor1","dotColor3")||this.MatchProperties("dotColor2","dotColor3")||this.MatchProperties("dotColor4","dotColor3")\')'
 	);
-	rulesEngineWhite.createRulesSet("whiteDotColor4",["dotColor4"]);
-	rulesEngineWhite.addRule("whiteDotColor4","testWColor4",'!MatchProperty("dotColor4")');
-	rulesEngineWhite.addRule("whiteDotColor4"
+	rulesEngineWhite4.createRulesSet("whiteDotColor4",["dotColor1","dotColor2","dotColor3","dotColor4"]);
+	rulesEngineWhite4.addRule("whiteDotColor4","testWColor4",'!MatchProperty("dotColor4")');
+	rulesEngineWhite4.addRule("whiteDotColor4"
 			,"testifWColor4"
 			,'MatchExternalRule(\'this.MatchProperties("dotColor1","dotColor4")||this.MatchProperties("dotColor2","dotColor4")||this.MatchProperties("dotColor3","dotColor4")\')'
 	);
 	/*
 			*/
 	// prepare the rule engine
-	rulesEngineWhite.compileRules();
+	rulesEngineWhite1.compileRules();
+	rulesEngineWhite2.compileRules();
+	rulesEngineWhite3.compileRules();
+	rulesEngineWhite4.compileRules();
 
 			
 	rulesEngineWin.createRulesSet("winAllColor",["dotColor1","dotColor2","dotColor3","dotColor4"]);
@@ -99,16 +105,27 @@
 		case 'rulesEngineWin':
 		    $("#msg").append("<h3>You win!!</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
 			break;
-		case 'rulesEngineWhite':
+		case 'rulesEngineWhite1':
+		case 'rulesEngineWhite2':
+		case 'rulesEngineWhite3':
+		case 'rulesEngineWhite4':
 			this.nbWhiteDotFound++;
-			$("#msg").append("<p>not matched</p>");
+			$("#msg").append("<p>matched</p>");
+			$.each(aEngineRule.ruleEngine.opts.reason,function(index,value) {
+ 				if (value.indexOf("DefaultState")==-1)
+ 					$("#msg").append("Match reason: State "+index+" --> "+value);
+ 			});
 			break;
 		case 'rulesEngineBlack1':
 		case 'rulesEngineBlack2':
 		case 'rulesEngineBlack3':
 		case 'rulesEngineBlack4':
 			this.nbBlackDotFound++;
-			$("#msg").append("<p>not matched</p>");
+			$("#msg").append("<p>matched</p>");
+			$.each(aEngineRule.ruleEngine.opts.reason,function(index,value) {
+ 				if (value.indexOf("DefaultState")==-1)
+ 					$("#msg").append("Match reason: State "+index+" --> "+value);
+ 			});
 			break;
 		}
 	}
@@ -124,6 +141,10 @@
 			break;
 		default:
 			$("#msg").append("<p>not matched</p>");
+			$.each(aEngineRule.ruleEngine.opts.reason,function(index,value) {
+	 				if (value.indexOf("DefaultState")==-1)
+	 					$("#msg").append("Don't Match reason: State "+index+" --> "+value);
+	 			});
 		}
 	}
 	var test1={
@@ -164,7 +185,10 @@
 	
 //	rulesEngineWhite.addObject(test1);
 //	rulesEngineWhite.addObject(test2);
-	rulesEngineWhite.addObject(test3);
+	rulesEngineWhite1.addObject(test3);
+	rulesEngineWhite2.addObject(test3);
+	rulesEngineWhite3.addObject(test3);
+	rulesEngineWhite4.addObject(test3);
 
 //	rulesEngineBlack1.addObject(test1);
 //	rulesEngineBlack1.addObject(test2);
@@ -187,10 +211,25 @@
 	rulesEngineBlack3.selectConfigurationPropertyValue("dotColor3","red",1);
 	rulesEngineBlack4.selectConfigurationPropertyValue("dotColor4","yellow",1);
 
-	rulesEngineWhite.selectConfigurationPropertyValue("dotColor1","red",1,false);
-	rulesEngineWhite.selectConfigurationPropertyValue("dotColor2","blue",1,false);
-	rulesEngineWhite.selectConfigurationPropertyValue("dotColor3","red",1,false);
-	rulesEngineWhite.selectConfigurationPropertyValue("dotColor4","yellow",1);
+	rulesEngineWhite1.selectConfigurationPropertyValue("dotColor1","red",1,false);
+	rulesEngineWhite1.selectConfigurationPropertyValue("dotColor2","blue",1,false);
+	rulesEngineWhite1.selectConfigurationPropertyValue("dotColor3","red",1,false);
+	rulesEngineWhite1.selectConfigurationPropertyValue("dotColor4","yellow",1);
+
+	rulesEngineWhite2.selectConfigurationPropertyValue("dotColor1","red",1,false);
+	rulesEngineWhite2.selectConfigurationPropertyValue("dotColor2","blue",1,false);
+	rulesEngineWhite2.selectConfigurationPropertyValue("dotColor3","red",1,false);
+	rulesEngineWhite2.selectConfigurationPropertyValue("dotColor4","yellow",1);
+
+	rulesEngineWhite3.selectConfigurationPropertyValue("dotColor1","red",1,false);
+	rulesEngineWhite3.selectConfigurationPropertyValue("dotColor2","blue",1,false);
+	rulesEngineWhite3.selectConfigurationPropertyValue("dotColor3","red",1,false);
+	rulesEngineWhite3.selectConfigurationPropertyValue("dotColor4","yellow",1);
+	
+	rulesEngineWhite4.selectConfigurationPropertyValue("dotColor1","red",1,false);
+	rulesEngineWhite4.selectConfigurationPropertyValue("dotColor2","blue",1,false);
+	rulesEngineWhite4.selectConfigurationPropertyValue("dotColor3","red",1,false);
+	rulesEngineWhite4.selectConfigurationPropertyValue("dotColor4","yellow",1);
 
 	rulesEngineWin.selectConfigurationPropertyValue("dotColor1","red",1,false);
 	rulesEngineWin.selectConfigurationPropertyValue("dotColor2","blue",1,false);

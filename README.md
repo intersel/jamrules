@@ -108,7 +108,7 @@ You can define a "notmatched" that will be called if the tested object did not m
 
 aRuleEngine variable gives you access to the rule engine that has called the matched/unmatched function.
 
-You may find why the object does not match by accessing aRuleEngine.opts.reason.
+You may find why the object does not match by accessing aRuleEngine.ruleEngine.opts.reason.
 
 ### Run the test 
 
