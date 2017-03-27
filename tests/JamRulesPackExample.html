@@ -27,8 +27,9 @@
 			msg="<p style='color:green;font-weight:bold;'>This pack has a promo coupon</p>";
 			$("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
 		};
-		var notmatched=function(reason){
+		var notmatched=function(aJamRules){
 			var msg;
+			var reason = aJamRules.ruleEngine.opts.reason;
 			msg="<p style='color:red'>This pack is has no coupon</p>";
 			$("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
 			$.each(reason,function(index,value) {
