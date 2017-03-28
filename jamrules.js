@@ -26,32 +26,8 @@
  *
  * see README.md content or consult it on https://github.com/intersel/jamrules
  */
-function jamrules(aJqueryObj,options) {
- 
-    // variables and functions private unless attached to API below
-    // 'this' refers to global window
+var jamrules = (function() {
 
-	var defaults = {
-			debug				: false,
-			LogLevel			: 1,
-		};
-	
-	// on charge les options passées en paramètre
-	if (options == undefined) options=null;
-	options = jQuery.extend( {}, defaults, options || {});
-
-	
-    /**
-	 * @param jamrules - the current jamrules object giving access to its API
-     * @access public
-     */
-	var jamrules;
-	
-	/**
-	 * @param myRulesEngine - the FSM engine bound to the jamrules
-	 * @access private 
-	 */
-	var myRulesEngine;
 	
 	/**
 	 * @param propertiesConfiguration
@@ -619,6 +595,76 @@ function jamrules(aJqueryObj,options) {
     
     
     /**
+     * jamrulesConstructor
+     * 
+     * constructor of a jamRules object
+     * 
+     */
+    var jamrulesConstructor = function(aJqueryObj,options) {
+    	
+   	 
+	    // variables and functions private unless attached to API below
+	    // 'this' refers to global window
+	
+		var defaults = {
+				debug				: false,
+				LogLevel			: 1,
+			};
+	
+		/**
+		 * @param options - options given to jamrules
+		 * @access public 
+		 */
+		if (this.options == undefined) this.options=null;
+		this.options = jQuery.extend( {}, defaults, this.options || {});
+
+	
+		/**
+		 * @param myRulesEngine - the FSM engine bound to the jamrules
+		 * @access public 
+		 */
+		this.myRulesEngine={};
+
+	
+		/**
+		 * @param myJqueryObj - the jquery object on which jamrules is bound
+		 * @access public 
+		 */
+		this.myJqueryObj = aJqueryObj;
+
+    };
+
+	/**
+     * @access private
+     * @abstract get the key to access to the object profile of an object
+     * @return a md5 key for a json object
+	 * 
+	 */
+    var getObjectProfileKey = function(anObject)
+    {
+    	return $.md5(JSON.stringify(anObject.propertiesSet));
+    }
+    /**
+     * @access private
+     * @abstract add a new object profile if the one defines by anObject does not exist
+	 * 
+	 */
+    var addObjectProfile = function(objectKey,anObject)
+    {
+    	if (!ObjectProfiles[objectKey]) ObjectProfiles[objectKey]={propertiesSet:anObject.propertiesSet,objectsList:[]};
+    }
+    /**
+     * @access private
+     * @abstract add a new element to the element profiles array
+	 * 
+	 */
+    var addObjectToObjectProfilesArray = function(objectKey,anObject)
+    {
+    	ObjectProfiles[objectKey]['objectsList'].push(anObject);
+    }
+
+    
+    /**
      * ----------------------------------------- 
      * Testing functions available for the rules
      * ----------------------------------------- 
@@ -641,9 +687,9 @@ function jamrules(aJqueryObj,options) {
      *  MatchProperty('priority') -> match
      *  MatchProperty('technician') -> no match
      */
-    function MatchProperty(aPropertyName)
+    var MatchProperty = function(aPropertyName)
     {
-    	propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
     	
     	if (propertiesConfiguration[aPropertyName] && propertiesObjectProfile[aPropertyName])
     	{
@@ -676,9 +722,9 @@ function jamrules(aJqueryObj,options) {
      * MatchPropertyValue('priority','priority1') -> match
      * MatchPropertyValue('technician','technician1') -> no match
      */
-    function MatchPropertyValue(aPropertyName,aPropertyValue)
+    var MatchPropertyValue=function (aPropertyName,aPropertyValue)
     {
-    	var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
     	if (
     			(propertiesConfiguration[aPropertyName] && propertiesObjectProfile[aPropertyName])
     			&& (propertiesConfiguration[aPropertyName][aPropertyValue] && propertiesObjectProfile[aPropertyName][aPropertyValue])
@@ -708,9 +754,9 @@ function jamrules(aJqueryObj,options) {
      * MatchExternalRule('propertiesObjectProfile[priority]==propertiesConfiguration[priority]') -> match
      * MatchExternalRule('propertiesObjectProfile[technician][technician1]==propertiesConfiguration[technician][technician1]') -> not match
      */
-    function MatchExternalRule(aRule)
+    var MatchExternalRule = function(aRule)
     {
-    	var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
     	
     	var resultTest = eval(aRule);
     	
@@ -736,9 +782,9 @@ function jamrules(aJqueryObj,options) {
      *  MatchPropertiesSameValue('activity','priority') -> match
      *  MatchPropertiesSameValue('strawberry','priority') -> no match
      */
-    function MatchPropertiesSameValue(aConfigurationPropertyName,anObjectPropertyName,aPropertyValue)
+    var MatchPropertiesSameValue = function(aConfigurationPropertyName,anObjectPropertyName,aPropertyValue)
     {
-    	var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
     	
     	//if undefined, means that we want that one of the property value of object is set in the configuration too 
     	if (aPropertyValue==undefined) 
@@ -783,10 +829,10 @@ function jamrules(aJqueryObj,options) {
      *  MatchPropertiesSameValues('activity','priority') -> match
      *  MatchPropertiesSameValues('strawberry','priority','priority1') -> no match
      */
-    function MatchPropertiesSameValues(aConfigurationPropertyName,anObjectPropertyName)
+    var MatchPropertiesSameValues = function(aConfigurationPropertyName,anObjectPropertyName)
     {
     	
-    	var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
     	
 		// we can process only if the property has only one value
 		for(aPropertyValue in propertiesObjectProfile[anObjectPropertyName]) 
@@ -815,9 +861,9 @@ function jamrules(aJqueryObj,options) {
      *  MatchProperties('activity','priority') -> match
      *  MatchProperties('strawberry','priority') -> no match
      */
-    function MatchProperties(aConfigurationPropertyName,anObjectPropertyName)
+    var MatchProperties = function(aConfigurationPropertyName,anObjectPropertyName)
     {
-    	propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
     	if (
     			(propertiesConfiguration[aConfigurationPropertyName] && propertiesObjectProfile[anObjectPropertyName])
@@ -848,7 +894,7 @@ function jamrules(aJqueryObj,options) {
      *   
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    function ConfigurationPropertySet(aPropertyName,aPropertyValue,valueSet)
+    var ConfigurationPropertySet = function(aPropertyName,aPropertyValue,valueSet)
     {
     	if (valueSet == undefined) valueSet=1;
     	if (
@@ -870,9 +916,9 @@ function jamrules(aJqueryObj,options) {
      *   
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    function ObjectPropertySet(aPropertyName,aPropertyValue,valueSet)
+    var ObjectPropertySet = function(aPropertyName,aPropertyValue,valueSet)
     {
-    	propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
     	
     	if (valueSet == undefined) valueSet=1;
     	if (
@@ -894,9 +940,9 @@ function jamrules(aJqueryObj,options) {
      *   
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    function ObjectPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
+    var ObjectPropertiesSameValue = function(aPropertyName1,aPropertyName2,aPropertyValue)
     {
-    	propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+    	propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
     	
     	//if undefined, means that we want that one of the property value of object is set in the configuration too 
     	if (aPropertyValue==undefined) 
@@ -934,9 +980,9 @@ function jamrules(aJqueryObj,options) {
      *   
      * @return returns boolean
      */
-    function ObjectPropertiesSameValues(aPropertyName1,aPropertyName2)
+    var ObjectPropertiesSameValues = function(aPropertyName1,aPropertyName2)
     {
-		var propertiesObjectProfile = myRulesEngine.opts.objectProfile.propertiesSet;
+		var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 		
 		// we can process only if the property has only one value
 		for(aPropertyValue in propertiesObjectProfile[aPropertyName1]) 
@@ -960,7 +1006,7 @@ function jamrules(aJqueryObj,options) {
      *   
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    function ConfigurationPropertiesSameValue(aPropertyName1,aPropertyName2,aPropertyValue)
+    var ConfigurationPropertiesSameValue = function(aPropertyName1,aPropertyName2,aPropertyValue)
     {
     	//if undefined, means that we want that one of the property value of object is set in the configuration too 
     	if (aPropertyValue==undefined) 
@@ -998,7 +1044,7 @@ function jamrules(aJqueryObj,options) {
      *   
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    function ConfigurationPropertiesSameValues(aPropertyName1,aPropertyName2)
+    var ConfigurationPropertiesSameValues = function(aPropertyName1,aPropertyName2)
     {
 		// we can process only if the property has only one value
 		for(aPropertyValue in propertiesConfiguration[aPropertyName1]) 
@@ -1017,59 +1063,6 @@ function jamrules(aJqueryObj,options) {
      * -----------------------------------------
      */ 
     
-    /**
-	 * @function runRulesEngine
-	 * @access public 
-	 * @abstract run the rules engine
-	 * @return void 
-	 */
-    function runRulesEngine() {
-    	log("runRulesEngine");
-    	if (!myRulesEngine)
-    	{
-    		if (options.debug) alert("Rules engine is not started. Call first compile rules (cf compileRules())");
-    		return;
-    	}
-		myRulesEngine.trigger('runEngine');
-
-    }
-    
-    /**
-	 * @function selectConfigurationPropertyValue
-	 * @access public 
-	 * @abstract set a property/property value status in the rules configurator
-	 * @param aPropertyName: name of the property that has changed
-	 * @param aProperyValue: value of the property
-	 * @param aStatus: [boolean] status of the property for this property value set or not
-	 * @param doTest: [boolean] [default:true] if false, configure the configurator but does not run the rules engine test
-	 * @return void 
-	 */
-    function selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus, doTest) {
-    	log("selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus):"+aPropertyName+','+aPropertyValue+','+aStatus);
-    	if (aStatus == undefined) aStatus=false;
-    	if (doTest == undefined) doTest=true;
-    	
-    	var statusChanged = true;
-
-    	if (	propertiesConfiguration[aPropertyName] 
-    		&& 	propertiesConfiguration[aPropertyName][aPropertyValue] 
-    		&& 	propertiesConfiguration[aPropertyName][aPropertyValue] == aStatus
-    		)
-    		statusChanged=false;
-    	
-    	if (!propertiesConfiguration[aPropertyName]) propertiesConfiguration[aPropertyName]={};
-    	
-    	propertiesConfiguration[aPropertyName][aPropertyValue]=aStatus;
-		if (myRulesEngine && doTest && statusChanged) myRulesEngine.trigger('propertyChange',{propertyName:aPropertyName,propertyValue:aPropertyValue,status:aStatus});
-		else if (!myRulesEngine)
-    	{
-    		if (options.debug) alert("Rules engine is not started. Call first compile rules (cf compileRules())");
-    		return;
-    	}
-
-
-    }
-    
 	/**
 	 * @function createRulesSet - creates a rule set
 	 * @access public 
@@ -1081,8 +1074,8 @@ function jamrules(aJqueryObj,options) {
 	 * The rule engine will react only to events defined in ruleEvents
 	 * 
 	 */
-    function createRulesSet(aRulesGroup, ruleEvents) {
-    	log("createRulesSet(aRulesGroup, ruleEvents): "+aRulesGroup+" - "+ruleEvents);
+    var createRulesSet = function(aRulesGroup, ruleEvents) {
+    	this.log("createRulesSet(aRulesGroup, ruleEvents): "+aRulesGroup+" - "+ruleEvents);
     	var testRules = myRulesEngineStates.TestRules;
     	var waitTestRules = myRulesEngineStates.waitTestRules;
     	if (!testRules.delegate_machines[aRulesGroup])
@@ -1100,7 +1093,7 @@ function jamrules(aJqueryObj,options) {
     	}
     	else
     	{
-    		log("createRulesSet: "+aRulesGroup+" still declared! nothing done");
+    		this.log("createRulesSet: "+aRulesGroup+" still declared! nothing done");
     	}
     }    
  
@@ -1114,22 +1107,22 @@ function jamrules(aJqueryObj,options) {
 	 * 
 	 * 
 	 */
-    function addRule(aRulesGroup, aRuleName, aRuleTest, overloadRule) {
-    	log("addRule(aRulesGroup, aRuleName, aRuleTest): "+aRulesGroup+" - "+aRuleName+"-"+aRuleTest);
+    var addRule = function(aRulesGroup, aRuleName, aRuleTest, overloadRule) {
+    	this.log("addRule(aRulesGroup, aRuleName, aRuleTest): "+aRulesGroup+" - "+aRuleName+"-"+aRuleTest);
     	var testRules = myRulesEngineStates.TestRules;
     	
     	if (!overloadRule) overloadRule=false;
     	
     	if (!testRules.delegate_machines[aRulesGroup])
     	{	
-    		if (options.debug) alert(aRulesGroup+" needs to be previously created with createRulesSet function");
+    		if (this.options.debug) alert(aRulesGroup+" needs to be previously created with createRulesSet function");
     		return;
     	}
     	
     	//create the new state called "aRuleName" for the rule
     	if (!overloadRule && testRules.delegate_machines[aRulesGroup]['submachine'][aRuleName])
     	{	
-    		if (options.debug) alert(aRuleName+" still exists and can not be overloaded");
+    		if (this.options.debug) alert(aRuleName+" still exists and can not be overloaded");
     		return;
     	}
 	 	testRules.delegate_machines[aRulesGroup]['submachine'][aRuleName]=$.extend(true, {}, stateRuleTemplate);
@@ -1145,95 +1138,122 @@ function jamrules(aJqueryObj,options) {
 	 	
     }
 
-	/**
-	 * @function public addObject 
-	 * @abstract add an object to the list of objects to test against rules
-	 * @param anObject: object
-	 * {
-	 * 		propertiesSet:
-	 * 		[	
-	 * 			<propertyName1>.<propertyValue1>:true|false,
-	 * 			<propertyName2>.<propertyValue2>:true|false
-	 * 			....
-	 * 		]
-	 * 		matched:<function name to call when a rule will match for the object>
-	 * 		notmatched:<function name to call when there is a change but object does not match any rules>
-	 * }
-	 * @example
-	 */
-    function addObject(anObject) {
-    	log("addObject");
-    	objectKey = getObjectProfileKey(anObject);
-    	addObjectProfile(objectKey,anObject);
-    	addObjectToObjectProfilesArray(objectKey,anObject);
-    }
 
+    /**
+	 * @function runRulesEngine
+	 * @access public 
+	 * @abstract run the rules engine
+	 * @return void 
+	 */
+    var runRulesEngine = function() {
+    	this.log("runRulesEngine");
+    	if (!this.myRulesEngine)
+    	{
+    		if (this.options.debug) alert("Rules engine is not started. Call first compile rules (cf compileRules())");
+    		return;
+    	}
+		this.myRulesEngine.trigger('runEngine');
+
+    }
+    
+    /**
+	 * @function selectConfigurationPropertyValue
+	 * @access public 
+	 * @abstract set a property/property value status in the rules configurator
+	 * @param aPropertyName: name of the property that has changed
+	 * @param aProperyValue: value of the property
+	 * @param aStatus: [boolean] status of the property for this property value set or not
+	 * @param doTest: [boolean] [default:true] if false, configure the configurator but does not run the rules engine test
+	 * @return void 
+	 */
+    var selectConfigurationPropertyValue = function(aPropertyName,aPropertyValue,aStatus, doTest) {
+    	this.log("selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus):"+aPropertyName+','+aPropertyValue+','+aStatus);
+    	if (aStatus == undefined) aStatus=false;
+    	if (doTest == undefined) doTest=true;
+    	
+    	var statusChanged = true;
+
+    	if (	propertiesConfiguration[aPropertyName] 
+    		&& 	propertiesConfiguration[aPropertyName][aPropertyValue] 
+    		&& 	propertiesConfiguration[aPropertyName][aPropertyValue] == aStatus
+    		)
+    		statusChanged=false;
+    	
+    	if (!propertiesConfiguration[aPropertyName]) propertiesConfiguration[aPropertyName]={};
+    	
+    	propertiesConfiguration[aPropertyName][aPropertyValue]=aStatus;
+		if (this.myRulesEngine && doTest && statusChanged) this.myRulesEngine.trigger('propertyChange',{propertyName:aPropertyName,propertyValue:aPropertyValue,status:aStatus});
+		else if (!this.myRulesEngine)
+    	{
+    		if (this.options.debug) alert("Rules engine is not started. Call first compile rules (cf compileRules())");
+    		return;
+    	}
+
+
+    }
+    
     /**
      * @function compileRules
      * @abstract initialize the rule engine - to do before action and after adding the rules
      */
-    function compileRules()
+    var compileRules = function()
     {
-    	log("compileRules");
-        aJqueryObj.iFSM(myRulesEngineStates,{debug:options.debug,LogLevel:options.LogLevel,jamrules:jamrules});
-    	myRulesEngine = aJqueryObj.getFSM(myRulesEngineStates); 
+    	this.log("compileRules");
+    	var jamrules = this;
+        this.myJqueryObj.iFSM(myRulesEngineStates,{debug:this.options.debug,logLevel:this.options.logLevel,jamrules:jamrules});
+    	var myRulesEngine = this.myJqueryObj.getFSM(myRulesEngineStates); 
 
-    	jamrules.ruleEngine = myRulesEngine;
-    	return jamrules;
+    	this.myRulesEngine = myRulesEngine;
     }
     
     /**
-     * @access private
-     * @abstract get the key to access to the object profile of an object
-     * @return a md5 key for a json object
-	 * 
-	 */
-    function getObjectProfileKey(anObject)
-    {
-    	return $.md5(JSON.stringify(anObject.propertiesSet));
-    }
+     * @function public static addObject 
+     * @abstract add an object to the list of objects to test against rules
+     * @param anObject: object
+     * {
+     * 		propertiesSet:
+     * 		[	
+     * 			<propertyName1>.<propertyValue1>:true|false,
+     * 			<propertyName2>.<propertyValue2>:true|false
+     * 			....
+     * 		]
+     * 		matched:<function name to call when a rule will match for the object>
+     * 		notmatched:<function name to call when there is a change but object does not match any rules>
+     * }
+     * @example
+     */
+    var addObject = function(anObject) {
+    	this.log("addObject");
+    	var objectKey = getObjectProfileKey(anObject);
+    	addObjectProfile(objectKey,anObject);
+    	addObjectToObjectProfilesArray(objectKey,anObject);
+    };
+
+  
     /**
-     * @access private
-     * @abstract add a new object profile if the one defines by anObject does not exist
-	 * 
-	 */
-    function addObjectProfile(objectKey,anObject)
-    {
-    	if (!ObjectProfiles[objectKey]) ObjectProfiles[objectKey]={propertiesSet:anObject.propertiesSet,objectsList:[]};
-    }
-    /**
-     * @access private
-     * @abstract add a new element to the element profiles array
-	 * 
-	 */
-    function addObjectToObjectProfilesArray(objectKey,anObject)
-    {
-    	ObjectProfiles[objectKey]['objectsList'].push(anObject);
-    }
-    
-    /**
-     * @access private
+     * @access public
      * @abstract log a message on the console for debug
 	 * 
 	 */
-    function log(msg) {
-    	if (!options.debug) return;
+    var log = function(msg) {
+    	if (!this.options.debug) return;
         console.debug(msg);
     }
  
-    jamrules = {
+    jamrulesConstructor.prototype = {
+    			constructor:jamrules
     			/** general API **/
-    			runRulesEngine:runRulesEngine
+    		,	runRulesEngine:runRulesEngine
     		,	selectConfigurationPropertyValue: selectConfigurationPropertyValue
-        	,	addObject:addObject
         	,	createRulesSet:createRulesSet
         	,	addRule:addRule
         	,	compileRules:compileRules
         	,	log:log
+        		/** Static Functions **/
+        	,	_addObject:addObject
         		/** Public variables **/
         	,	propertiesConfiguration:propertiesConfiguration
-        	,	options:options
-        		/** Test function for matchin **/ 
+        		/** Test function for matching **/ 
         	,	MatchProperty:MatchProperty
         	,	MatchPropertyValue:MatchPropertyValue
         	,	MatchProperties:MatchProperties
@@ -1249,5 +1269,6 @@ function jamrules(aJqueryObj,options) {
     }; 
 
 
-    return (jamrules);
-};
+    return (jamrulesConstructor);
+})();
+

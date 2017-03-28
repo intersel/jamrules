@@ -29,7 +29,7 @@
 		};
 		var notmatched=function(aJamRules){
 			var msg;
-			var reason = aJamRules.ruleEngine.opts.reason;
+			var reason = aJamRules.myRulesEngine.opts.reason;
 			msg="<p style='color:red'>This pack is has no coupon</p>";
 			$("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
 			$.each(reason,function(index,value) {
@@ -92,9 +92,9 @@
 			matched : matched,
 			notmatched : notmatched
 		};
-		rulesEngine.addObject(pack1);
-		rulesEngine.addObject(pack2);
-		rulesEngine.addObject(pack3);
+		rulesEngine._addObject(pack1);
+		rulesEngine._addObject(pack2);
+		rulesEngine._addObject(pack3);
 
 		// rules setting
 	
