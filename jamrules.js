@@ -66,7 +66,7 @@ var jamrules = (function() {
     /**
      * @param ObjectProfiles
      * @access private 
-     * @abstract list of possible profiles
+     * @abstract list of possible profiles available to all rules
      * 	a profile is defined by a list of entries [objectKey]:{propertiesSet:<apropertiesSet>,objectsList:[]}
      * {
 	 * 		<objectKey1>:{
@@ -534,7 +534,8 @@ var jamrules = (function() {
 	                	//initialize the element profiles to process
 	                	this.opts.objectProfileId=-1;
 	                	this.opts.aPropertyConfiguration=aPropertyConfiguration;
-	                	this.opts.maxObjectProfiles = Object.keys(ObjectProfiles).length;
+	                	this.opts.ObjectProfiles = this.opts.jamrules.getAllObjectProfiles();
+	                	this.opts.maxObjectProfiles = Object.keys(this.opts.ObjectProfiles).length;
 	                	// start processing rules on the element profiles list
 	                	if (this.opts.maxObjectProfiles > 0) this.trigger(this.opts.aPropertyConfiguration.propertyName); 
 	                },
@@ -549,7 +550,8 @@ var jamrules = (function() {
 	                	//initialize the element profiles to process
 	                	this.opts.objectProfileId=-1;
 	                	this.opts.aPropertyConfiguration={propertyName:'dummyEvent'};
-	                	this.opts.maxObjectProfiles = Object.keys(ObjectProfiles).length;
+	                	this.opts.ObjectProfiles = this.opts.jamrules.getAllObjectProfiles();
+	                	this.opts.maxObjectProfiles = Object.keys(this.opts.ObjectProfiles).length;
 	                	// start processing rules on the element profiles list
 	                	if (this.opts.maxObjectProfiles > 0) this.trigger('testRules'); 
 	                },
@@ -572,7 +574,7 @@ var jamrules = (function() {
                     	this.opts.objectProfileId++;
             			if (this.opts.objectProfileId  < this.opts.maxObjectProfiles)
             			{
-                    		this.opts.objectProfile=ObjectProfiles[Object.keys(ObjectProfiles)[this.opts.objectProfileId]];
+                    		this.opts.objectProfile=this.opts.ObjectProfiles[Object.keys(this.opts.ObjectProfiles)[this.opts.objectProfileId]];
                     		this.trigger(this.opts.aPropertyConfiguration.propertyName);
             			}
             		},
@@ -631,7 +633,52 @@ var jamrules = (function() {
 		 * @access public 
 		 */
 		this.myJqueryObj = aJqueryObj;
+		
+		
+	    /**
+	     * @param _ObjectProfiles
+	     * @access private 
+	     * @abstract list of possible profiles available local to this rule engine
+	     * 	a profile is defined by a list of entries [objectKey]:{propertiesSet:<apropertiesSet>,objectsList:[]}
+	     * {
+		 * 		<objectKey1>:{
+		 * 			propertiesSet:
+		 * 			{	
+		 * 				<propertyName1>:{
+		 * 					type:<discreteValuesList>,
+		 * 					<propertyValue1>:1|0,
+		 * 					<propertyValue2>:1|0,
+		 * 					...
+		 * 				},
+		 * 				... same as propertiesConfiguration definition
+		 * 				<propertyName1>.<propertyValue1>:1|0,
+		 * 				<propertyName2>.<propertyValue2>:1|0
+		 * 				....
+		 * 			],
+		 * 			elementList:[ //element objects that share the same properties set
+		 * 			]
+		 * 		},
+		 * 		<objectKey2>:{
+		 *  	....
+		 *  }
+	     */
+	    var _ObjectProfiles = {};
+	    
+	    /**
+	     * getObjectProfiles - get the current object profiles bound to this rule engine
+	     * 
+	     */
+	    this.getObjectProfiles = function(){
+	    	return _ObjectProfiles;
+	    }
 
+	    /**
+	     * getAllObjectProfiles - get all the object profiles (shared and of the current instance) bound to this rule engine
+	     * 
+	     */
+	    this.getAllObjectProfiles = function(){
+		    return $.extend( ObjectProfiles, this.getObjectProfiles() );
+	    }
     };
 
 	/**
@@ -649,18 +696,20 @@ var jamrules = (function() {
      * @abstract add a new object profile if the one defines by anObject does not exist
 	 * 
 	 */
-    var addObjectProfile = function(objectKey,anObject)
+    var addObjectProfile = function(objectKey,anObject,anObjectProfiles)
     {
-    	if (!ObjectProfiles[objectKey]) ObjectProfiles[objectKey]={propertiesSet:anObject.propertiesSet,objectsList:[]};
+    	if (!anObjectProfiles) anObjectProfiles = ObjectProfiles;
+    	if (!anObjectProfiles[objectKey]) anObjectProfiles[objectKey]={propertiesSet:anObject.propertiesSet,objectsList:[]};
     }
     /**
      * @access private
      * @abstract add a new element to the element profiles array
 	 * 
 	 */
-    var addObjectToObjectProfilesArray = function(objectKey,anObject)
+    var addObjectToObjectProfilesArray = function(objectKey,anObject,anObjectProfiles)
     {
-    	ObjectProfiles[objectKey]['objectsList'].push(anObject);
+    	if (!anObjectProfiles) anObjectProfiles = ObjectProfiles;
+    	anObjectProfiles[objectKey]['objectsList'].push(anObject);
     }
 
     
@@ -1207,7 +1256,31 @@ var jamrules = (function() {
     }
     
     /**
-     * @function public static addObject 
+     * @function public static _addObject 
+     * @abstract add an object to the list of objects to test against rules
+     * the new object will be tested against all the called rules
+     * @param anObject: object
+     * {
+     * 		propertiesSet:
+     * 		[	
+     * 			<propertyName1>.<propertyValue1>:true|false,
+     * 			<propertyName2>.<propertyValue2>:true|false
+     * 			....
+     * 		]
+     * 		matched:<function name to call when a rule will match for the object>
+     * 		notmatched:<function name to call when there is a change but object does not match any rules>
+     * }
+     * @example
+     */
+    var _addObject = function(anObject,anObjectProfiles) {
+    	this.log("addObject");
+    	var objectKey = getObjectProfileKey(anObject);
+    	addObjectProfile(objectKey,anObject,anObjectProfiles);
+    	addObjectToObjectProfilesArray(objectKey,anObject,anObjectProfiles);
+    };
+
+    /**
+     * @function public addObject 
      * @abstract add an object to the list of objects to test against rules
      * @param anObject: object
      * {
@@ -1224,11 +1297,8 @@ var jamrules = (function() {
      */
     var addObject = function(anObject) {
     	this.log("addObject");
-    	var objectKey = getObjectProfileKey(anObject);
-    	addObjectProfile(objectKey,anObject);
-    	addObjectToObjectProfilesArray(objectKey,anObject);
+    	this._addObject(anObject,this.getObjectProfiles());
     };
-
   
     /**
      * @access public
@@ -1248,9 +1318,10 @@ var jamrules = (function() {
         	,	createRulesSet:createRulesSet
         	,	addRule:addRule
         	,	compileRules:compileRules
+        	,	addObject:addObject
         	,	log:log
         		/** Static Functions **/
-        	,	_addObject:addObject
+        	,	_addObject:_addObject
         		/** Public variables **/
         	,	propertiesConfiguration:propertiesConfiguration
         		/** Test function for matching **/ 
