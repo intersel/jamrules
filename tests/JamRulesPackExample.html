@@ -19,8 +19,16 @@
 	<script>
 	
 		//initialisation of jamrules and its configurator
-		var rulesEngine = new jamrules($('body'),{debug:true});
-		
+/*		var jamrules2 = function(aJqueryObj,options){
+			  jamrules.call(this, aJqueryObj,options);
+		};
+		jamrules2.prototype = new jamrules();
+
+		var rulesEngine = new jamrules2($('body'),{debug:true});
+*/
+var rulesEngine = jamrules.build($('body'),{debug:true,name:"engine1"});
+var rulesEngine2 = jamrules.build($('body'),{debug:true,name:"engine2"});
+
 		//add objects that we want to test with jamrules
 		var matched=function(){
 			var msg;
@@ -116,6 +124,35 @@
 		$("#msg").append("<h2>run the test to get the packs that match the rules... </h2>");
 		rulesEngine.runRulesEngine();
 
+		
+		var pack21 = {
+				propertiesSet : {
+					object1 : {
+						shirt : 1
+					},
+					object2 : {
+						shirt : 1
+					},
+					object1Color : {
+						white : 1
+					},
+					object2Color : {
+						blue : 1
+					}
+				},
+				matched : matched,
+				notmatched : notmatched
+			};
+		rulesEngine2.addObject(pack21);
+		rulesEngine2.createRulesSet("SameColorTrousersPack");
+		rulesEngine2.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","trouser")');
+		rulesEngine2.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+		rulesEngine2.addRule("SameColorTrousersPack","O1O2SameColor",'ObjectPropertiesSameValue("object1Color","object2Color")');
+		rulesEngine2.compileRules();
+		$("#msg").append("<h2>run the test to get the packs that match the rules... </h2>");
+		rulesEngine2.runRulesEngine();
+
+		
 	</script>
 
 </body>
