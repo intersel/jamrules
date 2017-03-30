@@ -1349,15 +1349,11 @@ var jamrules = (function(){
 	    return (new jamrulesConstructor(aJqueryObj,options));
 	};
 	
-	var jamRulesArray=[];
-	
 	/**
 	 * builder of instance of a jamrules engine from the jamrulesClass definition
 	 */
 	var jamRulesBuilder = function(aJqueryObj,options){
 		
-		//initialisation of jamrules and its configurator
-		id=jamRulesArray.length;
 
 		return new jamrulesClass(aJqueryObj,options);
 
