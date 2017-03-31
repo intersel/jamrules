@@ -20,9 +20,9 @@
 	
 	
 	//initialisation of jamrules and its configurator
-	var rulesForPriorityLayer = new jamrules($('#filterbox'),{debug:true});
+	var rulesForPriorityLayer = jamrules.build($('#filterbox'),{debug:true});
 	/* initialisation of the configurator if needed*/
-	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",1);
+	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",1,false);
 	
 	// rules setting
 	rulesForPriorityLayer.createRulesSet("PriorityMatch1",["activities","priority"]);

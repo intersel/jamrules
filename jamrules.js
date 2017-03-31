@@ -8,6 +8,7 @@
  *
  * -----------------------------------------------------------------------------------------
  * Modifications :
+ * - 20170331  - E.Podvin - V2.0.0 - Creation
  * - 20170227  - E.Podvin - V1.0.0 - Creation
  * 
  * -----------------------------------------------------------------------------------------
@@ -16,7 +17,7 @@
  * @fileoverview : 
  * @see {@link https://github.com/intersel/jamrules}
  * @author : Emmanuel Podvin - emmanuel.podvin@intersel.fr
- * @version : 1.0.0
+ * @version : 2.0.0
  * -----------------------------------------------------------------------------------------
  */
 
@@ -28,7 +29,37 @@
  */
 
 var jamrules = (function(){
+
 	
+    /**
+     * @param ObjectProfiles
+     * @access private 
+     * @abstract list of possible profiles available to all rules
+     * 	a profile is defined by a list of entries [objectKey]:{propertiesSet:<apropertiesSet>,objectsList:[]}
+     * {
+	 * 		<objectKey1>:{
+	 * 			propertiesSet:
+	 * 			{	
+	 * 				<propertyName1>:{
+	 * 					type:<discreteValuesList>,
+	 * 					<propertyValue1>:1|0,
+	 * 					<propertyValue2>:1|0,
+	 * 					...
+	 * 				},
+	 * 				... same as propertiesConfiguration definition
+	 * 				<propertyName1>.<propertyValue1>:1|0,
+	 * 				<propertyName2>.<propertyValue2>:1|0
+	 * 				....
+	 * 			],
+	 * 			elementList:[ //element objects that share the same properties set
+	 * 			]
+	 * 		},
+	 * 		<objectKey2>:{
+	 *  	....
+	 *  }
+     */
+    var ObjectProfiles = {};
+
 
 	var jamrulesClass = function(aJqueryObj,options) {
 	
@@ -67,35 +98,6 @@ var jamrules = (function(){
 		 */
 	    var propertiesConfiguration = {};
 	
-	    /**
-	     * @param ObjectProfiles
-	     * @access private 
-	     * @abstract list of possible profiles available to all rules
-	     * 	a profile is defined by a list of entries [objectKey]:{propertiesSet:<apropertiesSet>,objectsList:[]}
-	     * {
-		 * 		<objectKey1>:{
-		 * 			propertiesSet:
-		 * 			{	
-		 * 				<propertyName1>:{
-		 * 					type:<discreteValuesList>,
-		 * 					<propertyValue1>:1|0,
-		 * 					<propertyValue2>:1|0,
-		 * 					...
-		 * 				},
-		 * 				... same as propertiesConfiguration definition
-		 * 				<propertyName1>.<propertyValue1>:1|0,
-		 * 				<propertyName2>.<propertyValue2>:1|0
-		 * 				....
-		 * 			],
-		 * 			elementList:[ //element objects that share the same properties set
-		 * 			]
-		 * 		},
-		 * 		<objectKey2>:{
-		 *  	....
-		 *  }
-	     */
-	    var ObjectProfiles = {};
-	    
 	    /**
 	     * @param matchRuleTemplate
 	     * @abstract template to create new rule in the state definition of the rules engine
@@ -681,7 +683,7 @@ var jamrules = (function(){
 		     * 
 		     */
 		    this.getAllObjectProfiles = function(){
-			    return $.extend( ObjectProfiles, this.getObjectProfiles() );
+			    return $.extend( {}, ObjectProfiles, this.getObjectProfiles() );
 		    }
 	    };
 	

@@ -49,31 +49,31 @@
 		<h1>Elément 1</h1>
 		<section id='priority' class="property">
 			<label>
-				<input class="checkbox" id="el1-priority-un" type="checkbox" value="priority1" checked>
+				<input class="checkbox" id="el1-priority-un" type="checkbox" value="priority1" checked disabled>
 				Priority 1
 			</label>
 			<label>
-				<input class="checkbox" id="el1-priority-deux" type="checkbox" value="priority2">
+				<input class="checkbox" id="el1-priority-deux" type="checkbox" value="priority2" disabled>
 				Priority 2
 			</label>
 		</section>
 		<section id='technician' class='property'>
 			<label>
-				<input class="checkbox" id="el1-technician1" type="checkbox" value="technician1" checked>
+				<input class="checkbox" id="el1-technician1" type="checkbox" value="technician1" checked disabled>
 				Technician 1
 			</label>
 			<label>
-				<input class="checkbox" id="el1-technician2" type="checkbox" value="technician2">
+				<input class="checkbox" id="el1-technician2" type="checkbox" value="technician2" disabled>
 				Technician 2 
 			</label>
 		</section>
 		<section id='compliantTechnician' class='property'>
 			<label>
-				<input class="checkbox" id="el1-technician1-compliant" type="checkbox" value="technician1" checked>
+				<input class="checkbox" id="el1-technician1-compliant" type="checkbox" value="technician1" checked disabled>
 				Technician 1 Compliant
 			</label>
 			<label>
-				<input class="checkbox" id="el1-technician2-compliant" type="checkbox" value="technician2">
+				<input class="checkbox" id="el1-technician2-compliant" type="checkbox" value="technician2" disabled>
 				Technician 2 Compliant
 			</label>
 		</section>
@@ -84,10 +84,11 @@
 			<input class="checkbox" id="el1-match" type="checkbox"  disabled>
 			object 1 match?
 		</label>
-		<label>
+<!-- 		<label>
 			<input class="checkbox" id="el2-match" type="checkbox" disabled>
 			object 2 match?
 		</label>
+-->
 		<div id="debug">
 		</div>
 	</section>
@@ -114,18 +115,8 @@
 	// ---------------------------------
 	
 	//initialisation of jamrules and its configurator
-	var rulesForPriorityLayer = new jamrules($('#filterbox'),{debug:true});
+	var rulesForPriorityLayer = jamrules.build($('#filterbox'),{debug:true});
 
-	/* initialisation if needed*/
-	// checked the input in the above html (#filterbox section) you'd like to have set in the configurator
-	// section id is a property name and input value is the value of the property and 'checked' the status
-	$("#filterbox section").each(function(){
-		var propertyName = this.id;
-		$(this).find("input.checkbox").each(function(){
-			rulesForPriorityLayer.selectConfigurationPropertyValue(propertyName,$(this).val(),$(this).prop('checked'));
-		});
-	});
-	
 	// rules setting
 	rulesForPriorityLayer.createRulesSet("PriorityMatch1",["activities","priority"]);
 	rulesForPriorityLayer.addRule("PriorityMatch1","testPriorityExist",'MatchProperty("priority")');
@@ -143,6 +134,17 @@
 	
 	//add objects that we want to test if they match the rules
 	rulesForPriorityLayer.addObject(el1);
+	
+	/* initialisation if needed*/
+	// checked the input in the above html (#filterbox section) you'd like to have set in the configurator
+	// section id is a property name and input value is the value of the property and 'checked' the status
+	$("#filterbox section").each(function(){
+		var propertyName = this.id;
+		$(this).find("input.checkbox").each(function(){
+			rulesForPriorityLayer.selectConfigurationPropertyValue(propertyName,$(this).val(),$(this).prop('checked'));
+		});
+	});
+
 
 	// test if object is technician tech1
 	// test if object is compliant with tech1

@@ -20,15 +20,15 @@
 	
 	
 	//initialisation of jamrules and its configurator
-	var rulesEngineBlack1 = new jamrules($('#filterbox'),{debug:true,LogLevel:3,name:"rulesEngineBlack1"});
-	var rulesEngineBlack2 = new jamrules($('#filterbox'),{name:"rulesEngineBlack2"});
-	var rulesEngineBlack3 = new jamrules($('#filterbox'),{name:"rulesEngineBlack3"});
-	var rulesEngineBlack4 = new jamrules($('#filterbox'),{name:"rulesEngineBlack4"});
-	var rulesEngineWhite1 = new jamrules($('#filterbox'),{name:"rulesEngineWhite1"});
-	var rulesEngineWhite2 = new jamrules($('#filterbox'),{name:"rulesEngineWhite2"});
-	var rulesEngineWhite3 = new jamrules($('#filterbox'),{name:"rulesEngineWhite3"});
-	var rulesEngineWhite4 = new jamrules($('#filterbox'),{name:"rulesEngineWhite4"});
-	var rulesEngineWin = new jamrules($('#filterbox'),{debug:false,LogLevel:3,name:"rulesEngineWin"});
+	var rulesEngineBlack1 = jamrules.build($('#filterbox'),{debug:true,LogLevel:3,name:"rulesEngineBlack1"});
+	var rulesEngineBlack2 = jamrules.build($('#filterbox'),{name:"rulesEngineBlack2"});
+	var rulesEngineBlack3 = jamrules.build($('#filterbox'),{name:"rulesEngineBlack3"});
+	var rulesEngineBlack4 = jamrules.build($('#filterbox'),{name:"rulesEngineBlack4"});
+	var rulesEngineWhite1 = jamrules.build($('#filterbox'),{name:"rulesEngineWhite1"});
+	var rulesEngineWhite2 = jamrules.build($('#filterbox'),{name:"rulesEngineWhite2"});
+	var rulesEngineWhite3 = jamrules.build($('#filterbox'),{name:"rulesEngineWhite3"});
+	var rulesEngineWhite4 = jamrules.build($('#filterbox'),{name:"rulesEngineWhite4"});
+	var rulesEngineWin = jamrules.build($('#filterbox'),{debug:false,LogLevel:3,name:"rulesEngineWin"});
 	
 	var nbFoundDotColor=0;
 	
@@ -111,7 +111,7 @@
 		case 'rulesEngineWhite4':
 			this.nbWhiteDotFound++;
 			$("#msg").append("<p>matched</p>");
-			$.each(aEngineRule.ruleEngine.opts.reason,function(index,value) {
+			$.each(aEngineRule.myRulesEngine.opts.reason,function(index,value) {
  				if (value.indexOf("DefaultState")==-1)
  					$("#msg").append("Match reason: State "+index+" --> "+value);
  			});
@@ -122,7 +122,7 @@
 		case 'rulesEngineBlack4':
 			this.nbBlackDotFound++;
 			$("#msg").append("<p>matched</p>");
-			$.each(aEngineRule.ruleEngine.opts.reason,function(index,value) {
+			$.each(aEngineRule.myRulesEngine.opts.reason,function(index,value) {
  				if (value.indexOf("DefaultState")==-1)
  					$("#msg").append("Match reason: State "+index+" --> "+value);
  			});
@@ -141,7 +141,7 @@
 			break;
 		default:
 			$("#msg").append("<p>not matched</p>");
-			$.each(aEngineRule.ruleEngine.opts.reason,function(index,value) {
+			$.each(aEngineRule.myRulesEngine.opts.reason,function(index,value) {
 	 				if (value.indexOf("DefaultState")==-1)
 	 					$("#msg").append("Don't Match reason: State "+index+" --> "+value);
 	 			});
