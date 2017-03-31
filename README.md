@@ -15,7 +15,7 @@ You have to first create your jamrules object, then you'll be able to call its f
 ```javascript
 
 //initialisation of jamrules and its configurator
-var rulesEngine = new jamrules($('body'));
+var rulesEngine = jamrules.build($('body'));
 ```
  
 ## Define a set of objects 
@@ -243,6 +243,28 @@ var anObject = {
 		notmatched : null
 	};
 rulesEngine.addObject(onObject);
+```
+
+## _addObject(anObject)
+Add an object to the list of objects to test against rules.
+This function differs from addObject in the way that all the jamrules will share the objects added this way.
+So, you include once your objects in the first jamrules object and then they will be processed by all the other rules.
+
+### parameters  
+* anObject: a object to test in jamrule 
+
+### Example
+```javascript
+var anObject = {
+		propertiesSet : {
+			object1Color : {
+				white : 1
+			},
+		},
+		matched : myMatchFunction,
+		notmatched : null
+	};
+rulesEngine._addObject(onObject);
 ```
 
 ## createRulesSet(aRulesGroup, ruleEvents) 
