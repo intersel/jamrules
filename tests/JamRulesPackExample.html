@@ -26,25 +26,26 @@
 
 		var rulesEngine = new jamrules2($('body'),{debug:true});
 */
-var rulesEngine = jamrules.build($('body'),{debug:true,name:"engine1"});
-var rulesEngine2 = jamrules.build($('body'),{debug:true,name:"engine2"});
 
-		//add objects that we want to test with jamrules
-		var matched=function(){
-			var msg;
-			msg="<p style='color:green;font-weight:bold;'>This pack has a promo coupon</p>";
-			$("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
-		};
-		var notmatched=function(aJamRules){
-			var msg;
-			var reason = aJamRules.myRulesEngine.opts.reason;
-			msg="<p style='color:red'>This pack is has no coupon</p>";
-			$("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
-			$.each(reason,function(index,value) {
-	 				if (value.indexOf("DefaultState")==-1)
-	 					$("#msg").append('reason:'+index+' '+reason[index]);
-	 			});
-		};
+//add objects that we want to test with jamrules
+var matched=function(){
+	var msg;
+	msg="<p style='color:green;font-weight:bold;'>This pack has a promo coupon</p>";
+	$("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+};
+var notmatched=function(aJamRules){
+	var msg;
+	var reason = aJamRules.myRulesEngine.opts.reason;
+	msg="<p style='color:red'>This pack is has no coupon</p>";
+	$("#msg").append("<h3>configuration of this pack:</h3><pre>"+JSON.stringify(this)+"</pre>"+msg);
+	$.each(reason,function(index,value) {
+				if (value.indexOf("DefaultState")==-1)
+					$("#msg").append('reason:'+index+' '+reason[index]);
+			});
+};
+
+
+var rulesEngine = jamrules.build({jqueryObj:$('#jamrules'),debug:true,name:"engine1"});
 
 		var pack1 = {
 			propertiesSet : {
@@ -100,7 +101,7 @@ var rulesEngine2 = jamrules.build($('body'),{debug:true,name:"engine2"});
 			matched : matched,
 			notmatched : notmatched
 		};
-		rulesEngine._addObject(pack1);
+		jamrules._addObject(pack1);
 		rulesEngine.addObject(pack2);
 		rulesEngine.addObject(pack3);
 
@@ -126,24 +127,39 @@ var rulesEngine2 = jamrules.build($('body'),{debug:true,name:"engine2"});
 
 		
 		var pack21 = {
-				propertiesSet : {
-					object1 : {
-						shirt : 1
-					},
-					object2 : {
-						shirt : 1
-					},
-					object1Color : {
-						white : 1
-					},
-					object2Color : {
-						blue : 1
-					}
-				},
-				matched : matched,
-				notmatched : notmatched
-			};
-		rulesEngine2.addObject(pack21);
+					object1 : 'trouser',
+					object2 : 'trouser',
+					object1Color : 'blue',
+					object2Color : 'blue'
+					};
+		var pack22 = {
+				object1 : 'shirt',
+				object2 : 'shirt',
+				object1Color : 'blue',
+				object2Color : 'blue'
+				};
+		var pack23 = {
+				object1 : 'trouser',
+				object2 : 'trouser',
+				object1Color : 'red',
+				object2Color : 'red'
+				};
+		var rulematched=function(aListOfMatchedObjects){
+			var msg;
+			msg="<p style='color:green;font-weight:bold;'>The Rule matched for an element profile of "+aListOfMatchedObjects.length+" element(s)!</p>";
+			$("#msg").append("<h3>"+msg+"</h3><pre>");
+		};
+		var rulenotmatched=function(aListOfMatchedObjects){
+			var msg;
+			msg="<p style='color:green;font-weight:bold;'>The Rule did NOT matched for an element profile of "+aListOfMatchedObjects.length+" element(s)!</p>";
+			$("#msg").append("<h3>"+msg+"</h3><pre>");
+		};
+		var rulesEngine2 = jamrules.build({debug:true,name:"engine2",matched:rulematched,notmatched:rulenotmatched});
+		
+		rulesEngine2.addObject({propertiesSet:jamrules._translateToJamrulesProperties(pack21),matched : matched,notmatched : notmatched});
+		rulesEngine2.addPropertyObject(pack22);
+		rulesEngine2.addPropertyObject(pack23,matched,notmatched);
+
 		rulesEngine2.createRulesSet("SameColorTrousersPack");
 		rulesEngine2.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","trouser")');
 		rulesEngine2.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');

@@ -32,19 +32,17 @@ For the example, we will translate this description defining the "pack" as our j
 * property "object2" that can have the values "trouser" or "shirt"
 * property "object2color" that can have the values "blue" or "yellow" or "white"
 
-Here is an exemple of how a pack should be defined for jamrules:
+Here is an exemple of how a pack may defined for jamrules:
 ```javascript
 	
 var pack1={
-		propertiesSet:{
-			object1:{trouser:1}
-		,	object2:{shirt:1}
-		,	object1Color:{blue:1}
-		,	object2Color:{white:1}
-		}			
+			object1:"trouser"
+		,	object2:"shirt"
+		,	object1Color:"blue"
+		,	object2Color:"white"
 };
 
-rulesEngine.addObject(pack1);
+rulesEngine.addPropertyObject(pack1);
 	
 ```
 
@@ -98,10 +96,12 @@ JamRules will select the packs that match the configuration if it respects the r
 To do that, just define a "matched" function on your object like in this example:
 
 ```javascript
-	
-var pack1.matched=function(aRuleEngine){
+
+var pack1 ={property1:20} 
+pack1.matched=function(aRuleEngine){
 	alert("it matches");
 }
+rulesEngine.addPropertyObject(pack1);
 ```
 
 You can define a "notmatched" that will be called if the tested object did not match the rules...
@@ -136,11 +136,35 @@ no demo available :-( will come quickly!
 ```javascript
 
 //initialisation of jamrules and its configurator
-var rulesEngine = new jamrules($('#filterbox'),{debug:true});
+var rulesEngine = jamrules.build({
+	debug:		<boolean>,
+	matched:	<a function to call when the rule find a match>,
+	notmatched:	<a function to call when the rule did not find a match>
+	jqueryObj:	<aJqueryObject>,
+});
 ```
 
-# The JamRules Objects
-In order to test objects with jamrules, you need to format your data in this format:
+## the options parameter
+### debug
+if true, the rule engine will send debug message on the console
+
+
+### the Matched and NotMatched functions
+
+The "matched" and "notmatched" functions are called whenever the rule engine matches an object profile.
+
+They have the following parameters:
+  * aListOfMatchedObjects: the list of objects that matched the rule
+
+### jqueryObj -internal parameter-
+jquery Object to bind with the iFSM engine.
+
+# The JamRules Objects 
+In order to test objects with jamrules, you have to give it objects to test against the rules defined in the rule engine.
+
+These objects may be any with properties...
+
+Internally, the objects are formatted in order to process the matching functions and rules, the internal format of your data in jamrules will be :
 
 ```javascript
 {
@@ -148,7 +172,9 @@ In order to test objects with jamrules, you need to format your data in this for
 		<propertyName1>:{<propertyValue1:<0|1>,<propertyValue2:<0|1>, ...},
 		<propertyName2>:{<propertyValue1:<0|1>,<propertyValue2:<0|1>, ...},
 		...
-	}	
+	},
+	matched: <a function when it matches>,	
+	notmatched: <a function when it does not match>,	
 }
 ```
 
@@ -225,14 +251,35 @@ rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameVal
 ```
 # The JamRules API
 
+## addPropertyObject(anObject<, aMatchingFunction, aNotMatchingFunction>)
+
+Add an object to the list of objects to test against rules.
+
+  * object with its properties plus these optional ones
+	     * 		matched (otion):<function name to call when a rule will match for the object>
+	     * 		notmatched (option):<function name to call when there is a change but object does not match any rules>
+ 	* aMatchingFunction (option): the matching function, same as to define the "matched" property in the object 
+ 	* aNotMatchingFunction (option): the matching function, same as to define the "notmatched" property in the object
+
+### Example
+```javascript
+ruleEngine = jamrules.build();
+var anObject = {
+	object1Color : "white"
+};
+myMatchFunction = function(){alert("Hello:"+this.object1Color)};
+rulesEngine.addObject(onObject,myMatchFunction);
+```
+
 ## addObject(anObject)
 Add an object to the list of objects to test against rules.
 
 ### parameters  
-* anObject: a object to test in jamrule 
+* anObject: a object to test in jamrules in jamrules format
 
 ### Example
 ```javascript
+ruleEngine = jamrules.build();
 var anObject = {
 		propertiesSet : {
 			object1Color : {
@@ -245,7 +292,10 @@ var anObject = {
 rulesEngine.addObject(onObject);
 ```
 
-## _addObject(anObject)
+## _addObject(anObject) - static function
+
+Remark: to be called with jamrules variables.
+
 Add an object to the list of objects to test against rules.
 This function differs from addObject in the way that all the jamrules will share the objects added this way.
 So, you include once your objects in the first jamrules object and then they will be processed by all the other rules.
@@ -264,7 +314,7 @@ var anObject = {
 		matched : myMatchFunction,
 		notmatched : null
 	};
-rulesEngine._addObject(onObject);
+jamrules._addObject(onObject);
 ```
 
 ## createRulesSet(aRulesGroup, ruleEvents) 
@@ -563,6 +613,17 @@ To work properly, you need to include the following javascript library:
 # Official website
 
 # FAQ
+## How to get why the rule did not match
+
+You can get the reasons why the engine did not match by accessing to the following reason property :
+
+```javascript
+var notmatched=function(aJamRules){
+	var reason = aJamRules.myRulesEngine.opts.reason; //array of strings with the rules that did not match
+}
+```
+
+
 
 # Contact
 If you have any ideas, feedback, requests or bug reports, you can reach me at github@intersel.org, 

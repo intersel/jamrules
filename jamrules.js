@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------------------
- * INTERSEL - 4 cité d'Hauteville - 75010 PARIS
+ * INTERSEL - 4 cité d'Hauteville - 75010 PARIS - France
  * RCS PARIS 488 379 660 - NAF 721Z
  *
  * File : jamrules.js
@@ -8,7 +8,8 @@
  *
  * -----------------------------------------------------------------------------------------
  * Modifications :
- * - 20170331  - E.Podvin - V2.0.0 - Creation
+ * - 20170402 - E.Podvin - V2.1.0 - adding new objects simplified + possibility to call matching rule functions
+ * - 20170331  - E.Podvin - V2.0.0 - Refactoring
  * - 20170227  - E.Podvin - V1.0.0 - Creation
  * 
  * -----------------------------------------------------------------------------------------
@@ -17,7 +18,7 @@
  * @fileoverview : 
  * @see {@link https://github.com/intersel/jamrules}
  * @author : Emmanuel Podvin - emmanuel.podvin@intersel.fr
- * @version : 2.0.0
+ * @version : 2.1.0
  * -----------------------------------------------------------------------------------------
  */
 
@@ -61,7 +62,110 @@ var jamrules = (function(){
     var ObjectProfiles = {};
 
 
-	var jamrulesClass = function(aJqueryObj,options) {
+	/**
+	 * private 
+	 * private jQuery object for iFSM when not given
+	 */
+    var aDefaultJqueryObj;
+    var randomSessionId=$.md5(Math.random());
+    if (!$('html').attr("id")) $('html').attr("id","jamrules"+randomSessionId)
+    aDefaultJqueryObj = $("html");
+
+    
+    /**
+     * @access private
+     * @abstract get the key to access to the object profile of an object
+     * @return a md5 key for a json object
+	 * 
+	 */
+    var getObjectProfileKey = function(anObject)
+    {
+    	return $.md5(JSON.stringify(anObject.propertiesSet));
+    }
+    /**
+     * @access private
+     * @abstract add a new object profile if the one defines by anObject does not exist
+	 * 
+	 */
+    var addObjectProfile = function(objectKey,anObject,anObjectProfiles)
+    {
+    	if (!anObjectProfiles) anObjectProfiles = ObjectProfiles;
+    	if (!anObjectProfiles[objectKey]) anObjectProfiles[objectKey]={propertiesSet:anObject.propertiesSet,objectsList:[]};
+    }
+    /**
+     * @access private
+     * @abstract add a new element to the element profiles array
+	 * 
+	 */
+    var addObjectToObjectProfilesArray = function(objectKey,anObject,anObjectProfiles)
+    {
+    	if (!anObjectProfiles) anObjectProfiles = ObjectProfiles;
+    	anObjectProfiles[objectKey]['objectsList'].push(anObject);
+    }
+
+    /**
+     * @function public static _addObject 
+     * @abstract add an object to the list of objects to test against rules
+     * the new object will be tested against all the called rules
+     * @param anObject: object
+     * {
+     * 		propertiesSet:
+     * 		[	
+     * 			<propertyName1>.<propertyValue1>:true|false,
+     * 			<propertyName2>.<propertyValue2>:true|false
+     * 			....
+     * 		]
+     * 		matched:<function name to call when a rule will match for the object>
+     * 		notmatched:<function name to call when there is a change but object does not match any rules>
+     * }
+     * @example
+     */
+    var _addObject = function(anObject,anObjectProfiles) {
+    	if (!anObject)
+    	{
+    		alert("object is void...?");
+    		return;
+    	}
+    	if ( (!anObject.propertiesSet) || (Object.keys(anObject.propertiesSet).length === 0) )
+    	{
+    		alert("object has no properties...?");
+    		return;
+    	}
+    	var objectKey = getObjectProfileKey(anObject);
+    	addObjectProfile(objectKey,anObject,anObjectProfiles);
+    	addObjectToObjectProfilesArray(objectKey,anObject,anObjectProfiles);
+    };
+
+
+    /**
+     * @function public static _translateToJamrulesProperties 
+     * @abstract translate an object with properties to a propertiessSet compliant with jamrules..
+     * @return anObject: object
+     * {
+     * 		propertiesSet:
+     * 		[	
+     * 			<propertyName1>.<propertyValue1>:true|false,
+     * 			<propertyName2>.<propertyValue2>:true|false
+     * 			....
+     * 		]
+     * 		matched:<function name to call when a rule will match for the object>
+     * 		notmatched:<function name to call when there is a change but object does not match any rules>
+     * }
+     * @example
+     */
+    var _translateToJamrulesProperties= function(anObject) {
+    	var aPropertiesSet = {
+    	};
+    	
+    	for(var aProperty in anObject) {
+    		aPropertiesSet[aProperty] = {};
+    		aPropertiesSet[aProperty][anObject[aProperty]] = 1
+		};    		
+		return aPropertiesSet;
+
+    };
+
+	var jamrulesClass = function(options) {
 	
 		
 		/**
@@ -482,11 +586,16 @@ var jamrules = (function(){
 	 			 					thisme.opts.jamrules.log("Match reason: State "+index+" --> "+value);
 	 			 			});
 	
-	 			 			if (this.opts.objectProfile.objectsList[0].matched)
-	                    	for(anObject in this.opts.objectProfile.objectsList) 
+	 			 			if (this.opts.jamrules.options.matched)
 	                    	{
-	                    		this.opts.objectProfile.objectsList[anObject].matched(thisme.opts.jamrules);
+	                    		this.opts.jamrules.options.matched.apply(thisme.opts.jamrules,[this.opts.objectProfile.objectsList]);
 	                    	}
+
+	 			 			if (this.opts.objectProfile.objectsList[0].matched)
+		                    	for(anObject in this.opts.objectProfile.objectsList) 
+		                    	{
+		                    		this.opts.objectProfile.objectsList[anObject].matched(thisme.opts.jamrules);
+		                    	}
 	
 	                    },
 		            	propagate_event:'testRules',
@@ -510,6 +619,10 @@ var jamrules = (function(){
 	 			 					thisme.opts.jamrules.log("Don't Match reason: State "+index+" --> "+value);
 	 			 			});
 	
+	 			 			if (this.opts.jamrules.options.notmatched)
+	                    	{
+	                    		this.opts.jamrules.options.notmatched.apply(thisme.opts.jamrules,[this.opts.objectProfile.objectsList]);
+	                    	}
 	 			 			if (this.opts.objectProfile.objectsList[0].notmatched)
 		                	for(anObject in this.opts.objectProfile.objectsList) 
 		                	{
@@ -608,7 +721,7 @@ var jamrules = (function(){
 	     * constructor of a jamRules object
 	     * 
 	     */
-	    var jamrulesConstructor = function(aJqueryObj,options) {
+	    var jamrulesConstructor = function(options) {
 	    	
 	   	 
 		    // variables and functions private unless attached to API below
@@ -623,7 +736,7 @@ var jamrules = (function(){
 			 * @param options - options given to jamrules
 			 * @access public 
 			 */
-			if (this.options == undefined) this.options=null;
+			if (this.options == undefined) this.options={jqueryObj:aDefaultJqueryObj};
 			this.options = jQuery.extend( {}, defaults, options || {});
 	
 		
@@ -638,7 +751,7 @@ var jamrules = (function(){
 			 * @param myJqueryObj - the jquery object on which jamrules is bound
 			 * @access public 
 			 */
-			this.myJqueryObj = aJqueryObj;
+			this.myJqueryObj = options.jqueryObj;
 			
 			
 		    /**
@@ -688,38 +801,6 @@ var jamrules = (function(){
 	    };
 	
 
-	    
-	    /**
-	     * @access private
-	     * @abstract get the key to access to the object profile of an object
-	     * @return a md5 key for a json object
-		 * 
-		 */
-	    var getObjectProfileKey = function(anObject)
-	    {
-	    	return $.md5(JSON.stringify(anObject.propertiesSet));
-	    }
-	    /**
-	     * @access private
-	     * @abstract add a new object profile if the one defines by anObject does not exist
-		 * 
-		 */
-	    var addObjectProfile = function(objectKey,anObject,anObjectProfiles)
-	    {
-	    	if (!anObjectProfiles) anObjectProfiles = ObjectProfiles;
-	    	if (!anObjectProfiles[objectKey]) anObjectProfiles[objectKey]={propertiesSet:anObject.propertiesSet,objectsList:[]};
-	    }
-	    /**
-	     * @access private
-	     * @abstract add a new element to the element profiles array
-		 * 
-		 */
-	    var addObjectToObjectProfilesArray = function(objectKey,anObject,anObjectProfiles)
-	    {
-	    	if (!anObjectProfiles) anObjectProfiles = ObjectProfiles;
-	    	anObjectProfiles[objectKey]['objectsList'].push(anObject);
-	    }
-	
 	    
 	    /**
 	     * ----------------------------------------- 
@@ -892,6 +973,7 @@ var jamrules = (function(){
 	    	var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 	    	
 			// we can process only if the property has only one value
+    		if (propertiesObjectProfile[anObjectPropertyName])
 			for(aPropertyValue in propertiesObjectProfile[anObjectPropertyName]) 
 			{
 				//one of the value is not ok=> does not share their values setting
@@ -1004,6 +1086,7 @@ var jamrules = (function(){
 	    	//if undefined, means that we want that one of the property value of object is set in the configuration too 
 	    	if (aPropertyValue==undefined) 
 	    	{
+	    		if (propertiesObjectProfile[aPropertyName1])
 	    		for(aPropertyValue in propertiesObjectProfile[aPropertyName1]) 
 	    		{
 	    	    	if (
@@ -1042,6 +1125,7 @@ var jamrules = (function(){
 			var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 			
 			// we can process only if the property has only one value
+    		if (propertiesObjectProfile[aPropertyName1])
 			for(aPropertyValue in propertiesObjectProfile[aPropertyName1]) 
 			{
 				//one of the value is not ok=> does not share their values setting
@@ -1068,6 +1152,7 @@ var jamrules = (function(){
 	    	//if undefined, means that we want that one of the property value of object is set in the configuration too 
 	    	if (aPropertyValue==undefined) 
 	    	{
+	    		if (propertiesConfiguration[aPropertyName1])
 	    		for(aPropertyValue in propertiesConfiguration[aPropertyName1]) 
 	    		{
 	    	    	if (
@@ -1104,6 +1189,7 @@ var jamrules = (function(){
 	    var ConfigurationPropertiesSameValues = function(aPropertyName1,aPropertyName2)
 	    {
 			// we can process only if the property has only one value
+    		if (propertiesConfiguration[aPropertyName1])
 			for(aPropertyValue in propertiesConfiguration[aPropertyName1]) 
 			{
 				//one of the value is not ok=> does not share their values setting
@@ -1264,30 +1350,6 @@ var jamrules = (function(){
 	    }
 	    
 	    /**
-	     * @function public static _addObject 
-	     * @abstract add an object to the list of objects to test against rules
-	     * the new object will be tested against all the called rules
-	     * @param anObject: object
-	     * {
-	     * 		propertiesSet:
-	     * 		[	
-	     * 			<propertyName1>.<propertyValue1>:true|false,
-	     * 			<propertyName2>.<propertyValue2>:true|false
-	     * 			....
-	     * 		]
-	     * 		matched:<function name to call when a rule will match for the object>
-	     * 		notmatched:<function name to call when there is a change but object does not match any rules>
-	     * }
-	     * @example
-	     */
-	    var _addObject = function(anObject,anObjectProfiles) {
-	    	this.log("addObject");
-	    	var objectKey = getObjectProfileKey(anObject);
-	    	addObjectProfile(objectKey,anObject,anObjectProfiles);
-	    	addObjectToObjectProfilesArray(objectKey,anObject,anObjectProfiles);
-	    };
-	
-	    /**
 	     * @function public addObject 
 	     * @abstract add an object to the list of objects to test against rules
 	     * @param anObject: object
@@ -1305,9 +1367,29 @@ var jamrules = (function(){
 	     */
 	    var addObject = function(anObject) {
 	    	this.log("addObject");
-	    	this._addObject(anObject,this.getObjectProfiles());
+	    	_addObject(anObject,this.getObjectProfiles());
 	    };
 	  
+	    /**
+	     * @function public addPropertyObject 
+	     * @abstract add an object to the list of objects to test against rules
+	     * @param anObject: object with its properties plus optionnaly these following
+	     * 		matched (otion):<function name to call when a rule will match for the object>
+	     * 		notmatched (option):<function name to call when there is a change but object does not match any rules>
+	     * @param aMatchingFunction (option): the matching function, same as to define the "matched" property in the object
+	     * @param aNotMatchingFunction (option): the matching function, same as to define the "notmatched" property in the object
+	     * @example
+	     */
+	    var addPropertyObject = function(anObject, aMatchingFunction, aNotMatchingFunction) {
+	    	this.log("addObject");
+	    	if (!aMatchingFunction && anObject.matched)
+	    		aMatchingFunction = anObject.matched;
+	    	
+	    	if (!aNotMatchingFunction && anObject.notmatched)
+	    		aNotMatchingFunction = anObject.notmatched;
+
+	    	_addObject({propertiesSet:jamrules._translateToJamrulesProperties(anObject),matched:aMatchingFunction,notmatched:aNotMatchingFunction},this.getObjectProfiles());
+	    };
 	    /**
 	     * @access public
 	     * @abstract log a message on the console for debug
@@ -1327,9 +1409,8 @@ var jamrules = (function(){
 	        	,	addRule:addRule
 	        	,	compileRules:compileRules
 	        	,	addObject:addObject
+	        	,	addPropertyObject:addPropertyObject
 	        	,	log:log
-	        		/** Static Functions **/
-	        	,	_addObject:_addObject
 	        		/** Public variables **/
 	        	,	propertiesConfiguration:propertiesConfiguration
 	        		/** Test function for matching **/ 
@@ -1348,26 +1429,34 @@ var jamrules = (function(){
 	    }; 
 	
 	
-	    return (new jamrulesConstructor(aJqueryObj,options));
+	    return (new jamrulesConstructor(options));
 	};
 	
 	/**
 	 * builder of instance of a jamrules engine from the jamrulesClass definition
 	 */
-	var jamRulesBuilder = function(aJqueryObj,options){
+	var jamRulesBuilder = function(options){
+				
+		if (!options) options={};
 		
+		if (!options.jqueryObj) options.jqueryObj = aDefaultJqueryObj;
 
-		return new jamrulesClass(aJqueryObj,options);
+		return new jamrulesClass(options);
 
 	};
 	
 	/**
 	 * api of jamrules:
 	 * 
-	 * jamrules.build(aJqueryObj,options)
+	 * jamrules.build(options)
 	 */
-	var API = {};
-	API.build = jamRulesBuilder;
+	var API = {
+				build: jamRulesBuilder
+        		/** Static Functions **/
+			,	_addObject:_addObject
+			,	_translateToJamrulesProperties:_translateToJamrulesProperties
+	};
+	
 	return API;
 	
 })();
