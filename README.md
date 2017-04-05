@@ -6,6 +6,8 @@ Let's say you have a set of objects with properties and you'd like to filter the
 
 JamRules is Javascript/jQuery library that allows you to configure a set of parameters and a set of rules of matching, then it will test and select your objects accordingly to your configuration and the defined rules.
 
+![alt jamrules designed for the selection of objects](https://cloud.githubusercontent.com/assets/1048488/24730721/91d34c04-1a65-11e7-8fb8-9e47dec60691.jpg)
+
 # Let's get started with an example...
 ## Create a Jamrules object
 To run, jamrules needs to be bound to a DOM object that has an id defined on it.
