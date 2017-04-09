@@ -10,14 +10,12 @@ JamRules is Javascript/jQuery library that allows you to configure a set of para
 
 # Let's get started with an example...
 ## Create a Jamrules object
-To run, jamrules needs to be bound to a DOM object that has an id defined on it.
-
-You have to first create your jamrules object, then you'll be able to call its functions to create rules, add objects to test, run the test, ...
+To run jamrules, you have to create first your jamrules object, then you'll be able to call its functions to create rules, add objects to test, run the test, ...
 
 ```javascript
 
 //initialisation of jamrules and its configurator
-var rulesEngine = jamrules.build($('body'));
+var rulesEngine = jamrules.build();
 ```
  
 ## Define a set of objects 
