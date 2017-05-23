@@ -268,7 +268,7 @@ var anObject = {
 	object1Color : "white"
 };
 myMatchFunction = function(){alert("Hello:"+this.object1Color)};
-rulesEngine.addObject(onObject,myMatchFunction);
+rulesEngine.addPropertyObject(onObject,myMatchFunction);
 ```
 
 ## addObject(anObject)
