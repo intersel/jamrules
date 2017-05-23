@@ -256,10 +256,10 @@ rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameVal
 Add an object to the list of objects to test against rules.
 
   * object with its properties plus these optional ones
-	     * 		matched (otion):<function name to call when a rule will match for the object>
-	     * 		notmatched (option):<function name to call when there is a change but object does not match any rules>
- 	* aMatchingFunction (option): the matching function, same as to define the "matched" property in the object 
- 	* aNotMatchingFunction (option): the matching function, same as to define the "notmatched" property in the object
+    * matched (otion): function to call when a rule will match for the object
+    * notmatched (option): function to call when rules will be tested but no rules match for the object
+  * aMatchingFunction (option): a matching function, same as to define the "matched" property in the object 
+  * aNotMatchingFunction (option): a 'not' matching function, same as to define the "notmatched" property in the object
 
 ### Example
 ```javascript
