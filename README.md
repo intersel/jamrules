@@ -246,8 +246,8 @@ rulesEngine.createRulesSet("SameTrousers");
 rulesEngine.addRule("SameTrousers","O1Trouser",'ObjectPropertySet("object1","trouser")');
 rulesEngine.addRule("SameTrousers","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
 rulesEngine.createRulesSet("SameShirts",["object1","object2"]);
-rulesEngine.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","shirt")');
-rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+rulesEngine.addRule("SameColorTrousersPack","O1Shirt",'ObjectPropertySet("object1","shirt")');
+rulesEngine.addRule("SameColorTrousersPack","O2Shirt",'ObjectPropertiesSameValue("object1","object2")');
 ```
 # The JamRules API
 
