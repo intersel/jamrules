@@ -221,13 +221,13 @@ It declares an object "matched" as soon as the first set of rules is compliant w
 
 Rules are defined within a rules set.
 
-A rule set is validated when all its rules are validated. 
+A rules set is validated when all its rules are validated to true. 
 
-If not, Jamrules will try the following rules set.
+If not, Jamrules will try the next rules set.
 
 If none of the rules sets are validated, then the object is declared "unmatched".
 
-we use the **createRulesSet** function to create a rules set, and the **addRule** function to add a rule in a rule set.
+We use the **createRulesSet** function to create a rules set, and the **addRule** function to add a rule in a rule set.
 
 ## Rules
 
