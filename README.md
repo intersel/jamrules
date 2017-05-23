@@ -50,13 +50,13 @@ rulesEngine.addPropertyObject(pack1);
 
 I want to give a promo coupon for packs that
   * have two trousers 
-  * nothing if the trousers in the pack are of different colors
-  * nothing for the other kind of packs
+  * but nothing if the trousers in the pack are of different colors
+  * and nothing for the other kind of packs
 
 We will translate these rules to have a coupon as following:
 * object1 and object2 have to be trousers
   * AND
-    * object1color has to be different from object2color
+    * object1color has to be the same color with object2color
 
 In Jamrules, we'll describe these rules this way:
 ```javascript
