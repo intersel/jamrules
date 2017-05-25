@@ -191,7 +191,7 @@ The **selectConfigurationPropertyValue** function allows to create and edit such
 ```javascript
 
 
-rulesEngine.createRulesSet("SameTrousers");
+rulesEngine.createRulesSet("SameTrousers",["color"]);
 // tells to select objects that have their property "color" to "white" when the configurator has its "color/white" property set 
 rulesEngine.addRule("SameTrousers","O1WhiteTrouser",'MatchPropertyValue("color","white")');
 ...
@@ -321,11 +321,14 @@ jamrules._addObject(onObject);
 Creates a rule set.
 ### parameters  
 * aRulesGroup: name of the rules set to create
-* ruleEvents: [array] events to hear to test the rules group. Actually, should be names of properties that are used as events (see selectConfigurationPropertyValue). 
+* ruleEvents: [array] (option) a list of one or several property names used in the configurator. The rules set will be processed if a property of the configurator changes when using "selectConfigurationPropertyValue" function (see selectConfigurationPropertyValue). 
 
 ### Example
 ```javascript
 rulesEngine.createRulesSet("SameTrousers");
+...
+rulesEngine.createRulesSet("SameTrousers",["aProperty1","aProperty2"]);
+
 ```
 
 ## addRule(aRulesGroup, aRuleName, aRuleTest)
@@ -363,14 +366,28 @@ rulesEngine.runRulesEngine();
 Set a property/property value status in the rules configurator
 
 ### parameters  
-* aPropertyName: name of the property that has changed
-* aProperyValue: value of the property
-* aStatus: <boolean> status of the property for this property value set or not
-* doTest: <boolean> <default:true> if false, configure the configurator but does not run the rules engine test
+* **aPropertyName**: name of the property that has changed
+* **aProperyValue**: value of the property
+* **aStatus**: <boolean>  <default:false> (option) status of the property for this property value set or not
+* **doTest**: <boolean> <default:true> (option) if false, configure the configurator but does not run the rules engine test
+
+###Remarks
+If "doTest" is set, the rules engine will process -only- the rules sets that have configured the "aPropertyName" in the "ruleEvents" parameter of createRulesSet function.
 
 ### Example
 ```javascript
+
+	rulesEngine.createRulesSet("SameTrousers",["object1"]);
+	rulesEngine.addRule("SameTrousers","Trouser",'MatchProperty("object1")');
+	....
+	//as 'object1' is defined in the "SameTrousers" rules set, the following line will configure the "object1" property and see the rule set "SameTrousers" processed
 	rulesEngine.selectConfigurationPropertyValue("object1","trouser",1);
+	...
+	//no rule set to process... just configure the property in the configurator
+	rulesEngine.selectConfigurationPropertyValue("object1","trouser",1,false);
+	...
+	//will process all the rules sets
+	rulesEngine.runRulesEngine();
 ```
 
 
