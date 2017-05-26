@@ -622,10 +622,28 @@ Returns boolean
 
 # Install JamRules
 
+  * download JamRules from [github](https://github.com/intersel/jamrules) where you'd like in your project
+  * include the following javascript libraries (provided in the 'extlib' directory)
+```html
+		<script type="text/javascript" src="../extlib/jQuery/jquery-2.2.4.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>
+		<script type="text/javascript" src="../extlib/iFSM/iFSM.js"></script>
+		<script type="text/javascript" src="../extlib/jQuery-MD5/jquery.md5.js"></script>
+		<script type="text/javascript" src="../jamrules.js"></script>
+```
+  * include JamRules
+  
+```html
+  <script type="text/javascript" src="../jamrules.js"></script>
+```
+
+You're done!
+
 # Library Dependencies
 
-To work properly, you need to include the following javascript library:
-* jQuery (>= 1.10) `<script type="text/javascript" src="extlib/jQuery/jquery-2.2.4.js"></script>`
+JamRules needs to include the following javascript libraries and here's what they do:
+* jQuery (>= 1.10) `<script type="text/javascript" src="extlib/jQuery/jquery-3.1.1.js"></script>`
 * [iFSM by intersel](https://github.com/intersel/iFSM/). 
   * This library manages finite state machines and needs these libraries:
     * doTimeout by ["Cowboy" Ben Alman](http://benalman.com/projects/jquery-dotimeout-plugin/)
