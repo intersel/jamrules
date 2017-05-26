@@ -1,14 +1,23 @@
 # JamRules
-Javascript/jQuery configurator to match rules on massive number of objects
+Javascript/jQuery configurator to filter objects among a set of objects according to rules.
 
 # What is JamRules?
-Let's say you have a set of objects with properties and you'd like to filter them according to a user configuration of these properties and specific rules of choices... then JamRules is for you!
+Let's say you have a set of objects with properties and you'd like to filter them according to a user configuration of criteria and specific rules of selection... then JamRules is for you!
 
-JamRules is Javascript/jQuery library that allows you to configure a set of parameters and a set of rules of matching, then it will test and select your objects accordingly to your configuration and the defined rules.
+JamRules is a Javascript/jQuery library. 
 
-![alt jamrules designed for the selection of objects](https://cloud.githubusercontent.com/assets/1048488/24730721/91d34c04-1a65-11e7-8fb8-9e47dec60691.jpg)
+With it, you configure:
+  * a set of parameters/criteria of selection (configurator)  
+  * a set of rules of matching that your objects should comply
+  * a set of objects to test
 
-JamRules is your object filters best friend! Ideal for product configurators...
+Then, you run the matching processing in order to have JamRules to select the objects that match your criteria and to call a 'match' function on them.
+
+![alt JamRules designed for the selection of objects](https://cloud.githubusercontent.com/assets/1048488/24730721/91d34c04-1a65-11e7-8fb8-9e47dec60691.jpg)
+
+For example, connected to a dialog box of criteria managed with checkboxes, JamRules can be activated each time a criteria changes and so to alert the selected/unselected object of their new selection status.
+
+JamRules is your object filters best friend! Ideal for product configurators, objects selection on criteria, ...
 
 # Let's get started with an example...
 ## Create a Jamrules object
