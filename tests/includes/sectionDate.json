@@ -51,14 +51,14 @@
           "title":"Meeting report"
         , "docid":"doc6"
         , "tags":"club,anticipation"
-        , "cat":"dossier"
+        , "cat":"action plan"
         , "date":"21 march 2020"
         , "year":"2020"
       },
       {
           "title":"Meeting report"
         , "docid":"doc7"
-        , "tags":"ag,ca,action plan"
+        , "tags":"ca"
         , "cat":"dossier"
         , "date":"21 august 2020"
         , "year":"2020"
