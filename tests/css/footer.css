@@ -1,0 +1,39 @@
+footer {
+    background:#000;
+    color: #FFF;
+    padding: 70px 0;
+    font-family: Chatelet;
+    font-size: 19;
+}
+footer a {
+    color: #FFF;
+    text-decoration: none;
+}
+footer a:hover {
+    text-decoration: underline;
+}
+footer p {
+    margin: 0 0 1em 0;
+}
+
+
+footer .small {
+    font-size: 12px;
+}
+
+footer .rsf a {text-decoration: none;}
+footer .rsf img {
+    display: inline-block;
+    padding: 0 5px;
+}
+
+footer.fixed {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* nouvelles directives */
+    position: absolute;
+    bottom: auto;
+    top: 100vh;
+}

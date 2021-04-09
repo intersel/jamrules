@@ -1,0 +1,99 @@
+.documents ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid black;
+}
+.documents ul li  {
+    border-bottom: 1px solid black;
+    padding: 1.0em 0 1.4em;
+    background-color: #FFFFFF;
+    transition: all 0.2s;
+}
+.documents ul li .row:last-child {
+    justify-content: space-between;
+}
+.documents ul li .row:last-child .col-2 {
+    display: flex;
+    align-items: flex-end;
+    margin-right: 7.142857%;
+}
+.documents ul li:hover {
+    background-color: #C4D0FE;
+}
+.documents ul li .info {
+    padding-bottom: 0.5em;
+}
+.documents ul li .info  .date {
+    font-family: Chatelet;
+}
+.documents ul li h3 {
+    margin: 0;
+    font-family: Whyte;
+    font-size: 28px;
+    line-height: 32px;
+    font-weight: 400;
+}
+
+a.download {
+    background: transparent url('../img/DL.svg') left center no-repeat;
+    background-size: 0.8em;
+    padding-left: 1.2em;
+    display: inline-block;
+    height: 1.4em;
+}
+
+.filter-container {
+    padding-top: 3em;
+    padding-bottom: 3em;
+}
+
+.filters {
+    text-align: center ;
+}
+
+.filters.level2 .tags {
+    display: none;
+    padding-top: 1em;
+}
+.filters.level2.active .tags {
+    display: block;
+}
+
+
+.filters a.toggle {
+    display: inline-block;
+    height: 1.5em;
+    margin-bottom: 1em;
+    margin-top: 1em;
+    background: transparent url('../img/downArrow.svg') right center no-repeat;
+    background-size: 0.8em;
+    padding-right: 1.2em;
+}
+.filters.level2.active a.toggle {
+    background-image: url('../img/X.svg');
+}
+.filters a.btn {
+    display: inline-block;
+    border: 1px solid black;
+    border-radius: 1em;
+    text-decoration: none;
+    padding: 0 1em;
+    margin: 0 0.5em 1em;
+    height: 1.5em;
+    line-height: 1.6em;
+    transition: color 0.3s, background 0.3s;
+}
+.filters a.btn.active, .filters a.btn:hover {
+    background: #000;
+    color: #FFF;
+}
+.filters a.btn.active:hover:not(:focus) {
+    background: #FFF;
+    color: #000;
+}
+.filters .years a.btn {margin: 0 0.7em 1em;font-family: Chatelet;line-height: 1.6em;}
+
+section[data-year] .h1 {
+    margin-bottom: 15px
+}

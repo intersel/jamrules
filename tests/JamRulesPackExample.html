@@ -2,7 +2,7 @@
 <head>
 <title>JamRules Pack Example</title>
 <meta charset="utf-8" />
-<script type="text/javascript" src="../extlib/jQuery/jquery-2.2.4.js"></script>
+<script type="text/javascript" src="../extlib/jQuery/jquery-3.2.0.min.js"></script>
 <script type="text/javascript"
 	src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
 <script type="text/javascript"
@@ -106,7 +106,7 @@ var rulesEngine = jamrules.build({jqueryObj:$('#jamrules'),debug:true,name:"engi
 		rulesEngine.addObject(pack3);
 
 		// rules setting
-	
+
 		rulesEngine.createRulesSet("SameColorTrousersPack");
 		// we'd like to test a pack for giving it a promo coupon because it has 2 trousers of same color
 		// so, does our current pack being tested have a trouser for object1 property?
@@ -117,15 +117,15 @@ var rulesEngine = jamrules.build({jqueryObj:$('#jamrules'),debug:true,name:"engi
 		rulesEngine.addRule("SameColorTrousersPack","O1O2SameColor",'ObjectPropertiesSameValue("object1Color","object2Color")');
 		// if gone up here implies that the pack has two trousers of same color...
 		// then jamrules will call the match function for this pack
-		
+
 		// prepare the rule engine
 		rulesEngine.compileRules();
-		
+
 		//
 		$("#msg").append("<h2>run the test to get the packs that match the rules... </h2>");
 		rulesEngine.runRulesEngine();
 
-		
+
 		var pack21 = {
 					object1 : 'trouser',
 					object2 : 'trouser',
@@ -155,7 +155,7 @@ var rulesEngine = jamrules.build({jqueryObj:$('#jamrules'),debug:true,name:"engi
 			$("#msg").append("<h3>"+msg+"</h3><pre>");
 		};
 		var rulesEngine2 = jamrules.build({debug:true,name:"engine2",matched:rulematched,notmatched:rulenotmatched});
-		
+
 		rulesEngine2.addObject({propertiesSet:jamrules._translateToJamrulesProperties(pack21),matched : matched,notmatched : notmatched});
 		rulesEngine2.addPropertyObject(pack22);
 		rulesEngine2.addPropertyObject(pack23,matched,notmatched);
@@ -168,7 +168,7 @@ var rulesEngine = jamrules.build({jqueryObj:$('#jamrules'),debug:true,name:"engi
 		$("#msg").append("<h2>run the test to get the packs that match the rules... </h2>");
 		rulesEngine2.runRulesEngine();
 
-		
+
 	</script>
 
 </body>

@@ -2,7 +2,7 @@
 	<head>
 		<title>testJamRules</title>
 	 	<meta charset="utf-8" />
-		<script type="text/javascript" src="../extlib/jQuery/jquery-2.2.4.js"></script>
+		<script type="text/javascript" src="../extlib/jQuery/jquery-3.2.0.min.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/iFSM.js"></script>
@@ -10,35 +10,35 @@
 		<script type="text/javascript" src="../jamrules.js"></script>
 	</head>
 	<body>
-	
+
 	<div id="filterbox">
 		<h1>Raw test of jamrules</h1>
 		<div id="msg"></div>
 	</div>
 	<script>
-	
-	
-	
+
+
+
 	//initialisation of jamrules and its configurator
 	var rulesForPriorityLayer = jamrules.build({debug:true});
 	/* initialisation of the configurator if needed*/
 	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",1,false);
-	
+
 	// rules setting
 	rulesForPriorityLayer.createRulesSet("PriorityMatch1",["activities","priority"]);
 	rulesForPriorityLayer.addRule("PriorityMatch1","testPriorityExist",'MatchProperty("priority")');
 	rulesForPriorityLayer.addRule("PriorityMatch1","testActivityNotCompliant",'!ConfigurationPropertySet("activities","compliant")');
 	rulesForPriorityLayer.addRule("PriorityMatch1","testDisplayAll",'ConfigurationPropertySet("activities","all")');
-	
+
 	rulesForPriorityLayer.createRulesSet("PriorityMatch2",["activities","priority","technician"]);
 	rulesForPriorityLayer.addRule("PriorityMatch2","testPriorityExist",'MatchProperty("priority")');
 	rulesForPriorityLayer.addRule("PriorityMatch2","technicianCompliant",'MatchProperties("technician","compliantTechnician")');
 	rulesForPriorityLayer.addRule("PriorityMatch2","testActivityCompliant",'ConfigurationPropertySet("activities","compliant")');
 	rulesForPriorityLayer.addRule("PriorityMatch2","testDisplayAll",'ConfigurationPropertySet("activities","all")');
-	
+
 	// prepare the rule engine
 	rulesForPriorityLayer.compileRules();
-	
+
 	//add objects that we want to test if they match the rules
 	var el1={propertiesSet:{priority:{priority1:1 },compliantTechnician:{technician1:1}},matched:null,notmatched:null};
 	rulesForPriorityLayer.addObject(el1);
@@ -58,11 +58,11 @@
 	var msg = "set activities->all->on"
 	rulesForPriorityLayer.selectConfigurationPropertyValue("activities","all",1);
 	//-> match
-	// activate priority / priority1 
+	// activate priority / priority1
 	msg = "set priority->priority1->on"
 	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",1);
 	//-> match
-	// activate technician / technician1 
+	// activate technician / technician1
 	msg = "set technician->technician1->on"
 	rulesForPriorityLayer.selectConfigurationPropertyValue("technician","technician1",1);
 	//-> match
@@ -80,7 +80,7 @@
 	//-> match
 
 </script>
-	
+
 	</body>
-    
+
 </html>

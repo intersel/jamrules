@@ -1,0 +1,155 @@
+body > header {
+    font-family: Chatelet;
+    box-sizing: border-box;
+    background: #F8F8F8;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    height: calc(118px + 36px);
+    transition: all 0.6s;
+
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+body > header > .container {
+    height: 100%;
+}
+.logo-symbole {
+    padding-top: 0.7%;
+    transition: all 0.6s;
+}
+.logo-symbole img {
+    display: block;
+    height: 28px;
+    width: 28px;
+    margin-left: 20px;
+    transition: all 0.6s;
+
+}
+.logo-text-container {
+    position: relative;
+    flex-basis: 300px;
+    width: 300px;
+    transition: all 0.6s;
+}
+.logo-text {
+    position: absolute;
+    height: 46px;
+    width: auto;
+}
+.logo-text.comite {
+    left: 95px;
+    top: 0;
+    transition: all 0.6s;
+}
+.logo-text.colbert {
+    left: 10px;
+    top: 50px;
+    transition: all 0.6s;
+}
+
+.header ul {
+    margin: 0;
+    list-style: none;
+    display: flex;
+    padding-top: 0.7%;
+    font-size: 19px;
+}
+
+.header ul li {
+    padding-right: 1.5em;
+}
+.header ul li.active {
+    font-weight: 600;
+}
+.header ul li a {
+    text-decoration: none;
+}
+
+.header .right > * {
+    padding-right: 20px;
+}
+.header .profile {
+    font-size: 13px;
+    text-align: right;
+}
+
+.header .profile > * {
+    vertical-align: middle;
+    display: inline-block;
+    height: 25px;
+    line-height: 25px;
+}
+.header .profile a:not(.u) {
+    text-decoration: none;
+}
+.header .profile a.logout {padding-left: 2em;}
+.header .profile a:hover {
+    text-decoration: underline;
+}
+.header .profile .pp {
+    padding-right: 10px;
+}
+.header .profile .pp img {
+    display: inline-block;
+    height: 25px;
+    width: 25px;
+    border-radius: 13px;
+}
+
+.header .rs {
+    display: block;
+    padding-top:44px;
+    text-align: right;
+    transition: all 0.6s;
+}
+.header .rs a {text-decoration: none;}
+.header .rs svg {
+    display: inline-block;
+    padding-left: 8px;
+}
+.header #menubtn-sm {
+    display: none;
+}
+
+#menu-sm {display:none; }
+
+
+body {
+    transition: padding 0.6s;
+}
+
+body.scrolled {
+    padding-top: 54px;
+}
+body.scrolled > header {
+    height: 54px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+body.scrolled .logo-symbole {
+    padding-top: 0;
+}
+body.scrolled .logo-symbole img {height: 25px;}
+body.scrolled header ul {
+    padding-top: 0;
+}
+body.scrolled .logo-text-container {flex-basis: 220px;}
+body.scrolled .logo-text {height: 20px;}
+body.scrolled .logo-text.comite {left: 10px; top: 0;}
+body.scrolled .logo-text.colbert {left: 105px; top: 0;}
+body.scrolled .rs {
+    opacity: 0;
+    height: 0;
+}
+
+body.static {
+    padding-top: 0;
+    transition: none;
+}
+body.static > header {
+    position: static;
+}

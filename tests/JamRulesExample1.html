@@ -2,7 +2,7 @@
 	<head>
 		<title>testJamRules</title>
 	 	<meta charset="utf-8" />
-		<script type="text/javascript" src="../extlib/jQuery/jquery-2.2.4.js"></script>
+		<script type="text/javascript" src="../extlib/jQuery/jquery-3.2.0.min.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>
 		<script type="text/javascript" src="../extlib/iFSM/iFSM.js"></script>
@@ -44,7 +44,7 @@
 				Technician Compliant
 			</label>
 		</section>
-	</section> 
+	</section>
 	<section id="object1">
 		<h1>Elément 1</h1>
 		<section id='priority' class="property">
@@ -64,7 +64,7 @@
 			</label>
 			<label>
 				<input class="checkbox" id="el1-technician2" type="checkbox" value="technician2" disabled>
-				Technician 2 
+				Technician 2
 			</label>
 		</section>
 		<section id='compliantTechnician' class='property'>
@@ -102,7 +102,7 @@
 	el1['propertiesSet']['technician']['technician2']=$("#el1-technician2").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician1']=$("#el1-technician1-compliant").prop('checked');
 	el1['propertiesSet']['compliantTechnician']['technician2']=$("#el1-technician2-compliant").prop('checked');
-	
+
 	el1.matched=function(){
 		$("#el1-match").prop('checked',true);
 	};
@@ -113,7 +113,7 @@
 	// ---------------------------------
 	// Example of jamrules usage
 	// ---------------------------------
-	
+
 	//initialisation of jamrules and its configurator
 	var rulesForPriorityLayer = jamrules.build({debug:true});
 
@@ -122,19 +122,19 @@
 	rulesForPriorityLayer.addRule("PriorityMatch1","testPriorityExist",'MatchProperty("priority")');
 	rulesForPriorityLayer.addRule("PriorityMatch1","testActivityNotCompliant",'!ConfigurationPropertySet("activities","compliant")');
 	rulesForPriorityLayer.addRule("PriorityMatch1","testDisplayAll",'ConfigurationPropertySet("activities","all")');
-	
+
 	rulesForPriorityLayer.createRulesSet("PriorityMatch2",["activities","priority","technician"]);
 	rulesForPriorityLayer.addRule("PriorityMatch2","testPriorityExist",'MatchProperty("priority")');
 	rulesForPriorityLayer.addRule("PriorityMatch2","technicianCompliant",'MatchProperties("technician","compliantTechnician")');
 	rulesForPriorityLayer.addRule("PriorityMatch2","testActivityCompliant",'ConfigurationPropertySet("activities","compliant")');
 	rulesForPriorityLayer.addRule("PriorityMatch2","testDisplayAll",'ConfigurationPropertySet("activities","all")');
-	
+
 	// prepare the rule engine
 	rulesForPriorityLayer.compileRules();
-	
+
 	//add objects that we want to test if they match the rules
 	rulesForPriorityLayer.addObject(el1);
-	
+
 	/* initialisation if needed*/
 	// checked the input in the above html (#filterbox section) you'd like to have set in the configurator
 	// section id is a property name and input value is the value of the property and 'checked' the status
@@ -157,7 +157,7 @@
 	var checkBoxFilterFSM = {
             DefaultState        :
             {
-    	        click   :   
+    	        click   :
     	        {
                     init_function: function(){
                     	this.opts
@@ -177,7 +177,7 @@
     var filterBoxesFSM = {
             DefaultState        :
             {
-            	filterChange   :   
+            	filterChange   :
     	        {
                     init_function: function(data,aEvent,dataFromCheckbox){
                     	$("#debug").html("who:"+dataFromCheckbox.who.attr('id')+"<br>propertyName:"+dataFromCheckbox.propertyName+"<br>propertyValue:"+dataFromCheckbox.propertyValue+"<br>status:"+dataFromCheckbox.status);
@@ -193,7 +193,7 @@
 	});
 
     </script>
-	
+
 	</body>
-    
+
 </html>

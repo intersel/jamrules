@@ -1,0 +1,95 @@
+body.login {
+    padding-top: 0;
+}
+body.login > .container {
+    height: 100vh;
+    max-width: unset;
+    display: flex;
+    flex-direction: column;
+}
+body.login > .container > * {
+    flex-basis: 50vh;
+    flex-grow: 0;
+}
+
+body.login .half {
+    box-sizing: border-box;
+    padding: 0 1em;
+}
+
+body.login .half .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    height: 100%;
+    max-width: 571px;
+    margin: auto;
+}
+body.login .top {
+    background: #FED8D5;
+}
+body.login.pw .top {
+    background: #C4D0FF;
+}
+body.login .top-text {display: flex;align-items:flex-end; height: 6em;box-sizing: border-box; padding-top: 2em;}
+body.login .top p {
+    font-family: Chatelet;
+    font-size: 26px;
+    line-height: 32px;
+    font-weight: 400;
+    text-align: center;
+    margin: 0;
+}
+body.login .half.top .content {
+    padding-bottom: 2em;
+}
+
+body.login .bottom {
+    background: #ff864A;
+}
+body.login.pw .bottom {
+    background: #FFFE30;
+}
+body.login .half.bottom .content {
+    justify-content: flex-start;
+    padding-top: 2em;
+}
+body.login .half.bottom p {margin-bottom: 2em;margin-top: 0;}
+body.login form > * {
+    display: block;
+    width: 100%;
+}
+body.login label {
+    display: block;
+    padding-bottom:0.3em;
+}
+body.login input:not([type="checkbox"]) {
+    display: block;
+    box-sizing: border-box;
+    background:#F7F7F7;
+    border: none;
+    width: 100%;
+    padding: 0.5em;
+    
+}
+body.login span.error {
+    color: #FF0000;
+    display: block;
+}
+
+body.login .remember {
+    display: flex;
+    justify-content: space-between;
+    padding: 1em;
+    box-sizing: border-box;
+}
+body.login .remember > * {flex-basis: 49%;}
+body.login .remember > *:last-child  {
+    text-align: right;
+}
+
+body.login .submit {text-align: center;padding-top: 1em}
+body.login .submit button {background-color:#FFF;}
+body.login .submit button:hover {background-color:#000;}

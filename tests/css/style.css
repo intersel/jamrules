@@ -1,0 +1,14 @@
+/* Styles globaux */
+@import "normalize.css";
+@import "text.css";
+@import "layout.css";
+@import "header.css";
+@import "footer.css";
+
+@import "login.css";
+
+/* Styles spécifiques par page */
+@import "page-documents.css";   /* Styles communs : page documents et section documents sur pages HP et event */
+
+/* Styles mobile : largeur d'écran de 0 à 767px */
+@import "mobile.css";
