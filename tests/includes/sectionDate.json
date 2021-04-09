@@ -4,27 +4,35 @@
     "documents" : [
       {
           "title":"Compte-rendu de la réunion"
+        , "docid":"doc1"
         , "tags":"ag,ca,anticipation"
         , "cat":"compte-rendu"
         , "date":"20 janvier 2021"
+        , "year":"2021"
       },
       {
           "title":"Compte-rendu de la réunion"
+        , "docid":"doc2"
         , "tags":"ag,ca,anticipation"
         , "cat":"annexe"
         , "date":"12 Juillet 2021"
+        , "year":"2021"
       },
       {
           "title":"Compte-rendu de la réunion"
+        , "docid":"doc3"
         , "tags":"ca,bureau"
         , "cat":"dossier"
         , "date":"2 octobre 2021"
+        , "year":"2021"
       },
       {
           "title":"Compte-rendu de la réunion"
+        , "docid":"doc4"
         , "tags":"rayonnement"
         , "cat":"compte-rendu"
         , "date":"22 décembre 2021"
+        , "year":"2021"
       }
     ]
   },
@@ -33,33 +41,51 @@
     "documents" : [
       {
           "title":"Compte-rendu de la réunion"
+        , "docid":"doc5"
         , "tags":"ca,bureau"
         , "cat":"compte-rendu"
         , "date":"2 février 2020"
+        , "year":"2020"
       },
       {
           "title":"Compte-rendu de la réunion"
+        , "docid":"doc6"
         , "tags":"club,anticipation"
         , "cat":"dossier"
         , "date":"21 mars 2020"
+        , "year":"2020"
       },
       {
           "title":"Compte-rendu de la réunion"
+        , "docid":"doc7"
         , "tags":"ag,ca,anticipation"
         , "cat":"dossier"
         , "date":"21 aout 2020"
+        , "year":"2020"
       },
       {
           "title":"Compte-rendu de la réunion"
-        , "tags":"rayonnement"
-        , "cat":"annexe"
-        , "date":"13 octobre 2020"
+        , "docid":"doc70"
+        , "tags":"ag,ca,anticipation"
+        , "cat":"dossier"
+        , "date":"21 aout 2020"
+        , "year":"2020"
       },
       {
           "title":"Compte-rendu de la réunion"
+        , "docid":"doc8"
+        , "tags":"rayonnement,club"
+        , "cat":"dossier de presse"
+        , "date":"18 octobre 2020"
+        , "year":"2020"
+      },
+      {
+          "title":"Compte-rendu de la réunion"
+        , "docid":"doc9"
         , "tags":"ag,ca,anticipation"
         , "cat":"compte-rendu"
         , "date":"2 novembre 2020"
+        , "year":"2020"
       }
     ]
   }

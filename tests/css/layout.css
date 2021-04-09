@@ -1,5 +1,5 @@
 .titleblock {
-    height: 176px;
+/*    height: 176px;*/
 }
 header + section .titleblock, header + section.headerintro {
     height: 210px;
@@ -129,7 +129,7 @@ body.fixed .overlay {
 
 .container {
     max-width: 1366px;
-    margin: 0 auto; 
+    margin: 0 auto;
 }
 .row {
     display:flex;
