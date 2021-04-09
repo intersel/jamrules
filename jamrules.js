@@ -1210,9 +1210,11 @@ var jamrules = (function() {
      */
     var runRulesEngine = function() {
       this.log("runRulesEngine");
-      if (!this.myRulesEngine) {
-        if (this.options.debug) alert("Rules engine is not started. Call first compile rules (cf compileRules())");
-        return;
+      if (!this.myRulesEngine || $.isEmptyObject(this.myRulesEngine)) {
+        if (this.options.debug) console.log("Rules engine is not started. Call first compile rules (cf compileRules())");
+        this.myRulesEngine = {};
+        this.compileRules();
+        //return;
       }
       this.myRulesEngine.trigger('runEngine');
 
