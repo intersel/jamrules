@@ -19,7 +19,7 @@ For example, connected to a dialog box of criteria managed with checkboxes, JamR
 
 JamRules is your object filters best friend! Ideal for product configurators, objects selection on criteria, ...
 
-[See JamRules in action](https://demo.intersel.fr/jamrules/tests/filterDocs.html)
+[See JamRules in action](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
 
 # Let's get started with an example...
 ## Create a Jamrules object
