@@ -977,9 +977,9 @@ var jamrules = (function() {
     var ConfigurationPropertySet = function(aPropertyName, aPropertyValue, valueSet) {
       if (valueSet == undefined) valueSet = 1;
       if (
-        (propertiesConfiguration[aPropertyName]) &&
-        (propertiesConfiguration[aPropertyName][aPropertyValue]) &&
-        valueSet
+        (propertiesConfiguration[aPropertyName] !== undefined) &&
+        (propertiesConfiguration[aPropertyName][aPropertyValue] !== undefined) &&
+        (propertiesConfiguration[aPropertyName][aPropertyValue] == valueSet)
       )
         return true;
       else return false;
@@ -1000,9 +1000,9 @@ var jamrules = (function() {
 
       if (valueSet == undefined) valueSet = 1;
       if (
-        (propertiesObjectProfile[aPropertyName]) &&
-        (propertiesObjectProfile[aPropertyName][aPropertyValue]) &&
-        valueSet
+        (propertiesObjectProfile[aPropertyName] !== undefined) &&
+        (propertiesObjectProfile[aPropertyName][aPropertyValue] !== undefined) &&
+        (propertiesObjectProfile[aPropertyName][aPropertyValue] == valueSet)
       )
         return true;
       else return false;
@@ -1021,12 +1021,12 @@ var jamrules = (function() {
     var ObjectPropertiesSameValue = function(aPropertyName1, aPropertyName2, aPropertyValue) {
       propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
-      //if undefined, means that we want that one of the property value of object is set in the configuration too
+      //if undefined, means that we want that one value of the property 1 and property 2 of object are set 
       if (aPropertyValue == undefined) {
-        if (propertiesObjectProfile[aPropertyName1])
+        if (propertiesObjectProfile[aPropertyName1]  !== undefined)
           for (aPropertyValue in propertiesObjectProfile[aPropertyName1]) {
             if (
-              (propertiesObjectProfile[aPropertyName2]) &&
+              (propertiesObjectProfile[aPropertyName2]  !== undefined) &&
               (propertiesObjectProfile[aPropertyName1][aPropertyValue] && propertiesObjectProfile[aPropertyName2][aPropertyValue])
             ) {
               return true;
