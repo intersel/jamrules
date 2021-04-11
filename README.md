@@ -142,7 +142,7 @@ rulesEngine.runRulesEngine();
 Of course, that's a simple example but you can now create your own rules with all the complexity you'd like... 
 
 # Demos
-no demo available :-( will come quickly!
+* [filtering of documents according to filters](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
 
 # Create the javascript JamRules object - jamrules
 
