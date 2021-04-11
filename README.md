@@ -1,5 +1,5 @@
 # JamRules
-Javascript/jQuery configurator to filter objects among a set of objects according to rules.
+Javascript/jQuery filtering tool that helps to filter objects among a set of objects according to rules.
 
 # What is JamRules?
 Let's say you have a set of objects with properties and you'd like to filter them according to a user configuration of criteria and specific rules of selection... then JamRules is for you!
@@ -17,7 +17,7 @@ Then, you run the matching processing in order to have JamRules to select the ob
 
 For example, connected to a dialog box of criteria managed with checkboxes, JamRules can be activated each time a criteria changes and so to alert the selected/unselected object of their new selection status.
 
-JamRules is your object filters best friend! Ideal for product configurators, objects selection on criteria, ...
+JamRules is your object filtering best friend library! Ideal for product configurators, objects selection on criteria, ...
 
 [See JamRules in action](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
 
