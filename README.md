@@ -384,7 +384,7 @@ Set a property/property value status in the rules configurator
 * **aStatus**: <boolean>  <default:false> (option) status of the property for this property value set or not
 * **doTest**: <boolean> <default:true> (option) if false, configure the configurator but does not run the rules engine test
 
-###Remarks
+### Remarks
 If "doTest" is set, the rules engine will process -only- the rules sets that have configured the "aPropertyName" in the "ruleEvents" parameter of createRulesSet function.
 
 ### Example
