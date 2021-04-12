@@ -144,7 +144,7 @@ Of course, that's a simple example but you can now create your own rules with al
 # Demos
 * [filtering of documents according to filters](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
 
-# Create the JamRules object: jamrules.build()
+# Create the JamRules object: jamrules.build(options)
 
 ```javascript
 
@@ -172,6 +172,13 @@ Functions have the following parameters:
 In order to test objects with jamrules, you have to give it objects to test against the rules defined in the rule engine.
 
 These objects may be any with properties...
+```javascript
+{
+	color: "red",
+	size: "xl",
+	...
+}
+```
 
 Internally, the objects are formatted in order to process the matching functions and rules, the internal format of your data in jamrules will be :
 
@@ -182,10 +189,28 @@ Internally, the objects are formatted in order to process the matching functions
 		<propertyName2>:{<propertyValue1:<0|1>,<propertyValue2:<0|1>, ...},
 		...
 	},
-	matched: <a function when it matches>,	
-	notmatched: <a function when it does not match>,	
+	matched: <a function to call when it matches>,	
+	notmatched: <a function to call when it does not match>,	
 }
 ```
+
+eg:
+```javascript
+{
+	propertiesSet:{
+		color: {red:1},
+		size: {xl:1}
+		...
+	},
+	matched: function(ruleEngine){console.log("object matched!")},	
+	notmatched: null,	
+}
+```
+
+
+
+
+**Remark**: The properties of the objects should be "static". The use of functions to define dynamic properties within objects is not possible.
 
 # The JamRules Filtering Configurator
 The JamRules filtering configurator is a special object that can be used in a rule to test a configuration of properties against the properties of the objects to filter.
