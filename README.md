@@ -144,7 +144,7 @@ Of course, that's a simple example but you can now create your own rules with al
 # Demos
 * [filtering of documents according to filters](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
 
-# Create the javascript JamRules object - jamrules
+# Create the JamRules object: jamrules.build()
 
 ```javascript
 
@@ -153,7 +153,6 @@ var rulesEngine = jamrules.build({
 	debug:		<boolean>,
 	matched:	<a function to call when the rule find a match>,
 	notmatched:	<a function to call when the rule did not find a match>
-	jqueryObj:	<aJqueryObject>,
 });
 ```
 
@@ -166,11 +165,8 @@ if true, the rule engine will send debug message on the console
 
 The "matched" and "notmatched" functions are called whenever the rule engine matches an object profile.
 
-They have the following parameters:
+Functions have the following parameters:
   * aListOfMatchedObjects: the list of objects that matched the rule
-
-### jqueryObj -internal parameter-
-jquery Object to bind with the iFSM engine.
 
 # The JamRules Objects 
 In order to test objects with jamrules, you have to give it objects to test against the rules defined in the rule engine.
@@ -191,8 +187,8 @@ Internally, the objects are formatted in order to process the matching functions
 }
 ```
 
-# The JamRules Configurator
-The JamRules configurator is a special object that can be used in a rule to test a configuration of properties that have been set.
+# The JamRules Filtering Configurator
+The JamRules filtering configurator is a special object that can be used in a rule to test a configuration of properties against the properties of the objects to filter.
 
 For example, let's say we have white and black trousers.
 If you'd like to get only the white trousers, you can set a configurator property "color" with a "white" property value set to 1.
@@ -213,7 +209,7 @@ rulesEngine.selectConfigurationPropertyValue("color","white",1);
 
 ```
 
-There are several matching functions that helps the tests between a configuration in the configurator and the properties of an object:
+There are several filtering functions that may help to test a configuration in the filtering configurator against the properties of objects:
 * MatchProperty
 * MatchPropertyValue
 * MatchProperties
@@ -228,17 +224,16 @@ There are several matching functions that helps the tests between a configuratio
 # The JamRules rules
 
 ## Rules set
-Jamrules tests sets of rules. 
 
-It declares an object "matched" as soon as the first set of rules is compliant with the properties of the object.
+When "run", Jamrules tests each objects against the defined sets of rules in their order of declaration. 
 
-Rules are defined within a rules set.
+It declares an object as "**matched**" as soon as **a set of rules is compliant with the object** and its properties.
 
-A rules set is validated when all its rules are validated to true. 
+Rules are defined within a "rules set" declation. A rules set is validated **when all its rules are validated to true**. 
 
-If not, Jamrules will try the next rules set.
+When a rule set is not ok, Jamrules tries the next rules set.
 
-If none of the rules sets are validated, then the object is declared "unmatched".
+If **none of the rules sets** are validated, then the object is declared "**unmatched**".
 
 We use the **createRulesSet** function to create a rules set, and the **addRule** function to add a rule in a rule set.
 
@@ -262,7 +257,8 @@ rulesEngine.createRulesSet("SameShirts",["object1","object2"]);
 rulesEngine.addRule("SameColorTrousersPack","O1Shirt",'ObjectPropertySet("object1","shirt")');
 rulesEngine.addRule("SameColorTrousersPack","O2Shirt",'ObjectPropertiesSameValue("object1","object2")');
 ```
-# The JamRules API
+
+# Adding Objects to test by JamRules
 
 ## addPropertyObject(anObject<, aMatchingFunction, aNotMatchingFunction>)
 
@@ -271,8 +267,8 @@ Add an object to the list of objects to test against rules.
   * object with its properties plus these optional ones
     * matched (otion): function to call when a rule will match for the object
     * notmatched (option): function to call when rules will be tested but no rules match for the object
-  * aMatchingFunction (option): a matching function, same as to define the "matched" property in the object 
-  * aNotMatchingFunction (option): a 'not' matching function, same as to define the "notmatched" property in the object
+  * aMatchingFunction (option): a matching function, same as to define a "matched" property in the object 
+  * aNotMatchingFunction (option): a 'not' matching function, same as to define a "notmatched" property in the object
 
 ### Example
 ```javascript
@@ -288,7 +284,7 @@ rulesEngine.addPropertyObject(onObject,myMatchFunction);
 Add an object to the list of objects to test against rules.
 
 ### parameters  
-* anObject: a object to test in jamrules in jamrules format
+* anObject: a object to test in jamrules in **jamrules format**
 
 ### Example
 ```javascript
@@ -330,6 +326,8 @@ var anObject = {
 jamrules._addObject(onObject);
 ```
 
+# Creating rules set and rules
+
 ## createRulesSet(aRulesGroup, ruleEvents) 
 Creates a rule set.
 ### parameters  
@@ -357,6 +355,8 @@ Add a new "and" rule in aRulesGroup.
 rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
 ```
 
+# Run JamRules
+
 ## compileRules
 Initialize the rule engine - to do before action and after adding the rules
 
@@ -375,8 +375,10 @@ Run the rules engine.
 rulesEngine.runRulesEngine();
 ```
 
+# Filtering configurator
+
 ## selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus, doTest)
-Set a property/property value status in the rules configurator
+Set a property/property value status in the filtering configurator
 
 ### parameters  
 * **aPropertyName**: name of the property that has changed
@@ -404,7 +406,7 @@ If "doTest" is set, the rules engine will process -only- the rules sets that hav
 ```
 
 
-# The Available Matching Functions
+# The Available filtering functions for "addRule" 
 
 ## MatchProperty(aPropertyName)
 Tests if at least a property value of a property is shared between the configuration and the object
