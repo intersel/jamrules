@@ -377,7 +377,9 @@ Add a new "and" rule in aRulesGroup.
 
 ### Example
 ```javascript
-rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
+// colortop should have the same color name than colorbottom but different from colormiddle
+rulesEngine.addRule("SameColorTrousersPack","Test1",'ObjectPropertiesSameValue("colortop","colorbottom")');
+rulesEngine.addRule("SameColorTrousersPack","TestNot2",'!ObjectPropertiesSameValue("colortop","colormiddle")');
 ```
 
 # Run JamRules
