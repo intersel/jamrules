@@ -129,6 +129,7 @@ Any object that matches the rules will have their "Matched" function called. Any
 
 
 # Demos
+* [filtering of animals according to filters](https://demo.intersel.fr/jamrules/tests/exampleReadMe.html) (source code in test/exampleReadMe.html)
 * [filtering of documents according to filters](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
 
 # Create the JamRules object: jamrules.build(options)

@@ -8,6 +8,7 @@
  *
  * -----------------------------------------------------------------------------------------
  * Modifications :
+ * - 20210418 - E.Podvin - V2.2.0 - add addPropertyObjects
  * - 20170402 - E.Podvin - V2.1.0 - adding new objects simplified + possibility to call matching rule functions
  * - 20170331  - E.Podvin - V2.0.0 - Refactoring
  * - 20170227  - E.Podvin - V1.0.0 - Creation
@@ -36,6 +37,7 @@ var jamrules = (function() {
    * @param ObjectProfiles
    * @access private
    * @abstract list of possible profiles available to all rules
+   * used as optimization to process filtering on object profiles rather than on each objects...
    * 	a profile is defined by a list of entries [objectKey]:{propertiesSet:<apropertiesSet>,objectsList:[]}
    * {
    * 		<objectKey1>:{
@@ -790,8 +792,8 @@ var jamrules = (function() {
         for (aPropertyValue in propertiesObjectProfile[aPropertyName]) {
           if (
             (propertiesConfiguration[aPropertyName][aPropertyValue]) &&
-            (propertiesObjectProfile[aPropertyName][aPropertyValue])
-            //    				&& 	(propertiesObjectProfile[aPropertyName][aPropertyValue] == propertiesConfiguration[aPropertyName][aPropertyValue])
+            (propertiesObjectProfile[aPropertyName][aPropertyValue]) &&
+            (propertiesObjectProfile[aPropertyName][aPropertyValue] == propertiesConfiguration[aPropertyName][aPropertyValue])
           )
             return true;
         }
@@ -818,9 +820,11 @@ var jamrules = (function() {
     var MatchPropertyValue = function(aPropertyName, aPropertyValue) {
       var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
       if (
-        (propertiesConfiguration[aPropertyName] && propertiesObjectProfile[aPropertyName]) &&
-        (propertiesConfiguration[aPropertyName][aPropertyValue] && propertiesObjectProfile[aPropertyName][aPropertyValue])
-        //    			&& (propertiesConfiguration[aPropertyName][aPropertyValue] == propertiesObjectProfile[aPropertyName][aPropertyValue])
+        (propertiesConfiguration[aPropertyName]
+          && propertiesObjectProfile[aPropertyName])
+          && (propertiesConfiguration[aPropertyName][aPropertyValue]
+          && propertiesObjectProfile[aPropertyName][aPropertyValue])
+          && (propertiesConfiguration[aPropertyName][aPropertyValue] == propertiesObjectProfile[aPropertyName][aPropertyValue])
       )
         return true;
       else return false;
@@ -988,7 +992,7 @@ var jamrules = (function() {
     /**
      * @function ObjectPropertySet
      * @access public
-     * @abstract matching rule function, tests if the property in theObjectPropertySett has its value set
+     * @abstract matching rule function, tests if the property in theObjectPropertySet has its value set
      * @param  aPropertyName: an element property name
      * @param  aPropertyValue: a value of aPropertyName
      * @param  valueSet: [0|1(default)]
@@ -1021,7 +1025,7 @@ var jamrules = (function() {
     var ObjectPropertiesSameValue = function(aPropertyName1, aPropertyName2, aPropertyValue) {
       propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
-      //if undefined, means that we want that one value of the property 1 and property 2 of object are set 
+      //if undefined, means that we want that one value of the property 1 and property 2 of object are set
       if (aPropertyValue == undefined) {
         if (propertiesObjectProfile[aPropertyName1]  !== undefined)
           for (aPropertyValue in propertiesObjectProfile[aPropertyName1]) {
@@ -1308,7 +1312,7 @@ var jamrules = (function() {
      * @example
      */
     var addPropertyObject = function(anObject, aMatchingFunction, aNotMatchingFunction) {
-      this.log("addObject");
+      this.log("addPropertyObject");
       if (!aMatchingFunction && anObject.matched)
         aMatchingFunction = anObject.matched;
 
@@ -1320,6 +1324,35 @@ var jamrules = (function() {
         matched: aMatchingFunction,
         notmatched: aNotMatchingFunction
       }, this.getObjectProfiles());
+    };
+    /**
+     * @function public addPropertyObjects
+     * @abstract add objects to the list of objects to test against rules
+     * @param objects: array of property objects. Each object may have these properties set:
+     * 		matched (otion):<function name to call when a rule will match for the object>
+     * 		notmatched (option):<function name to call when there is a change but object does not match any rules>
+     * @param aMatchingFunction (option): the matching function, same as to define the "matched" property in the object
+     * @param aNotMatchingFunction (option): the matching function, same as to define the "notmatched" property in the object
+     * @example
+     */
+    var addPropertyObjects = function(objects, aMatchingFunction, aNotMatchingFunction) {
+      this.log("addPropertyObjects");
+      let that=this;
+      objects.forEach(function(anObject) {
+        if (!aMatchingFunction && anObject.matched)
+          aMatchingFunction = anObject.matched;
+
+        if (!aNotMatchingFunction && anObject.notmatched)
+          aNotMatchingFunction = anObject.notmatched;
+
+        let theObject = anObject;
+        _addObject({
+          propertiesSet: jamrules._translateToJamrulesProperties(anObject),
+          matched: aMatchingFunction,
+          notmatched: aNotMatchingFunction,
+          object:theObject
+        }, that.getObjectProfiles());
+      });
     };
     /**
      * @access public
@@ -1342,6 +1375,7 @@ var jamrules = (function() {
       compileRules: compileRules,
       addObject: addObject,
       addPropertyObject: addPropertyObject,
+      addPropertyObjects: addPropertyObjects,
       log: log
         /** Public variables **/
         ,
