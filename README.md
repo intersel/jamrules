@@ -4,155 +4,141 @@ Javascript/jQuery filtering tool that helps to filter objects among a set of obj
 # What is JamRules?
 Let's say you have a set of objects with properties and you'd like to filter them according to a user configuration of criteria and specific rules of selection... then JamRules is for you!
 
-JamRules is a Javascript/jQuery library. 
+JamRules is a Javascript/jQuery library.
 
 With it, you configure:
-  * a set of parameters/criteria of selection (configurator)  
-  * a set of rules of matching that your objects should comply
-  * a set of objects to test
+  * a set of parameters/criteria of selection (filters configurator) that can be driven by checkboxes and input
+  * a set of rules to find the objects according to the filters configuration
+  * a set of objects to play with
 
-Then, you run the matching processing in order to have JamRules to select the objects that match your criteria and to call a 'match' function on them.
+once configured, you can start the filtering process so that JamRules selects the objects that match your criteria and calls a 'selected' and a 'not selected' functions on each of them.
 
 ![alt JamRules designed for the selection of objects](https://cloud.githubusercontent.com/assets/1048488/24730721/91d34c04-1a65-11e7-8fb8-9e47dec60691.jpg)
 
-For example, connected to a dialog box of criteria managed with checkboxes, JamRules can be activated each time a criteria changes and so to alert the selected/unselected object of their new selection status.
+For example, connected to a dialog box of criteria managed with checkboxes, JamRules can be activated each time a criteria changes and so to alert the selected/unselected object of their new selection status, for instance to be displayed or not...
 
-JamRules is your object filtering best friend library! Ideal for product configurators, objects selection on criteria, ...
+As an object filter library, Jamrules is your best friend! Ideal for product configurators, objects selection on criteria, ...
 
 [See JamRules in action](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
 
-# Let's get started with an example...
+# Get started with an example...
+To run jamrules, you will have to:
+* create a jamrules object,
+* define the filter configuration
+* create rules,
+* add objects to test,
+* run the filtering process,
+
 ## Create a Jamrules object
-To run jamrules, you have to create first your jamrules object, then you'll be able to call its functions to create rules, add objects to test, run the test, ...
 
 ```javascript
-
-//initialisation of jamrules and its configurator
+//Create a jamrules object
 var rulesEngine = jamrules.build();
 ```
- 
-## Define a set of objects 
 
-I sell red and white trousers and yellow and blue shirts through different kind of packs of 2 products:
-  * packs of 2 trousers
-  * packs with a trouser and shirt
-  * packs with two shirts
-  * etc...
+## Identify the properties used to filter
 
-For the example, we will translate this description defining the "pack" as our jamrules objects with the following properties:
-* property "object1" that can have the values "trouser" or "shirt"
-* property "object1color" that can have the values "blue" or "yellow" or "white"
-* property "object2" that can have the values "trouser" or "shirt"
-* property "object2color" that can have the values "blue" or "yellow" or "white"
+The properties are data that define your object. They are used to identify the objects that answer your filtering rules.
 
-Here is an exemple of how a pack may defined for jamrules:
+Eg, if your objects to filter are animals, properties of an animal may be "Type" ('mammal', 'bird', 'insect', ...), "Name" ('cat', 'dog', ...), "Number of limbs" (0,2,4,8, ...), "Color" ('brown', 'green', ...), ...
+
+Some of the properties may be used in the filtering configuration to select the objects.
+
+Your objects needs to have a json definition, eg. :
+
+```json
+let myobjects = [
+  {
+    "type":"mammal",
+    "name":"cat",
+    "color":"black"
+  },
+  {
+    "type":"mammal",
+    "name":"dog",
+    "color":"white"
+  },
+  ...]
+```
+
+Your objects may not have the same set of properties... Up to you to define in your rules how to select or not your objects...
+
+## Add objects
+
+Use the function addPropertyObjects of your rulesEngine to add your objects and the behavior of the selected and not selected objects by jamRules:
+
 ```javascript
-	
-var pack1={
-			object1:"trouser"
-		,	object2:"shirt"
-		,	object1Color:"blue"
-		,	object2Color:"white"
-};
+rulesEngine.addPropertyObjects(
+  myobjects,
+  function(){console.log('I am selected:'+this.name)},
+  function(){console.log('I am NOT selected'+this.name)}
+);
+```
 
-rulesEngine.addPropertyObject(pack1);
-	
+## Filtering configuration
+
+Generally, the filtering configuration is driven by the status of checkboxes, radio buttons, input... that the user can click to select a configuration value. These input set the status of the value of a property as chosen or not.
+
+For example, for the property "color", you could set several checkboxes, each allowing to select a color as "red", "blue", "green", ...
+
+To configure the configurator, we use the function 'rulesEngine.selectConfigurationPropertyValue'.
+
+```html
+<label for="check_green" onclick="rulesEngine.selectConfigurationPropertyValue("color","green",$(this).children('input').value());">
+  <input type="checkbox">
+  Green
+</label>
+<label for="check_red" onclick="rulesEngine.selectConfigurationPropertyValue("color","red",$(this).children('input').value());">
+  <input type="checkbox">
+  Red
+</label>
 ```
 
 ## Define the rules to select objects
 
-I want to give a promo coupon for packs that
-  * have two trousers 
-  * but nothing if the trousers in the pack are of different colors
-  * and nothing for the other kind of packs
+A rule is a boolean test on your configuration and objects.
 
-We will translate these rules to have a coupon as following:
-* object1 and object2 have to be trousers
-  * AND
-    * object1color has to be the same color with object2color
+Rules are defined within a rule set. You can defined as rule sets as you need.
 
-In Jamrules, we'll describe these rules this way:
+To be selected ("matched"), an object should match ONE or more rule sets. If none of the rule sets are validated by the object, it is considered as "not matched"...
+
+The rules will generally be based on pre-defined test functions as "is property xxx of object equal this value?" (ObjectPropertySet), "is property value is selected in the filtering configuration?" (MatchProperty), ...
+
+So, you first define your rule set, then add rules in it, then define a second rule set, and so on...
+
 ```javascript
 
 // rules setting
-rulesEngine.createRulesSet("SameColorTrousersPack");
-	// we'd like to test a pack for giving it a promo coupon because it has 2 trousers of same color
-	// so, does our current pack being tested have a trouser for object1 property?
-	rulesEngine.addRule("SameColorTrousersPack","O1Trouser",'ObjectPropertySet("object1","trouser")');
-	// yes? ok... do we have a trouser for object2 property too in our pack?
-	rulesEngine.addRule("SameColorTrousersPack","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
-	// yes? ok... is the color of the trouser is of same color?
-	rulesEngine.addRule("SameColorTrousersPack","O1O2SameColor",'ObjectPropertiesSameValue("object1Color","object2Color")');
-	// if gone up here implies that the pack has two trousers of same color...
-	// then jamrules will call the match function for this pack
+rulesEngine.createRulesSet("HasGreenColor");
+	rulesEngine.addRule("HasGreenColor","lightgreen",'ObjectPropertySet("color","light green")');
+	rulesEngine.addRule("HasGreenColor","darkgreen",'ObjectPropertySet("color","dark green")');
+	rulesEngine.addRule("HasGreenColor","green",'ObjectPropertySet("color","green")');
 
-
-// prepare the rule engine
-rulesEngine.compileRules();
 ```
 
-## Test your objects against the rules... 
+## Test your objects against the rules...
 
-Which packs should have a promo code?
+Once done, we will be able to run our jamrules engine with rulesEngine.runRulesEngine:
 
-Jamrules will be able to tell you!
-* add the objects to test in jamrules
-* run the test: 
-  * jamrules will tell to the packs that have a two trousers with the same color that they have a coupon. 
-  * It will tell to the others packs that they don't match the selection or the rules.
-
-JamRules will select the packs that match the configuration if it respects the rules in order to give them the promo code.
-
-
-### Give the function to call if objects match
-
-To do that, just define a "matched" function on your object like in this example:
-
-```javascript
-
-var pack1 ={property1:20} 
-pack1.matched=function(aRuleEngine){
-	alert("it matches");
-}
-rulesEngine.addPropertyObject(pack1);
-```
-
-You can define a "notmatched" that will be called if the tested object did not match the rules...
-
-aRuleEngine variable gives you access to the rule engine that has called the matched/unmatched function.
-
-You may find why the object does not match by accessing aRuleEngine.ruleEngine.opts.reason.
-
-### Run the test 
-
-* You need first to "compile" your rules. You need to do that anytimes you change your rules...
-* Then run the engine...
-
-```javascript
-
-// prepare the rule engine
-rulesEngine.compileRules();
-
-//
-$("#msg").append("<h2>run the test to get the packs that match the rules... </h2>");
+```Javascript
 rulesEngine.runRulesEngine();
 ```
 
-## Example conclusion
-Of course, that's a simple example but you can now create your own rules with all the complexity you'd like... 
+Any object that matches the rules will have their "Matched" function called. Any object that is not selected with the rules will have their "NotMatched" function called....
+
 
 # Demos
 * [filtering of documents according to filters](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
 
 # Create the JamRules object: jamrules.build(options)
 
-```javascript
+```Javascript
 
 //initialisation of jamrules and its configurator
 var rulesEngine = jamrules.build({
-	debug:		<boolean>,
-	matched:	<a function to call when the rule find a match>,
-	notmatched:	<a function to call when the rule did not find a match>
+	"debug":		"<boolean>",
+	"matched":	"<a function to call when the rule find a match>",
+	"notmatched":	"<a function to call when the rule did not find a match>"
 });
 ```
 
@@ -168,14 +154,17 @@ The "matched" and "notmatched" functions are called whenever the rule engine mat
 Functions have the following parameters:
   * aListOfMatchedObjects: the list of objects that matched the rule
 
-# The JamRules Objects 
+**Remarks**: These functions are not to be confused with the ones defined on the object level...
+
+# The JamRules Objects
 In order to test objects with jamrules, you have to give it objects to test against the rules defined in the rule engine.
 
 These objects may be any with properties...
+
 ```javascript
 {
-	color: "red",
-	size: "xl",
+	"color": "red",
+	"size": "xl",
 	...
 }
 ```
@@ -189,8 +178,8 @@ Internally, the objects are formatted in order to process the matching functions
 		<propertyName2>:{<propertyValue1:<0|1>,<propertyValue2:<0|1>, ...},
 		...
 	},
-	matched: <a function to call when it matches>,	
-	notmatched: <a function to call when it does not match>,	
+	matched: <a function to call when it matches>,
+	notmatched: <a function to call when it does not match>,
 }
 ```
 
@@ -202,8 +191,8 @@ eg:
 		size: {xl:1}
 		...
 	},
-	matched: function(ruleEngine){console.log("object matched!")},	
-	notmatched: null,	
+	matched: function(ruleEngine){console.log("object matched!")},
+	notmatched: null,
 }
 ```
 
@@ -223,38 +212,19 @@ The **selectConfigurationPropertyValue** function allows to create and edit such
 
 
 ```javascript
-
-
-rulesEngine.createRulesSet("SameTrousers",["color"]);
-// tells to select objects that have their property "color" to "white" when the configurator has its "color/white" property set 
-rulesEngine.addRule("SameTrousers","O1WhiteTrouser",'MatchPropertyValue("color","white")');
-...
-
 rulesEngine.selectConfigurationPropertyValue("color","white",1);
 
 ```
-
-There are several filtering functions that may help to test a configuration in the filtering configurator against the properties of objects:
-* MatchProperty
-* MatchPropertyValue
-* MatchProperties
-* MatchPropertiesSameValue
-* MatchPropertiesSameValues
-* ConfigurationPropertySet
-* ConfigurationPropertiesSameValue
-* ConfigurationPropertiesSameValues
-* MatchExternalRule
- 
 
 # The JamRules rules
 
 ## Rules set
 
-When "run", Jamrules tests each objects against the defined sets of rules in their order of declaration. 
+When "run", Jamrules tests each objects against the defined sets of rules in their order of declaration.
 
 It declares an object as "**matched**" as soon as **a set of rules is compliant with the object** and its properties.
 
-Rules are defined within a "rules set" declation. A rules set is validated **when all its rules are validated to true**. 
+Rules are defined within a "rules set" declation. A rules set is validated **when all its rules are validated to true**.
 
 When a rule set is not ok, Jamrules tries the next rules set.
 
@@ -271,9 +241,22 @@ The test can use information on the object properties, the configurator or any o
 JamRules has several matching functions ready to use as:
 * ObjectPropertySet: tests the value of the property of the object currently tested
 * ObjectPropertiesSameValue: tests the value of one property against another property...
-* ... 
+* ...
 
-## Example 
+There are several filtering functions that may help to test a configuration in the filtering configurator against the properties of objects:
+* MatchProperty
+* MatchPropertyValue
+* MatchProperties
+* MatchPropertiesSameValue
+* MatchPropertiesSameValues
+* ConfigurationPropertySet
+* ConfigurationPropertiesSameValue
+* ConfigurationPropertiesSameValues
+* MatchExternalRule
+
+
+
+## Example
 ```javascript
 rulesEngine.createRulesSet("SameTrousers");
 rulesEngine.addRule("SameTrousers","O1Trouser",'ObjectPropertySet("object1","trouser")');
@@ -285,15 +268,35 @@ rulesEngine.addRule("SameColorTrousersPack","O2Shirt",'ObjectPropertiesSameValue
 
 # Adding Objects to test by JamRules
 
+## addPropertyObjects(Objects <, aMatchingFunction, aNotMatchingFunction>)
+
+Add objects to the list of objects to test against rules.
+
+  * **Objects**: array of objects with their properties plus these optional ones:
+    * **matched** (option): function to call when a rule will match for the object
+    * **notmatched** (option): function to call when rules will be tested but no rules match for the object
+  * **aMatchingFunction** (option): a matching function, same as to define a "matched" property in the object
+  * **aNotMatchingFunction** (option): a 'not' matching function, same as to define a "notmatched" property in the object
+
+### Example
+```javascript
+ruleEngine = jamrules.build();
+var anObject = {
+	object1Color : "white"
+};
+myMatchFunction = function(){alert("Hello:"+this.object1Color)};
+rulesEngine.addPropertyObject(onObject,myMatchFunction);
+```
+
 ## addPropertyObject(anObject<, aMatchingFunction, aNotMatchingFunction>)
 
 Add an object to the list of objects to test against rules.
 
-  * object with its properties plus these optional ones
-    * matched (otion): function to call when a rule will match for the object
-    * notmatched (option): function to call when rules will be tested but no rules match for the object
-  * aMatchingFunction (option): a matching function, same as to define a "matched" property in the object 
-  * aNotMatchingFunction (option): a 'not' matching function, same as to define a "notmatched" property in the object
+  * **anObject** with its properties plus these optional ones
+    * **matched** (option): function to call when a rule will match for the object
+    * **notmatched** (option): function to call when rules will be tested but no rules match for the object
+  * **aMatchingFunction** (option): a matching function, same as to define a "matched" property in the object
+  * **aNotMatchingFunction** (option): a 'not' matching function, same as to define a "notmatched" property in the object
 
 ### Example
 ```javascript
@@ -309,7 +312,7 @@ rulesEngine.addPropertyObject(onObject,myMatchFunction);
 Add an object to the list of objects to test against rules.
 
 ### parameters  
-* anObject: a object to test in jamrules in **jamrules format**
+* **anObject**: a object to test in jamrules in **jamrules format**
 
 ### Example
 ```javascript
@@ -331,11 +334,11 @@ rulesEngine.addObject(onObject);
 Remark: to be called with jamrules variables.
 
 Add an object to the list of objects to test against rules.
-This function differs from addObject in the way that all the jamrules will share the objects added this way.
+This function differs from addObject in the way that all the jamrules engines will share the objects added this way.
 So, you include once your objects in the first jamrules object and then they will be processed by all the other rules.
 
 ### parameters  
-* anObject: a object to test in jamrule 
+* **anObject**: a object to test in jamrules
 
 ### Example
 ```javascript
@@ -353,11 +356,11 @@ jamrules._addObject(onObject);
 
 # Creating rules set and rules
 
-## createRulesSet(aRulesGroup, ruleEvents) 
+## createRulesSet(aRulesGroup, ruleEvents)
 Creates a rule set.
 ### parameters  
-* aRulesGroup: name of the rules set to create
-* ruleEvents: [array] (option) a list of one or several property names used in the configurator. The rules set will be processed if a property of the configurator changes when using "selectConfigurationPropertyValue" function (see selectConfigurationPropertyValue). 
+* **aRulesGroup**: name of the rules set to create
+* **ruleEvents**: [array] (option) a list of one or several property names used in the configurator. The rules set will be processed if a property of the configurator changes when using "selectConfigurationPropertyValue" function (see selectConfigurationPropertyValue).
 
 ### Example
 ```javascript
@@ -371,9 +374,10 @@ rulesEngine.createRulesSet("SameTrousers",["aProperty1","aProperty2"]);
 Add a new "and" rule in aRulesGroup.
 
 ### parameters  
-* aRulesGroup: a rule set name
-* aRuleName: a rule to define in the rules set
-* aRuleTest: a boolean test to evaluate
+* **aRulesGroup**: a rule set name
+* **aRuleName**: a rule to define in the rules set
+* **aRuleTest**: a filtering function with its parameters to assess
+  * eg: "[!]<filterFunction(p1[,p2,...])"
 
 ### Example
 ```javascript
@@ -385,7 +389,7 @@ rulesEngine.addRule("SameColorTrousersPack","TestNot2",'!ObjectPropertiesSameVal
 # Run JamRules
 
 ## compileRules
-Initialize the rule engine - to do before action and after adding the rules
+Initialize the rule engine - to do before action and after adding new rules
 
 ### Example
 
@@ -414,7 +418,7 @@ Set a property/property value status in the filtering configurator
 * **doTest**: <boolean> <default:true> (option) if false, configure the configurator but does not run the rules engine test
 
 ### Remarks
-If "doTest" is set, the rules engine will process -only- the rules sets that have configured the "aPropertyName" in the "ruleEvents" parameter of createRulesSet function.
+If "doTest" is set, the rules engine will **run** and process -only- the rules sets that have configured the "aPropertyName" in the "ruleEvents" parameter of createRulesSet function.
 
 ### Example
 ```javascript
@@ -433,7 +437,7 @@ If "doTest" is set, the rules engine will process -only- the rules sets that hav
 ```
 
 
-# The Available filtering functions for "addRule" 
+# The Available filtering functions for "addRule"
 
 ## MatchProperty(aPropertyName)
 Tests if at least a property value of a property is shared between the configuration and the object
@@ -456,11 +460,11 @@ Returns true if any property value for a given aPropertyName is set in the profi
 * MatchProperty('technician') -> no match
 
 ## MatchPropertyValue(aPropertyName,aPropertyValue)
-Tests if a given property value is set for configuration and the object 
+Tests if a given property value is set for configuration and the object
 
 ### parameters  
 * aPropertyName: a property name
-* aPropertyValue: a value of aPropertyName 
+* aPropertyValue: a value of aPropertyName
 
 ### returns
 Returns true if the configuration for the aPropertyName.aPropertyValue == the one defined for the current objectProfile being tested
@@ -542,7 +546,7 @@ tests if the property in theObjectPropertySett has its value set
 ### parameters  
 
 * aPropertyName: an element property name
-* aPropertyValue: a value of aPropertyName 
+* aPropertyValue: a value of aPropertyName
 * valueSet: [0|1(default)]
 
 ### returns
@@ -557,7 +561,7 @@ tests if the property in the configurator has its value set
 ### parameters  
 
 * aPropertyName: an element property name
-* aPropertyValue: a value of aPropertyName 
+* aPropertyValue: a value of aPropertyName
 * valueSet: [0|1(default)]
 
 ### returns
@@ -573,7 +577,7 @@ Tests if the property in the element has the same value as an other element prop
 
 * aPropertyName1: an element property name
 * aPropertyName2: an other element property name
-* aPropertyValue: a value of aPropertyName 
+* aPropertyValue: a value of aPropertyName
 
 ### returns
 
@@ -602,7 +606,7 @@ tests if the property in the configuration has the same value as an other config
 
 * aPropertyName1: an element property name
 * aPropertyName2: an other element property name
-* aPropertyValue: a value of aPropertyName 
+* aPropertyValue: a value of aPropertyName
 
 ### returns
 
@@ -664,7 +668,7 @@ Returns boolean
 		<script type="text/javascript" src="../jamrules.js"></script>
 ```
   * include JamRules
-  
+
 ```html
   <script type="text/javascript" src="../jamrules.js"></script>
 ```
@@ -675,18 +679,18 @@ You're done!
 
 JamRules needs to include the following javascript libraries and here's what they do:
 * jQuery (>= 1.10) `<script type="text/javascript" src="extlib/jQuery/jquery-3.1.1.js"></script>`
-* [iFSM by intersel](https://github.com/intersel/iFSM/). 
+* [iFSM by intersel](https://github.com/intersel/iFSM/).
   * This library manages finite state machines and needs these libraries:
     * doTimeout by ["Cowboy" Ben Alman](http://benalman.com/projects/jquery-dotimeout-plugin/)
 	  * this library brings some very usefull feature on the usual javascript setTimeout function like Debouncing, Delays & Polling Loops, Hover Intent...
 	  * `<script type="text/javascript" src="extlib/iFSM/extlib/jquery.dorequesttimeout.js"></script>`
-    * attrchange by Selvakumar Arumugam](http://meetselva.github.io/attrchange/) 
+    * attrchange by Selvakumar Arumugam](http://meetselva.github.io/attrchange/)
 	  * a simple jQuery function to bind a listener function to any HTML object on attribute change
 	  * `<script type="text/javascript" src="../extlib/iFSM/extlib/jquery.attrchange.js"></script>`
 * [jquery.MD5](https://github.com/placemarker/jQuery-MD5)
-  * gives the MD5 function used in jamrules 
+  * gives the MD5 function used in jamrules
   * `<script type="text/javascript" src="extlib/jQuery-MD5/jquery.md5.js"></script>`
-  
+
 # Official website
 
 # FAQ
@@ -700,8 +704,27 @@ var notmatched=function(aJamRules){
 }
 ```
 
+## Can I define a match function different for each object?
+
+Yes.
+
+To do that, define a "matched" function like in this example:
+
+```javascript
+
+var myObject1 ={property1:20}
+myObject1.matched=function(){
+	alert("it matches this object 1"+this.property1);
+}
+var myObject2 ={property2:40}
+myObject2.matched=function(){
+	alert("it matches this object 2:"+this.property2);
+}
+rulesEngine.addPropertyObjects([myObject1,myObject2]);
+```
+
 
 
 # Contact
-If you have any ideas, feedback, requests or bug reports, you can reach me at github@intersel.org, 
+If you have any ideas, feedback, requests or bug reports, you can reach me at github@intersel.org,
 or via my website: http://www.intersel.fr
