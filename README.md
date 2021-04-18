@@ -11,7 +11,7 @@ With it, you configure:
   * a set of rules to find the objects according to the filters configuration
   * a set of objects to play with
 
-once configured, you can start the filtering process so that JamRules selects the objects that match your criteria and calls a 'selected' and a 'not selected' functions on each of them.
+Once configured, you can start the filtering process so that JamRules selects the objects that match your criteria and calls a 'selected' function on each of them, and call a 'not selected' function for the others...
 
 ![alt JamRules designed for the selection of objects](https://cloud.githubusercontent.com/assets/1048488/24730721/91d34c04-1a65-11e7-8fb8-9e47dec60691.jpg)
 
@@ -21,7 +21,7 @@ As an object filter library, Jamrules is your best friend! Ideal for product con
 
 [See JamRules in action](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
 
-# Get started with an example...
+# How it works...
 To run jamrules, you will have to:
 * create a jamrules object,
 * define the filter configuration
@@ -46,7 +46,7 @@ Some of the properties may be used in the filtering configuration to select the 
 
 Your objects needs to have a json definition, eg. :
 
-```json
+```javascript
 let myobjects = [
   {
     "type":"mammal",
@@ -58,14 +58,15 @@ let myobjects = [
     "name":"dog",
     "color":"white"
   },
-  ...]
+  //and so on
+  ]
 ```
 
 Your objects may not have the same set of properties... Up to you to define in your rules how to select or not your objects...
 
 ## Add objects
 
-Use the function addPropertyObjects of your rulesEngine to add your objects and the behavior of the selected and not selected objects by jamRules:
+Use the function **addPropertyObjects** of your rules engine to add your objects and the behavior of the selected and not selected objects by jamRules:
 
 ```javascript
 rulesEngine.addPropertyObjects(
@@ -81,7 +82,7 @@ Generally, the filtering configuration is driven by the status of checkboxes, ra
 
 For example, for the property "color", you could set several checkboxes, each allowing to select a color as "red", "blue", "green", ...
 
-To configure the configurator, we use the function 'rulesEngine.selectConfigurationPropertyValue'.
+To configure the property values of the configurator, we use the function **selectConfigurationPropertyValue**.
 
 ```html
 <label for="check_green" onclick="rulesEngine.selectConfigurationPropertyValue("color","green",$(this).children('input').value());">
@@ -118,7 +119,7 @@ rulesEngine.createRulesSet("HasGreenColor");
 
 ## Test your objects against the rules...
 
-Once done, we will be able to run our jamrules engine with rulesEngine.runRulesEngine:
+Once done, we will be able to run our jamrules engine with **runRulesEngine**:
 
 ```Javascript
 rulesEngine.runRulesEngine();
