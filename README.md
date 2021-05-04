@@ -557,15 +557,20 @@ returns true if it exists a value of aConfigurationPropertyName that is the same
 
 ## MatchObjectSearch(aConfigurationPropertyName,anObjectPropertyName)
 Tests if the value of a configuration property string is found in the values of object's properties
+Generally used for a text input in the configuration, as search input...
 
 ### parameters  
 * aPropertyValueWithWildcard: a string to search in the property values of objects.
    wildcards are possible: '*' (0 or more char), '?' (0 or 1 char)
    eg: 'my*propert?' will match 'myproperty','mygivenpropert','myREDproperts'
                      won't match 'property', 'myREDproperties'
+* searchMode: 
+  - or (default): blank are considered as 'or' operator between keywords to find
+  - and: blank are considered as 'and' operator with all keywords to be found in any property values
+
 
 ### returns
-returns true if aPropertyValueWithWildcard is found as a property value of the object
+returns true if the pattern string(s) defined in the configurator are found in property values of object
 
 ### Example
 *  object.priority.priority1=1

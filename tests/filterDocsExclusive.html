@@ -34,7 +34,7 @@
                             <li> "Objects" to select that are the Documents to display
                             <li> "Rules" according to the configurator and the object configurations...
                           </ul>
-                          We use the Blapy library to load the documents from a JSON file in ajax mode.<br>
+                          We use the <a href="https://github.com/intersel/Blapy">Blapy library</a> to load the documents from a JSON file in ajax mode.<br>
                           Obviously, this demo could have been done in a simpler way without JamRules!
                         </div>
                     </div>
@@ -131,6 +131,7 @@
               </li>
               <script>
 
+              // add the object to the rules engine
               rulesEngine.addPropertyObject(
               		{
                     'title' : "{%title%}",
@@ -139,13 +140,13 @@
                     'tags' : "{%tags%}".split(','),
                 		'selected' : function() {
                       //debugger;
-                      $("#{%docid%}").show();
+                      $("#{%docid%}").show(); //show the document when rulesEngine considers it to match the rules
                     },
                 		'notselected' : function(aRuleEngine) {
                       //debugger;
                       var reason = aRuleEngine.myRulesEngine.opts.reason;
                       console.log(JSON.stringify(reason));
-                      $("#{%docid%}").hide();
+                      $("#{%docid%}").hide(); //hide the document when rulesEngine considers it not to match the rules
                     }
                   }
               	);
@@ -159,7 +160,7 @@
           });
           $("#myBlapy").on('Blapy_afterPageChange', function(){
             $.doTimeout('runJamrules',200,function(){
-              rulesEngine.runRulesEngine();
+              rulesEngine.runRulesEngine();//process the rulesEngine once the documents are loaded
             })
           })
           </script>
@@ -169,13 +170,14 @@
 
     <script>
 
-    rulesEngine.createRulesSet("AYearCat",["year","category","tags","title"]);
-    rulesEngine.addRule("AYearCat","YearMatch",'MatchProperty("year")');
-    rulesEngine.addRule("AYearCat","CatMatch",'MatchProperty("category")');
-    rulesEngine.addRule("AYearCat","TagMatch",'MatchProperty("tags")');
-    rulesEngine.addRule("AYearCat","TitleMatch",'MatchPropertySearch("title","and")');
+    // create the rules to select the documents according to the configurator selection buttons
+    rulesEngine.createRulesSet("AYearCat",["year","category","tags","title"]); // will reprocess the rules when the configuration input change
+    rulesEngine.addRule("AYearCat","YearMatch",'MatchProperty("year")'); // the document year should match the configuration year
+    rulesEngine.addRule("AYearCat","CatMatch",'MatchProperty("category")');// and the document category should match the configuration category
+    rulesEngine.addRule("AYearCat","TagMatch",'MatchProperty("tags")'); // and the tags too
+    rulesEngine.addRule("AYearCat","TitleMatch",'MatchPropertySearch("title","and")'); // and the title too...
 
-    rulesEngine.compileRules();
+    rulesEngine.compileRules();// we are ready, no more rules to define, so compile the rules
 
     var docFilter = {
         init: function(){
@@ -184,6 +186,7 @@
             console.log("docFilter: init");
             $(".filters a.btn").on('click', docFilter.select);
             $(".filters input").on("keyup", docFilter.updateInput);
+            // initialize the configurator to 'all' ('*') values
             rulesEngine.selectConfigurationPropertyValue("category",'*',1);
             rulesEngine.selectConfigurationPropertyValue("tags",'*',1);
             rulesEngine.selectConfigurationPropertyValue("year",'*',1);
@@ -197,6 +200,7 @@
               let cat   = $(this).attr('data-cat');
               let tag   = $(this).attr('data-tag');
               let year  = $(this).attr('data-year');
+              // reset the configurator values
               if (cat)  rulesEngine.selectConfigurationPropertyValue("category",(cat=='all')?'*':cat,0,false);
               if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",(tag=='all')?'*':tag,0,false);
               if (year) rulesEngine.selectConfigurationPropertyValue("year",(year=='all')?'*':year,0,false);
@@ -205,6 +209,8 @@
             let cat   = $(this).attr('data-cat');
             let tag   = $(this).attr('data-tag');
             let year  = $(this).attr('data-year');
+            // set the configuration for each property
+            // reprocess the rules/documents to display/hide
             if (cat)  rulesEngine.selectConfigurationPropertyValue("category",(cat=='all')?'*':cat,1);
             if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",(tag=='all')?'*':tag,1);
             if (year) rulesEngine.selectConfigurationPropertyValue("year",(year=='all')?'*':year,1);
@@ -214,13 +220,15 @@
         updateInput: function(e) {
           //let searchString = $(this).val() != "" ? '*'+$(this).val().replace(' ','*')+'*':'*';
           let searchStrings = $(this).val() != "" ? $(this).val():'*';
+          // see each word as separate keywords
           searchStrings = searchStrings.split(' ');
 
           rulesEngine.resetConfigurationProperty("title");
           searchStrings.map(searchString => {
-            rulesEngine.selectConfigurationPropertyValue("title",'*'+searchString+'*',1,false);
+            //create as many keywords to be searched in the configuration of title
+            rulesEngine.selectConfigurationPropertyValue("title",'*'+searchString+'*',1,false);// we don't process
           });
-          rulesEngine.runRulesEngine();
+          rulesEngine.runRulesEngine();// do now the search
         },
 
     };
@@ -240,6 +248,7 @@
       return aJson;
     }
 
+    // process the loading of the document with the help of Blapy
     $( document ).ready(function() {
   		$('#myBlapy').Blapy();
   	});
