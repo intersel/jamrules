@@ -3,7 +3,7 @@
     "dateYear" : "2021",
     "documents" : [
       {
-          "title":"Meeting report"
+          "title":"JamRules rocks :)"
         , "docid":"doc1"
         , "tags":"ag,ca,anticipation"
         , "cat":"minute"
@@ -11,7 +11,7 @@
         , "year":"2021"
       },
       {
-          "title":"Meeting report"
+          "title":"Meeting Schedule"
         , "docid":"doc2"
         , "tags":"ag,ca,anticipation"
         , "cat":"annex"
@@ -19,7 +19,7 @@
         , "year":"2021"
       },
       {
-          "title":"Meeting report"
+          "title":"Just do it... Right?"
         , "docid":"doc3"
         , "tags":"ca,comittee"
         , "cat":"dossier"
@@ -27,7 +27,7 @@
         , "year":"2021"
       },
       {
-          "title":"Meeting report"
+          "title":"Open your views"
         , "docid":"doc4"
         , "tags":"influence"
         , "cat":"minute"
@@ -40,7 +40,7 @@
     "dateYear" : "2020",
     "documents" : [
       {
-          "title":"Meeting report"
+          "title":"General Meeting"
         , "docid":"doc5"
         , "tags":"ca,comittee"
         , "cat":"minute"
@@ -48,7 +48,7 @@
         , "year":"2020"
       },
       {
-          "title":"Meeting report"
+          "title":"Meeting Schedule"
         , "docid":"doc6"
         , "tags":"club,anticipation"
         , "cat":"action plan"
@@ -56,7 +56,7 @@
         , "year":"2020"
       },
       {
-          "title":"Meeting report"
+          "title":"Conference on music"
         , "docid":"doc7"
         , "tags":"ca"
         , "cat":"dossier"
@@ -64,7 +64,7 @@
         , "year":"2020"
       },
       {
-          "title":"Meeting report"
+          "title":"Books are great!"
         , "docid":"doc70"
         , "tags":"ag,ca,anticipation"
         , "cat":"dossier"
@@ -72,7 +72,7 @@
         , "year":"2020"
       },
       {
-          "title":"Meeting report"
+          "title":"Meeting Schedule"
         , "docid":"doc8"
         , "tags":"influence,club"
         , "cat":"press release"
@@ -80,7 +80,7 @@
         , "year":"2020"
       },
       {
-          "title":"Meeting report"
+          "title":"Training on JamRules"
         , "docid":"doc9"
         , "tags":"ag,ca,misc"
         , "cat":"minute"

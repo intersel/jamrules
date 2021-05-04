@@ -17,7 +17,7 @@
     <script>
 
     //create a rule engine
-    var rulesEngine = jamrules.build({'debug':true});
+    var rulesEngine = jamrules.build({'debug':true,'notmatchedFunctionName':'notselected','matchedFunctionName':'selected'});
 
     </script>
 </head>
@@ -46,6 +46,7 @@
             <div class="row">
                 <div class="col col-12 offset-1">
                     <h2 class="h1">Configurator</h2>
+                    <div class="filters level1"><input type="text" value="" placeholder="search..."></div>
                     <div class="filters level1">
                         <div class="years">
                             <a href="#" data-year="all" class="btn active">All</a>
@@ -130,29 +131,24 @@
               </li>
               <script>
 
-              rulesEngine.addObject({
-              		'propertiesSet' : {
-              			'year' : {
-              				"{%year%}" : 1,
-                      "all" : 1
-              			},
-                    'category' : {
-              				"{%cat%}" : 1,
-                      "all" : 1
-              			},
-                    'tags' : "{%tags%},all".split(',').reduce(function(obj,atag) {obj[atag]=1;return obj;},{}),
-              		},
-              		'matched' : function() {
-                    //debugger;
-                    $("#{%docid%}").show();
-                  },
-              		'notmatched' : function(aRuleEngine) {
-                    //debugger;
-                    var reason = aRuleEngine.myRulesEngine.opts.reason;
-                    console.log(JSON.stringify(reason));
-                    $("#{%docid%}").hide();
+              rulesEngine.addPropertyObject(
+              		{
+                    'title' : "{%title%}",
+                    'year' : "{%year%}",
+                    'category' : "{%cat%}",
+                    'tags' : "{%tags%}".split(','),
+                		'selected' : function() {
+                      //debugger;
+                      $("#{%docid%}").show();
+                    },
+                		'notselected' : function(aRuleEngine) {
+                      //debugger;
+                      var reason = aRuleEngine.myRulesEngine.opts.reason;
+                      console.log(JSON.stringify(reason));
+                      $("#{%docid%}").hide();
+                    }
                   }
-              	});
+              	);
               </script>
             </|xmp>
           </ul>
@@ -173,11 +169,13 @@
 
     <script>
 
-    rulesEngine.createRulesSet("AYearCat");
+    rulesEngine.createRulesSet("AYearCat",["year","category","tags","title"]);
     rulesEngine.addRule("AYearCat","YearMatch",'MatchProperty("year")');
     rulesEngine.addRule("AYearCat","CatMatch",'MatchProperty("category")');
     rulesEngine.addRule("AYearCat","TagMatch",'MatchProperty("tags")');
+    rulesEngine.addRule("AYearCat","TitleMatch",'MatchPropertySearch("title","and")');
 
+    rulesEngine.compileRules();
 
     var docFilter = {
         init: function(){
@@ -185,10 +183,11 @@
                 return;
             console.log("docFilter: init");
             $(".filters a.btn").on('click', docFilter.select);
-            $(".filters a.toggle").on("click", docFilter.toggleTags);
-            rulesEngine.selectConfigurationPropertyValue("category",'all',1,false);
-            rulesEngine.selectConfigurationPropertyValue("tags",'all',1,false);
-            rulesEngine.selectConfigurationPropertyValue("year",'all',1,false);
+            $(".filters input").on("keyup", docFilter.updateInput);
+            rulesEngine.selectConfigurationPropertyValue("category",'*',1);
+            rulesEngine.selectConfigurationPropertyValue("tags",'*',1);
+            rulesEngine.selectConfigurationPropertyValue("year",'*',1);
+            rulesEngine.selectConfigurationPropertyValue("title",'*',1);
 
         },
         select: function(e) {
@@ -198,25 +197,30 @@
               let cat   = $(this).attr('data-cat');
               let tag   = $(this).attr('data-tag');
               let year  = $(this).attr('data-year');
-              if (cat)  rulesEngine.selectConfigurationPropertyValue("category",cat,0,false);
-              if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",tag,0,false);
-              if (year) rulesEngine.selectConfigurationPropertyValue("year",year,0,false);
+              if (cat)  rulesEngine.selectConfigurationPropertyValue("category",(cat=='all')?'*':cat,0,false);
+              if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",(tag=='all')?'*':tag,0,false);
+              if (year) rulesEngine.selectConfigurationPropertyValue("year",(year=='all')?'*':year,0,false);
             });
             $(e.currentTarget).addClass("active");
             let cat   = $(this).attr('data-cat');
             let tag   = $(this).attr('data-tag');
             let year  = $(this).attr('data-year');
-            if (cat)  rulesEngine.selectConfigurationPropertyValue("category",cat,1,false);
-            if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",tag,1,false);
-            if (year) rulesEngine.selectConfigurationPropertyValue("year",year,1,false);
+            if (cat)  rulesEngine.selectConfigurationPropertyValue("category",(cat=='all')?'*':cat,1);
+            if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",(tag=='all')?'*':tag,1);
+            if (year) rulesEngine.selectConfigurationPropertyValue("year",(year=='all')?'*':year,1);
 
-            rulesEngine.runRulesEngine();
+//            rulesEngine.runRulesEngine();
         },
-        toggleTags: function(e) {
-            e.preventDefault();
-            $(".filters.level2").toggleClass("active");
-            var label = $(".filters.level2").hasClass("active") ? "Fermer les filtres" : "Affiner par type de réunion";
-            $(".filters a.toggle").html(label);
+        updateInput: function(e) {
+          //let searchString = $(this).val() != "" ? '*'+$(this).val().replace(' ','*')+'*':'*';
+          let searchStrings = $(this).val() != "" ? $(this).val():'*';
+          searchStrings = searchStrings.split(' ');
+
+          rulesEngine.resetConfigurationProperty("title");
+          searchStrings.map(searchString => {
+            rulesEngine.selectConfigurationPropertyValue("title",'*'+searchString+'*',1,false);
+          });
+          rulesEngine.runRulesEngine();
         },
 
     };

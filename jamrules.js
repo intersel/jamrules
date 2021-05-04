@@ -8,6 +8,10 @@
  *
  * -----------------------------------------------------------------------------------------
  * Modifications :
+ * - 20210504 - E.Podvin - V2.3.0 -
+ *   - add MatchPropertySearch test with wildcard
+ *   - add resetConfigurationProperty
+ *   - add '*' as a property value to match any value of a property of the configurator
  * - 20210418 - E.Podvin - V2.2.0 - add addPropertyObjects
  * - 20170402 - E.Podvin - V2.1.0 - adding new objects simplified + possibility to call matching rule functions
  * - 20170331  - E.Podvin - V2.0.0 - Refactoring
@@ -15,11 +19,11 @@
  *
  * -----------------------------------------------------------------------------------------
  *
- * @copyright Intersel 2017
+ * @copyright Intersel 2017-2021
  * @fileoverview :
  * @see {@link https://github.com/intersel/jamrules}
  * @author : Emmanuel Podvin - emmanuel.podvin@intersel.fr
- * @version : 2.1.0
+ * @version : 2.3.0
  * -----------------------------------------------------------------------------------------
  */
 
@@ -116,8 +120,8 @@ var jamrules = (function() {
    * 			<propertyName1>.<propertyValue1>:true|false,
    * 			<propertyName2>.<propertyValue2>:true|false
    * 			....
-   * 		]
-   * 		matched:<function name to call when a rule will match for the object>
+   * 		],
+   * 		matched:<function name to call when a rule will match for the object>,
    * 		notmatched:<function name to call when there is a change but object does not match any rules>
    * }
    * @example
@@ -151,6 +155,8 @@ var jamrules = (function() {
    * 		matched:<function name to call when a rule will match for the object>
    * 		notmatched:<function name to call when there is a change but object does not match any rules>
    * }
+   * remarks:
+   * - the property value of an object may be a numeric, string or an array of values (multiple values)
    * @example
    */
   var _translateToJamrulesProperties = function(anObject) {
@@ -158,7 +164,15 @@ var jamrules = (function() {
 
     for (var aProperty in anObject) {
       aPropertiesSet[aProperty] = {};
-      aPropertiesSet[aProperty][anObject[aProperty]] = 1
+      if (Array.isArray(anObject[aProperty]))
+      {
+        anObject[aProperty].map(aPropertyValue => aPropertiesSet[aProperty][aPropertyValue] = 1);
+      }
+      else
+      {
+        aPropertiesSet[aProperty][anObject[aProperty]] = 1;
+      }
+      aPropertiesSet[aProperty]['*'] = 1;
     };
     return aPropertiesSet;
 
@@ -688,6 +702,8 @@ var jamrules = (function() {
       var defaults = {
         debug: false,
         LogLevel: 1,
+        matchedFunctionName: "matched",
+        notmatchedFunctionName: "notmatched"
       };
 
       /**
@@ -704,7 +720,7 @@ var jamrules = (function() {
        * @param myRulesEngine - the FSM engine bound to the jamrules
        * @access public
        */
-      this.myRulesEngine = {};
+      this.myRulesEngine = null;
 
 
       /**
@@ -745,6 +761,7 @@ var jamrules = (function() {
 
       /**
        * getObjectProfiles - get the current object profiles bound to this rule engine
+       * @access public
        *
        */
       this.getObjectProfiles = function() {
@@ -753,11 +770,84 @@ var jamrules = (function() {
 
       /**
        * getAllObjectProfiles - get all the object profiles (shared and of the current instance) bound to this rule engine
+       * @access public
        *
        */
       this.getAllObjectProfiles = function() {
         return $.extend({}, ObjectProfiles, this.getObjectProfiles());
       }
+
+      /**
+       * wildcardSearch - look for a string with wildcards in an other string
+       * @access public
+       * @param {string} str - string to test
+       * @param {string} wildcardStr
+       * checks if a string match to wildcardStr
+       * Wildcards are: * as zero to unlimited numbers - ? as zero to one character
+       * @param  {[type]} regexOptions default:gmi, regex options
+       * @returns {boolean}
+       *
+       *   "a*b" => everything that starts with "a" and ends with "b"
+       *   "a*"  => everything that starts with "a"
+       *   "*b"  => everything that ends with "b"
+       *   "*a*" => everything that has an "a" in it
+       *   "*a*b*"=> everything that has an "a" in it, followed by anything, followed by a "b", followed by anything
+       *
+       */
+      this.wildcardSearch = function(str, wildcardStr,regexOptions) {
+        regexOptions = regexOptions || 'gim';
+        const escapeRegex = (str) => str.replace(/([.*+?^=!:${}()|\[\]\/\\])/gi, "\\$1");
+        return new RegExp("^" + regexReplaceHelper(wildcardStr, {"*": ".*", "?": ".?"}, escapeRegex) + "$",regexOptions).test(str);
+      }
+
+      /**
+       * translate a string with wildcards in a regex
+       * @access private
+       * @param  {string} input        a string with wildcards
+       * eg "a*b"
+       * @param  {object} replace_dico object giving the how to translate a wildcard to a regex
+       * eg: {"*": ".*", "?": ".?"}
+       * @param  {function} last_map   a function to apply to string parts with no wildcard
+       * @return {string}              a regex expression
+       */
+      var regexReplaceHelper = function(input, replace_dico, last_map) {
+        let replace_dict = Object.assign({}, replace_dico);
+        if (Object.keys(replace_dict).length === 0) {
+          return last_map(input);
+        }
+        const split_by = Object.keys(replace_dict)[0];
+        const replace_with = replace_dict[split_by];
+        delete replace_dict[split_by];
+        return input.split(split_by).map((next_input) => regexReplaceHelper(next_input, replace_dict, last_map)).join(replace_with);
+      }
+
+      /**
+       * wildcardSearchInPropertyObject Search if a string is contained in one of the proporty values of the object
+       * @access public
+       * @param  {string} aString    a string (possible wildcards: '*' or '?') to find in one of the property values
+       * @param  {object} jsonObj    an object to test
+       * @param  {boolean} searchDeep default:false - if true, search all the levels in the object
+       * @return {boolean} true if found
+       */
+      this.wildcardSearchInPropertyObject = function(aString,jsonObj,searchDeep)
+      {
+          let found = false;
+          searchDeep = searchDeep?true:false;
+          for (var i in jsonObj) {
+            if (searchDeep && (typeof jsonObj[i] == 'object') && wildcardSearchInPropertyObject(aString, jsonObj[i])) {
+              found = true
+              break;
+            } else
+              //if key matches and value matches or if key matches and value is not passed (eliminating the case where key matches but passed value does not)
+              if (wildcardSearch(jsonObj[i], aString)) {
+                found = true
+                break;
+              }
+          }//end for
+          return found;
+      }
+
+
     };
 
 
@@ -829,6 +919,63 @@ var jamrules = (function() {
         return true;
       else return false;
     }
+
+    /**
+     * @function MatchPropertySearch
+     **access public
+     * @abstract matching rule function, tests if a string aPropertyName is found as a property value of objects =
+     * @param aPropertyName: a string to search in the property values of objects.
+     *   wildcards are possible: '*' (0 or more char), '?' (0 or 1 char)
+     *   eg: 'my*propert?' will match 'myproperty','mygivenpropert','myREDproperts'
+     *                     won't match 'property', 'myREDproperties'
+     *
+     * @param searchMode: default:'or'
+     *  - or: blank are considered as 'or' operator between keywords to find
+     *  - and: blank are considered as 'and' operator with all keywords to be found in any property values
+     * @return returns true if the pattern string(s) defined in the configurator are found in property values of object
+     * @remark generally used for text input as search input
+     * @example
+     *  object.priority.priority1=1
+     *  object.technician.technician1=1
+     *  configuration.priority['prio*']=1
+     *  configuration.technician['technician2']=1
+     *  MatchPropertySearch('priority') -> match
+     *  MatchPropertySearch('technician') -> no match
+     */
+    var MatchPropertySearch = function(aPropertyName, searchMode) {
+      searchMode =  searchMode || 'or';
+      let propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
+
+      let nbfound = 0;
+      let nbtofind = 0;
+      let found=false;
+
+      for (searchString in propertiesConfiguration[aPropertyName]) {
+        nbtofind++;
+        for (aObjPropertyName in propertiesObjectProfile) {
+          found=false;
+          for (aObjPropertyValue in propertiesObjectProfile[aObjPropertyName]) {
+            if (    aObjPropertyValue != '*'
+                &&  propertiesObjectProfile[aObjPropertyName][aObjPropertyValue]
+                &&  this.wildcardSearch(aObjPropertyValue,searchString)
+            )
+            {
+              if (searchMode == 'or') return true;
+              found=true;
+              break;
+            }
+          }
+          if (found)
+          {
+            nbfound++;
+            break;
+          }
+        }
+      }
+
+      return (nbfound >= nbtofind);
+    }
+
 
     /**
      * @function MatchExternalRule
@@ -1174,7 +1321,6 @@ var jamrules = (function() {
      * @param aRuleTest: a boolean test to evaluate
      * @param overloadRule: boolean (default: false), if aRuleName exists, will overload it
      *
-     *
      */
     var addRule = function(aRulesGroup, aRuleName, aRuleTest, overloadRule) {
       this.log("addRule(aRulesGroup, aRuleName, aRuleTest): " + aRulesGroup + " - " + aRuleName + "-" + aRuleTest);
@@ -1264,6 +1410,18 @@ var jamrules = (function() {
     }
 
     /**
+     * @function resetConfigurationProperty
+     * @access public
+     * @abstract reset a property completly
+     * @param aPropertyName: name of the property to reset
+     * @return void
+     */
+    var resetConfigurationProperty = function(aPropertyName) {
+      this.log("resetConfigurationProperty(aPropertyName):" + aPropertyName);
+      propertiesConfiguration[aPropertyName] = {};
+    }
+
+    /**
      * @function compileRules
      * @abstract initialize the rule engine - to do before action and after adding the rules
      */
@@ -1313,11 +1471,18 @@ var jamrules = (function() {
      */
     var addPropertyObject = function(anObject, aMatchingFunction, aNotMatchingFunction) {
       this.log("addPropertyObject");
-      if (!aMatchingFunction && anObject.matched)
-        aMatchingFunction = anObject.matched;
+      if (!aMatchingFunction && anObject[this.options.matchedFunctionName])
+      {
+        aMatchingFunction = anObject[this.options.matchedFunctionName];
+        delete(anObject[this.options.matchedFunctionName]);
+      }
 
-      if (!aNotMatchingFunction && anObject.notmatched)
-        aNotMatchingFunction = anObject.notmatched;
+      if (!aNotMatchingFunction && anObject[this.options.notmatchedFunctionName])
+      {
+        aNotMatchingFunction = anObject[this.options.notmatchedFunctionName];
+        delete(anObject[this.options.notmatchedFunctionName]);
+      }
+
 
       _addObject({
         propertiesSet: jamrules._translateToJamrulesProperties(anObject),
@@ -1329,7 +1494,7 @@ var jamrules = (function() {
      * @function public addPropertyObjects
      * @abstract add objects to the list of objects to test against rules
      * @param objects: array of property objects. Each object may have these properties set:
-     * 		matched (otion):<function name to call when a rule will match for the object>
+     * 		matched (option):<function name to call when a rule will match for the object>
      * 		notmatched (option):<function name to call when there is a change but object does not match any rules>
      * @param aMatchingFunction (option): the matching function, same as to define the "matched" property in the object
      * @param aNotMatchingFunction (option): the matching function, same as to define the "notmatched" property in the object
@@ -1339,11 +1504,17 @@ var jamrules = (function() {
       this.log("addPropertyObjects");
       let that=this;
       objects.forEach(function(anObject) {
-        if (!aMatchingFunction && anObject.matched)
-          aMatchingFunction = anObject.matched;
+        if (!aMatchingFunction && anObject[this.options.matchedFunctionName])
+        {
+          aMatchingFunction = anObject[this.options.matchedFunctionName];
+          delete(anObject[this.options.matchedFunctionName]);
+        }
 
-        if (!aNotMatchingFunction && anObject.notmatched)
-          aNotMatchingFunction = anObject.notmatched;
+        if (!aNotMatchingFunction && anObject[this.options.notmatchedFunctionName])
+        {
+          aNotMatchingFunction = anObject[this.options.notmatchedFunctionName];
+          delete(anObject[this.options.notmatchedFunctionName]);
+        }
 
         let theObject = anObject;
         _addObject({
@@ -1354,6 +1525,8 @@ var jamrules = (function() {
         }, that.getObjectProfiles());
       });
     };
+
+
     /**
      * @access public
      * @abstract log a message on the console for debug
@@ -1370,6 +1543,7 @@ var jamrules = (function() {
         ,
       runRulesEngine: runRulesEngine,
       selectConfigurationPropertyValue: selectConfigurationPropertyValue,
+      resetConfigurationProperty: resetConfigurationProperty,
       createRulesSet: createRulesSet,
       addRule: addRule,
       compileRules: compileRules,
@@ -1387,13 +1561,14 @@ var jamrules = (function() {
       MatchProperties: MatchProperties,
       MatchPropertiesSameValue: MatchPropertiesSameValue,
       MatchPropertiesSameValues: MatchPropertiesSameValues,
+      MatchPropertySearch:MatchPropertySearch,
       ObjectPropertySet: ObjectPropertySet,
       ConfigurationPropertySet: ConfigurationPropertySet,
       ObjectPropertiesSameValue: ObjectPropertiesSameValue,
       ObjectPropertiesSameValues: ObjectPropertiesSameValues,
       ConfigurationPropertiesSameValue: ConfigurationPropertiesSameValue,
       ConfigurationPropertiesSameValues: ConfigurationPropertiesSameValues,
-      MatchExternalRule: MatchExternalRule
+      MatchExternalRule: MatchExternalRule,
     };
 
 

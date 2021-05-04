@@ -19,7 +19,7 @@ For example, connected to a dialog box of criteria managed with checkboxes, JamR
 
 As an object filter library, Jamrules is your best friend! Ideal for product configurators, objects selection on criteria, ...
 
-[See JamRules in action](https://demo.intersel.fr/jamrules/tests/filterDocs.html) (source code in test/filterDocs.html)
+[See JamRules in action](https://demo.intersel.fr/jamrules/tests/filterDocsExclusive.html) (source code in test/filterDocsExclusive.html)
 
 # How it works...
 To run jamrules, you will have to:
@@ -140,9 +140,11 @@ Any object that matches the rules will have their "Matched" function called. Any
 
 //initialisation of jamrules and its configurator
 var rulesEngine = jamrules.build({
-	"debug":		"<boolean>",
-	"matched":	"<a function to call when the rule find a match>",
-	"notmatched":	"<a function to call when the rule did not find a match>"
+	"debug":		"<boolean>", //default: false
+	"matched":	"<a function to call when the rule find a match>", // default: null
+	"notmatched":	"<a function to call when the rule did not find a match>",// default: null
+  "matchedFunctionName": "<property name for the 'matched' function in objects>",// default: matched
+  "matchedFunctionName": "<property name for the 'notmatched' function in objects>"// default: notmatched
 });
 ```
 
@@ -151,7 +153,7 @@ var rulesEngine = jamrules.build({
 if true, the rule engine will send debug message on the console
 
 
-### the Matched and NotMatched functions
+### the "Matched" and "NotMatched" functions
 
 The "matched" and "notmatched" functions are called whenever the rule engine matches an object profile.
 
@@ -159,6 +161,12 @@ Functions have the following parameters:
   * aListOfMatchedObjects: the list of objects that matched the rule
 
 **Remarks**: These functions are not to be confused with the ones defined on the object level...
+
+### "matchedFunctionName" and "notmatchedFunctionName" options
+
+These options allows to change the default property names of the object that define the 'matched' and 'notmatched' functions of it.
+May be used if by any chance, these property names are used for other things...
+
 
 # The JamRules Objects
 In order to test objects with jamrules, you have to give it objects to test against the rules defined in the rule engine.
@@ -253,6 +261,7 @@ There are several filtering functions that may help to test a configuration in t
 * MatchProperties
 * MatchPropertiesSameValue
 * MatchPropertiesSameValues
+* MatchObjectSearch
 * ConfigurationPropertySet
 * ConfigurationPropertiesSameValue
 * ConfigurationPropertiesSameValues
@@ -266,8 +275,8 @@ rulesEngine.createRulesSet("SameTrousers");
 rulesEngine.addRule("SameTrousers","O1Trouser",'ObjectPropertySet("object1","trouser")');
 rulesEngine.addRule("SameTrousers","O2Trouser",'ObjectPropertiesSameValue("object1","object2")');
 rulesEngine.createRulesSet("SameShirts",["object1","object2"]);
-rulesEngine.addRule("SameColorTrousersPack","O1Shirt",'ObjectPropertySet("object1","shirt")');
-rulesEngine.addRule("SameColorTrousersPack","O2Shirt",'ObjectPropertiesSameValue("object1","object2")');
+rulesEngine.addRule("SameShirts","O1Shirt",'ObjectPropertySet("object1","shirt")');
+rulesEngine.addRule("SameShirts","O2Shirt",'ObjectPropertiesSameValue("object1","object2")');
 ```
 
 # Adding Objects to test by JamRules
@@ -422,7 +431,9 @@ Set a property/property value status in the filtering configurator
 * **doTest**: <boolean> <default:true> (option) if false, configure the configurator but does not run the rules engine test
 
 ### Remarks
-If "doTest" is set, the rules engine will **run** and process -only- the rules sets that have configured the "aPropertyName" in the "ruleEvents" parameter of createRulesSet function.
+If "doTest" is set, the rules engine will **run** and process -only- the rules sets that have configured the "aPropertyName" in the "ruleEvents" parameter in createRulesSet function.
+
+aPropertyValue may be set to "*" to match any value of aPropertyName.
 
 ### Example
 ```javascript
@@ -524,7 +535,7 @@ Returns true if all properties values of aConfigurationPropertyName and of anObj
 *  configuration.activity.priority1=1
 *  configuration.strawberry.priority2=1
 *  MatchPropertiesSameValues('activity','priority') -> match
-*  MatchPropertiesSameValues('strawberry','priority','priority1') -> no match
+*  MatchPropertiesSameValues('strawberry','priority') -> no match
 
 ## MatchProperties(aConfigurationPropertyName,anObjectPropertyName)
 Tests if at least a property value exists and is set between the configurator property and the object property
@@ -543,6 +554,28 @@ returns true if it exists a value of aConfigurationPropertyName that is the same
 *  configuration.strawberry.priority2=1
 *  MatchProperties('activity','priority') -> match
 *  MatchProperties('strawberry','priority') -> no match
+
+## MatchObjectSearch(aConfigurationPropertyName,anObjectPropertyName)
+Tests if the value of a configuration property string is found in the values of object's properties
+
+### parameters  
+* aPropertyValueWithWildcard: a string to search in the property values of objects.
+   wildcards are possible: '*' (0 or more char), '?' (0 or 1 char)
+   eg: 'my*propert?' will match 'myproperty','mygivenpropert','myREDproperts'
+                     won't match 'property', 'myREDproperties'
+
+### returns
+returns true if aPropertyValueWithWildcard is found as a property value of the object
+
+### Example
+*  object.priority.priority1=1
+*  object.technician.technician1=1
+*  configuration.technician.technician2=1
+*  MatchObjectSearch('priority1') -> match
+*  MatchObjectSearch('prior*') -> match
+*  MatchObjectSearch('tec?ician') -> no match
+*  MatchObjectSearch('tec*ician2') -> no match
+
 
 ## ObjectPropertySet(aPropertyName,aPropertyValue,valueSet)
 tests if the property in theObjectPropertySett has its value set

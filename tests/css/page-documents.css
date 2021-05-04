@@ -94,6 +94,17 @@ a.download {
 }
 .filters .years a.btn {margin: 0 0.7em 1em;font-family: Chatelet;line-height: 1.6em;}
 
+.filters input {
+  margin: 0 0 30px 0;
+  border: 2px solid darkgray;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 5px 14px;
+  width: 370px;
+  background-color: #F3F3F3;
+  color: darkgray;
+}
+
 section[data-year] .h1 {
     margin-bottom: 15px
 }
