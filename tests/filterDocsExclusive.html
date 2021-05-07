@@ -196,14 +196,14 @@
         select: function(e) {
             e.preventDefault();
             $(e.currentTarget).parent().find("a.btn").each(function(){
-              $(this).removeClass('active');
-              let cat   = $(this).attr('data-cat');
-              let tag   = $(this).attr('data-tag');
-              let year  = $(this).attr('data-year');
-              // reset the configurator values
-              if (cat)  rulesEngine.selectConfigurationPropertyValue("category",(cat=='all')?'*':cat,0,false);
-              if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",(tag=='all')?'*':tag,0,false);
-              if (year) rulesEngine.selectConfigurationPropertyValue("year",(year=='all')?'*':year,0,false);
+               $(this).removeClass('active');
+            //   let cat   = $(this).attr('data-cat');
+            //   let tag   = $(this).attr('data-tag');
+            //   let year  = $(this).attr('data-year');
+            //   // reset the configurator values
+            //   if (cat)  rulesEngine.checkConfigurationPropertyValue("category",(cat=='all')?'*':cat,0,false);
+            //   if (tag)  rulesEngine.checkConfigurationPropertyValue("tags",(tag=='all')?'*':tag,0,false);
+            //   if (year) rulesEngine.checkConfigurationPropertyValue("year",(year=='all')?'*':year,0,false);
             });
             $(e.currentTarget).addClass("active");
             let cat   = $(this).attr('data-cat');
@@ -226,7 +226,7 @@
           rulesEngine.resetConfigurationProperty("title");
           searchStrings.map(searchString => {
             //create as many keywords to be searched in the configuration of title
-            rulesEngine.selectConfigurationPropertyValue("title",'*'+searchString+'*',1,false);// we don't process
+            rulesEngine.checkConfigurationPropertyValue("title",'*'+searchString+'*',1,false);// we don't process
           });
           rulesEngine.runRulesEngine();// do now the search
         },

@@ -8,6 +8,11 @@
  *
  * -----------------------------------------------------------------------------------------
  * Modifications :
+ * - 20210507 - E.Podvin - V2.4.0
+ *    - !!selectConfigurationPropertyValue is renamed checkConfigurationPropertyValue !!
+ *    - selectConfigurationPropertyValue: select a value as a radio would do (unselecting other values)
+ *    - checkConfigurationPropertyValue: set a value as a checkbox would do
+ *    - resetConfigurationPropertyValues: reset all values of a property
  * - 20210504 - E.Podvin - V2.3.0 -
  *   - add MatchPropertySearch test with wildcard
  *   - add resetConfigurationProperty
@@ -1371,17 +1376,18 @@ var jamrules = (function() {
     }
 
     /**
-     * @function selectConfigurationPropertyValue
+     * @function checkConfigurationPropertyValue
      * @access public
      * @abstract set a property/property value status in the rules configurator
+     *           designed for checkboxes/multiple select
      * @param aPropertyName: name of the property that has changed
      * @param aProperyValue: value of the property
      * @param aStatus: [boolean] status of the property for this property value set or not
      * @param doTest: [boolean] [default:true] if false, configure the configurator but does not run the rules engine test
      * @return void
      */
-    var selectConfigurationPropertyValue = function(aPropertyName, aPropertyValue, aStatus, doTest) {
-      this.log("selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus):" + aPropertyName + ',' + aPropertyValue + ',' + aStatus);
+    var checkConfigurationPropertyValue = function(aPropertyName, aPropertyValue, aStatus, doTest) {
+      this.log("checkConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus):" + aPropertyName + ',' + aPropertyValue + ',' + aStatus);
       if (aStatus == undefined) aStatus = false;
       if (doTest == undefined) doTest = true;
 
@@ -1410,9 +1416,56 @@ var jamrules = (function() {
     }
 
     /**
+     * @function selectConfigurationPropertyValue
+     * @access public
+     * @abstract set a property/property value status in the rules configurator
+     *           designed for radio/exclusive select
+     * @param aPropertyName: name of the property that has changed
+     * @param aProperyValue: value of the property
+     * @param doTest: [boolean] [default:true] if false, configure the configurator but does not run the rules engine test
+     * @return void
+     */
+    var selectConfigurationPropertyValue = function(aPropertyName, aPropertyValue, doTest) {
+      this.log("selectConfigurationPropertyValue(aPropertyName,aPropertyValue):" + aPropertyName + ',' + aPropertyValue );
+      if (doTest == undefined) doTest = true;
+
+      if (!propertiesConfiguration[aPropertyName]) propertiesConfiguration[aPropertyName] = {};
+
+      this.resetConfigurationPropertyValues(aPropertyName);
+
+      // set the one...
+      propertiesConfiguration[aPropertyName][aPropertyValue] = true;
+
+      if (this.myRulesEngine && doTest) this.myRulesEngine.trigger('propertyChange', {
+        propertyName: aPropertyName,
+        propertyValue: aPropertyValue,
+        status: true
+      });
+      else if (!this.myRulesEngine) {
+        if (this.options.debug) alert("Rules engine is not started. Call first compile rules (cf compileRules())");
+        return;
+      }
+    }
+    /**
+     * @function resetConfigurationPropertyValues
+     * @access public
+     * @abstract reset a property by setting all its property values to a false status in the rules configurator
+     * @param aPropertyName: name of the property that has changed
+     * @return void
+     */
+    var resetConfigurationPropertyValues = function(aPropertyName) {
+      this.log("resetConfigurationPropertyValues(aPropertyName):" + aPropertyName);
+      //unset all property's values
+      for (propertyValue in propertiesConfiguration[aPropertyName]) {
+        propertiesConfiguration[aPropertyName][propertyValue]=false;
+      }
+
+    }
+
+    /**
      * @function resetConfigurationProperty
      * @access public
-     * @abstract reset a property completly
+     * @abstract reset a property completely
      * @param aPropertyName: name of the property to reset
      * @return void
      */
@@ -1543,6 +1596,8 @@ var jamrules = (function() {
         ,
       runRulesEngine: runRulesEngine,
       selectConfigurationPropertyValue: selectConfigurationPropertyValue,
+      checkConfigurationPropertyValue: checkConfigurationPropertyValue,
+      resetConfigurationPropertyValues: resetConfigurationPropertyValues,
       resetConfigurationProperty: resetConfigurationProperty,
       createRulesSet: createRulesSet,
       addRule: addRule,

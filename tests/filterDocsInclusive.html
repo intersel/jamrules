@@ -225,18 +225,18 @@
             $(".filters a.btn").on('click', docFilter.select);
             $(".filters a.toggle").on("click", docFilter.toggleTags);
 
-            rulesEngine.selectConfigurationPropertyValue("category","minute",0,false);
-            rulesEngine.selectConfigurationPropertyValue("category","dossier",0,false);
-            rulesEngine.selectConfigurationPropertyValue("category","annex",0,false);
-            rulesEngine.selectConfigurationPropertyValue("category","action plan",0,false);
-            rulesEngine.selectConfigurationPropertyValue("category","press release",0,false);
-            rulesEngine.selectConfigurationPropertyValue("category","misc",0,false);
-            rulesEngine.selectConfigurationPropertyValue("tags","anticipation",0,false);
-            rulesEngine.selectConfigurationPropertyValue("tags","influence",0,false);
-            rulesEngine.selectConfigurationPropertyValue("tags","club",0,false);
-            rulesEngine.selectConfigurationPropertyValue("tags","ag",0,false);
-            rulesEngine.selectConfigurationPropertyValue("tags","ca",0,false);
-            rulesEngine.selectConfigurationPropertyValue("tags","comittee",0,false);
+            rulesEngine.checkConfigurationPropertyValue("category","minute",0,false);
+            rulesEngine.checkConfigurationPropertyValue("category","dossier",0,false);
+            rulesEngine.checkConfigurationPropertyValue("category","annex",0,false);
+            rulesEngine.checkConfigurationPropertyValue("category","action plan",0,false);
+            rulesEngine.checkConfigurationPropertyValue("category","press release",0,false);
+            rulesEngine.checkConfigurationPropertyValue("category","misc",0,false);
+            rulesEngine.checkConfigurationPropertyValue("tags","anticipation",0,false);
+            rulesEngine.checkConfigurationPropertyValue("tags","influence",0,false);
+            rulesEngine.checkConfigurationPropertyValue("tags","club",0,false);
+            rulesEngine.checkConfigurationPropertyValue("tags","ag",0,false);
+            rulesEngine.checkConfigurationPropertyValue("tags","ca",0,false);
+            rulesEngine.checkConfigurationPropertyValue("tags","comittee",0,false);
 
             rulesEngine.runRulesEngine();
 
@@ -248,9 +248,9 @@
             //   let cat   = $(this).attr('data-cat');
             //   let tag   = $(this).attr('data-tag');
             //   let year  = $(this).attr('data-year');
-            //   if (cat)  rulesEngine.selectConfigurationPropertyValue("category",cat,0,false);
-            //   if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",tag,0,false);
-            //   if (year) rulesEngine.selectConfigurationPropertyValue("year",year,0,false);
+            //   if (cat)  rulesEngine.checkConfigurationPropertyValue("category",cat,0,false);
+            //   if (tag)  rulesEngine.checkConfigurationPropertyValue("tags",tag,0,false);
+            //   if (year) rulesEngine.checkConfigurationPropertyValue("year",year,0,false);
             // });
             let currentTarget = $(e.currentTarget);
             let cat   = currentTarget.attr('data-cat');
@@ -259,15 +259,15 @@
             if (currentTarget.hasClass("active"))
             {
               currentTarget.removeClass("active");
-              if (cat)  rulesEngine.selectConfigurationPropertyValue("category",cat,0,false);
-              if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",tag,0,false);
-              if (year) rulesEngine.selectConfigurationPropertyValue("year",year,0,false);
+              if (cat)  rulesEngine.checkConfigurationPropertyValue("category",cat,0,false);
+              if (tag)  rulesEngine.checkConfigurationPropertyValue("tags",tag,0,false);
+              if (year) rulesEngine.checkConfigurationPropertyValue("year",year,0,false);
             }
             else {
               currentTarget.addClass("active");
-              if (cat)  rulesEngine.selectConfigurationPropertyValue("category",cat,1,false);
-              if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",tag,1,false);
-              if (year) rulesEngine.selectConfigurationPropertyValue("year",year,1,false);
+              if (cat)  rulesEngine.checkConfigurationPropertyValue("category",cat,1,false);
+              if (tag)  rulesEngine.checkConfigurationPropertyValue("tags",tag,1,false);
+              if (year) rulesEngine.checkConfigurationPropertyValue("year",year,1,false);
             }
             rulesEngine.runRulesEngine();
         },
