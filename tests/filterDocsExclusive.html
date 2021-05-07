@@ -187,10 +187,10 @@
             $(".filters a.btn").on('click', docFilter.select);
             $(".filters input").on("keyup", docFilter.updateInput);
             // initialize the configurator to 'all' ('*') values
-            rulesEngine.selectConfigurationPropertyValue("category",'*',1);
-            rulesEngine.selectConfigurationPropertyValue("tags",'*',1);
-            rulesEngine.selectConfigurationPropertyValue("year",'*',1);
-            rulesEngine.selectConfigurationPropertyValue("title",'*',1);
+            rulesEngine.selectConfigurationPropertyValue("category",'*');
+            rulesEngine.selectConfigurationPropertyValue("tags",'*');
+            rulesEngine.selectConfigurationPropertyValue("year",'*');
+            rulesEngine.selectConfigurationPropertyValue("title",'*');
 
         },
         select: function(e) {
@@ -211,9 +211,9 @@
             let year  = $(this).attr('data-year');
             // set the configuration for each property
             // reprocess the rules/documents to display/hide
-            if (cat)  rulesEngine.selectConfigurationPropertyValue("category",(cat=='all')?'*':cat,1);
-            if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",(tag=='all')?'*':tag,1);
-            if (year) rulesEngine.selectConfigurationPropertyValue("year",(year=='all')?'*':year,1);
+            if (cat)  rulesEngine.selectConfigurationPropertyValue("category",(cat=='all')?'*':cat);
+            if (tag)  rulesEngine.selectConfigurationPropertyValue("tags",(tag=='all')?'*':tag);
+            if (year) rulesEngine.selectConfigurationPropertyValue("year",(year=='all')?'*':year);
 
 //            rulesEngine.runRulesEngine();
         },
