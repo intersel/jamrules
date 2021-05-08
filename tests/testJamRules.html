@@ -22,7 +22,7 @@
 	//initialisation of jamrules and its configurator
 	var rulesForPriorityLayer = jamrules.build({debug:true});
 	/* initialisation of the configurator if needed*/
-	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",1,false);
+	rulesForPriorityLayer.checkConfigurationPropertyValue("priority","priority1",1,false);
 
 	// rules setting
 	rulesForPriorityLayer.createRulesSet("PriorityMatch1",["activities","priority"]);
@@ -56,27 +56,27 @@
 
 	//activate activities to display all in the configurator
 	var msg = "set activities->all->on"
-	rulesForPriorityLayer.selectConfigurationPropertyValue("activities","all",1);
+	rulesForPriorityLayer.checkConfigurationPropertyValue("activities","all",1);
 	//-> match
 	// activate priority / priority1
 	msg = "set priority->priority1->on"
-	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",1);
+	rulesForPriorityLayer.checkConfigurationPropertyValue("priority","priority1",1);
 	//-> match
 	// activate technician / technician1
 	msg = "set technician->technician1->on"
-	rulesForPriorityLayer.selectConfigurationPropertyValue("technician","technician1",1);
+	rulesForPriorityLayer.checkConfigurationPropertyValue("technician","technician1",1);
 	//-> match
 	// activate display activities compliant
 	msg = "set activities->compliant->on"
-	rulesForPriorityLayer.selectConfigurationPropertyValue("activities","compliant",1);
+	rulesForPriorityLayer.checkConfigurationPropertyValue("activities","compliant",1);
 	//-> match
 	//deactivate priority/priority1
 	msg = "set priority->priority1->off"
-	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",0);
+	rulesForPriorityLayer.checkConfigurationPropertyValue("priority","priority1",0);
 	//-> not match
 	// deactivate display activities compliant
 	msg = "set activities->compliant->off"
-	rulesForPriorityLayer.selectConfigurationPropertyValue("activities","compliant",0);
+	rulesForPriorityLayer.checkConfigurationPropertyValue("activities","compliant",0);
 	//-> match
 
 </script>

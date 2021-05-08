@@ -141,16 +141,16 @@
 	$("#filterbox section").each(function(){
 		var propertyName = this.id;
 		$(this).find("input.checkbox").each(function(){
-			rulesForPriorityLayer.selectConfigurationPropertyValue(propertyName,$(this).val(),$(this).prop('checked'));
+			rulesForPriorityLayer.checkConfigurationPropertyValue(propertyName,$(this).val(),$(this).prop('checked'));
 		});
 	});
 
 
 	// test if object is technician tech1
 	// test if object is compliant with tech1
-/*	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",1);
-	rulesForPriorityLayer.selectConfigurationPropertyValue("activities","compliant",1);
-	rulesForPriorityLayer.selectConfigurationPropertyValue("priority","priority1",0);
+/*	rulesForPriorityLayer.checkConfigurationPropertyValue("priority","priority1",1);
+	rulesForPriorityLayer.checkConfigurationPropertyValue("activities","compliant",1);
+	rulesForPriorityLayer.checkConfigurationPropertyValue("priority","priority1",0);
 */
 	// ---------------------------------
 	// Test input FSM
@@ -181,7 +181,7 @@
     	        {
                     init_function: function(data,aEvent,dataFromCheckbox){
                     	$("#debug").html("who:"+dataFromCheckbox.who.attr('id')+"<br>propertyName:"+dataFromCheckbox.propertyName+"<br>propertyValue:"+dataFromCheckbox.propertyValue+"<br>status:"+dataFromCheckbox.status);
-                    	dataFromCheckbox.ruleEngine.selectConfigurationPropertyValue(dataFromCheckbox.propertyName,dataFromCheckbox.propertyValue,dataFromCheckbox.status);
+                    	dataFromCheckbox.ruleEngine.checkConfigurationPropertyValue(dataFromCheckbox.propertyName,dataFromCheckbox.propertyValue,dataFromCheckbox.status);
                     }
     	        }
             }

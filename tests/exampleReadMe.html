@@ -19,8 +19,8 @@
     <p>Select some filters to see the selection of some animals</p>
     <section id='type' onclick="
                 let radioVal = $('input[name=type]:checked').val();
-                rulesEngine.selectConfigurationPropertyValue('type', 'mammal', radioVal=='mammal'?'1':'0');
-                rulesEngine.selectConfigurationPropertyValue('type', 'other' , radioVal=='other' ?'1':'0');
+                rulesEngine.checkConfigurationPropertyValue('type', 'mammal', radioVal=='mammal'?'1':'0');
+                rulesEngine.checkConfigurationPropertyValue('type', 'other' , radioVal=='other' ?'1':'0');
                 ">
       <h3>Type</h3>
       <label>
@@ -35,26 +35,26 @@
     </section>
     <section id='name'>
       <label>
-        <input id="nameCat" type="checkbox" onclick="rulesEngine.selectConfigurationPropertyValue('name', 'cat' , $(this).is(':checked') ? '1' : '0');">
+        <input id="nameCat" type="checkbox" onclick="rulesEngine.checkConfigurationPropertyValue('name', 'cat' , $(this).is(':checked') ? '1' : '0');">
         Cat
       </label>
       <label>
-        <input id="nameDog" type="checkbox" onclick="rulesEngine.selectConfigurationPropertyValue('name', 'dog' , $(this).is(':checked') ? '1' : '0');">
+        <input id="nameDog" type="checkbox" onclick="rulesEngine.checkConfigurationPropertyValue('name', 'dog' , $(this).is(':checked') ? '1' : '0');">
         Dog
       </label>
 
     </section>
     <section id='color'>
       <label>
-        <input class="checkbox" id="colorBlack" type="checkbox" onclick="rulesEngine.selectConfigurationPropertyValue('color', 'black' , $(this).is(':checked') ? '1' : '0');">
+        <input class="checkbox" id="colorBlack" type="checkbox" onclick="rulesEngine.checkConfigurationPropertyValue('color', 'black' , $(this).is(':checked') ? '1' : '0');">
         Black
       </label>
       <label>
-        <input class="checkbox" id="colorWhite" type="checkbox" onclick="rulesEngine.selectConfigurationPropertyValue('color', 'white' , $(this).is(':checked') ? '1' : '0');">
+        <input class="checkbox" id="colorWhite" type="checkbox" onclick="rulesEngine.checkConfigurationPropertyValue('color', 'white' , $(this).is(':checked') ? '1' : '0');">
         White
       </label>
       <label>
-        <input class="checkbox" id="colorGrey" type="checkbox" onclick="rulesEngine.selectConfigurationPropertyValue('color', 'grey' , $(this).is(':checked') ? '1' : '0');">
+        <input class="checkbox" id="colorGrey" type="checkbox" onclick="rulesEngine.checkConfigurationPropertyValue('color', 'grey' , $(this).is(':checked') ? '1' : '0');">
         Grey
       </label>
     </section>

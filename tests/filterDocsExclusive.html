@@ -17,7 +17,13 @@
     <script>
 
     //create a rule engine
-    var rulesEngine = jamrules.build({'debug':true,'notmatchedFunctionName':'notselected','matchedFunctionName':'selected'});
+    var rulesEngine = jamrules.build({
+      'debug':true,
+      'notmatchedFunctionName':'notselected',
+      'matchedFunctionName':'selected',
+      'startProcessing':function() {console.log('on Commence!');},
+      'stopProcessing':function() {console.log('on a fini!');}
+    });
 
     </script>
 </head>

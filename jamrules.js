@@ -8,6 +8,7 @@
  *
  * -----------------------------------------------------------------------------------------
  * Modifications :
+ * - 20210508 - E.Podvin - V2.5.0 - add startProcessing and stopProcessing 
  * - 20210507 - E.Podvin - V2.4.0
  *    - !!selectConfigurationPropertyValue is renamed checkConfigurationPropertyValue !!
  *    - selectConfigurationPropertyValue: select a value as a radio would do (unselecting other values)
@@ -636,7 +637,11 @@ var jamrules = (function() {
             this.opts.ObjectProfiles = this.opts.jamrules.getAllObjectProfiles();
             this.opts.maxObjectProfiles = Object.keys(this.opts.ObjectProfiles).length;
             // start processing rules on the element profiles list
-            if (this.opts.maxObjectProfiles > 0) this.trigger(this.opts.aPropertyConfiguration.propertyName);
+            if (this.opts.maxObjectProfiles > 0)
+            {
+              this.trigger('startProcessing');
+              this.trigger(this.opts.aPropertyConfiguration.propertyName);
+            }
           },
         },
         /*
@@ -653,8 +658,24 @@ var jamrules = (function() {
             this.opts.ObjectProfiles = this.opts.jamrules.getAllObjectProfiles();
             this.opts.maxObjectProfiles = Object.keys(this.opts.ObjectProfiles).length;
             // start processing rules on the element profiles list
-            if (this.opts.maxObjectProfiles > 0) this.trigger('testRules');
+            if (this.opts.maxObjectProfiles > 0)
+            {
+              this.trigger('startProcessing');
+              this.trigger('testRules');
+            }
           },
+        },
+        startProcessing: {
+          init_function: function() {
+            if (this.opts.jamrules.options.startProcessing)
+              this.opts.jamrules.options.startProcessing(this.jamrules);
+          }
+        },
+        stopProcessing: {
+          init_function: function() {
+            if (this.opts.jamrules.options.stopProcessing)
+              this.opts.jamrules.options.stopProcessing(this.jamrules);
+          }
         },
         /*
          * internal event - starts the process to test the rules against the current configuration and the different element profiles
@@ -674,6 +695,9 @@ var jamrules = (function() {
             if (this.opts.objectProfileId < this.opts.maxObjectProfiles) {
               this.opts.objectProfile = this.opts.ObjectProfiles[Object.keys(this.opts.ObjectProfiles)[this.opts.objectProfileId]];
               this.trigger(this.opts.aPropertyConfiguration.propertyName);
+            }
+            else{
+              this.trigger('stopProcessing');
             }
           },
 

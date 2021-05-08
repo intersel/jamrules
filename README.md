@@ -145,6 +145,8 @@ var rulesEngine = jamrules.build({
 	"notmatched":	"<a function to call when the rule did not find a match>",// default: null
   "matchedFunctionName": "<property name for the 'matched' function in objects>",// default: matched
   "matchedFunctionName": "<property name for the 'notmatched' function in objects>"// default: notmatched
+  "startProcessing": "<a function to call when rule engine starts to process rules>"// default: null
+  "stopProcessing": "<a function to call when rule engine finished to process rules>"// default: null
 });
 ```
 
@@ -564,7 +566,7 @@ Generally used for a text input in the configuration, as search input...
    wildcards are possible: '*' (0 or more char), '?' (0 or 1 char)
    eg: 'my*propert?' will match 'myproperty','mygivenpropert','myREDproperts'
                      won't match 'property', 'myREDproperties'
-* searchMode: 
+* searchMode:
   - or (default): blank are considered as 'or' operator between keywords to find
   - and: blank are considered as 'and' operator with all keywords to be found in any property values
 
