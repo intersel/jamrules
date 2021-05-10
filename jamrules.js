@@ -8,7 +8,8 @@
  *
  * -----------------------------------------------------------------------------------------
  * Modifications :
- * - 20210508 - E.Podvin - V2.5.0 - add startProcessing and stopProcessing 
+ * - 20210509 - E.Podvin - V2.5.1 - fix on start/stopProcessing
+ * - 20210508 - E.Podvin - V2.5.0 - add startProcessing and stopProcessing
  * - 20210507 - E.Podvin - V2.4.0
  *    - !!selectConfigurationPropertyValue is renamed checkConfigurationPropertyValue !!
  *    - selectConfigurationPropertyValue: select a value as a radio would do (unselecting other values)
@@ -287,7 +288,7 @@ var jamrules = (function() {
               .testRuleDone
               .next_state_on_target
               .submachines).length;
-            this.opts.jamrules.log('nb rules to test:' + this.opts.TestRules.nbRulesToTest);
+            this.opts.jamrules.log('nb rules to test:' + this.opts.TestRules.nbRulesToTest,3);
           },
         },
         delegate_machines: {
@@ -491,7 +492,7 @@ var jamrules = (function() {
          */
         testRuleDone: {
           init_function: function() {
-            this.opts.jamrules.log("-->" + this.currentState + ' ' + this.receivedEvent);
+            this.opts.jamrules.log("-->" + this.currentState + ' ' + this.receivedEvent,3);
             this.opts.TestRules.nbRulesTested++;
 
             this.opts.reason = {};
@@ -518,7 +519,7 @@ var jamrules = (function() {
         },
         giveMatchResult: {
           init_function: function(data, aEvent, aPropertyConfiguration) {
-            this.opts.jamrules.log("-->" + this.currentState + ' ' + this.receivedEvent);
+            this.opts.jamrules.log("-->" + this.currentState + ' ' + this.receivedEvent,3);
           },
           process_event_if: 'this.opts.TestRules.nbRulesTested >= this.opts.TestRules.nbRulesToTest',
           propagate_event: 'giveMatchResult',
@@ -534,7 +535,7 @@ var jamrules = (function() {
       ruleMatch: {
         giveMatchResult: {
           init_function: function(data, aEvent, aPropertyConfiguration) {
-            this._log('Element profile matched');
+            this._log('Element profile matched',3);
             //alert("match");
           },
           propagate_event: 'updateObjectsMatch',
@@ -549,7 +550,7 @@ var jamrules = (function() {
       ruleDontMatch: {
         giveMatchResult: {
           init_function: function(data, aEvent, aPropertyConfiguration) {
-            this._log('Object profile did not match');
+            this._log('Object profile did not match',3);
             //alert("don't match");
           },
           propagate_event: 'updateObjectsDontMatch',
@@ -566,14 +567,14 @@ var jamrules = (function() {
         updateObjectsMatch: {
           init_function: function() {
             for (aSubMachine in this._stateDefinition.TestRules.delegate_machines) {
-              this.opts.jamrules.log("-->" + aSubMachine);
+              this.opts.jamrules.log("-->" + aSubMachine,3);
               this.opts.reason[aSubMachine] = this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.currentState;
               //not needed 				this.opts.reason[aSubMachine]+=':'+this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.lastState;
             }
             var thisme = this
             $.each(this.opts.reason, function(index, value) {
               if (value.indexOf("DefaultState") == -1)
-                thisme.opts.jamrules.log("Match reason: State " + index + " --> " + value);
+                thisme.opts.jamrules.log("Match reason: State " + index + " --> " + value,3);
             });
 
             if (this.opts.jamrules.options.matched) {
@@ -594,14 +595,14 @@ var jamrules = (function() {
           init_function: function() {
             this.opts.reason = {};
             for (aSubMachine in this._stateDefinition.TestRules.delegate_machines) {
-              this.opts.jamrules.log("-->" + aSubMachine);
+              this.opts.jamrules.log("-->" + aSubMachine,3);
               this.opts.reason[aSubMachine] = this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.currentState;
               this.opts.reason[aSubMachine] += ':' + this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.lastState;
             }
             var thisme = this
             $.each(this.opts.reason, function(index, value) {
               if (value.indexOf("DefaultState") == -1)
-                thisme.opts.jamrules.log("Don't Match reason: State " + index + " --> " + value);
+                thisme.opts.jamrules.log("Don't Match reason: State " + index + " --> " + value,3);
             });
 
             if (this.opts.jamrules.options.notmatched) {
@@ -640,7 +641,11 @@ var jamrules = (function() {
             if (this.opts.maxObjectProfiles > 0)
             {
               this.trigger('startProcessing');
-              this.trigger(this.opts.aPropertyConfiguration.propertyName);
+              let propertyNameEvent = this.opts.aPropertyConfiguration.propertyName;
+              let that=this;
+              $.doTimeout('testRules',100,function(){
+                that.trigger(propertyNameEvent);
+              });
             }
           },
         },
@@ -661,21 +666,12 @@ var jamrules = (function() {
             if (this.opts.maxObjectProfiles > 0)
             {
               this.trigger('startProcessing');
-              this.trigger('testRules');
+              let that=this;
+              $.doTimeout('testRules',10,function(){
+                that.trigger('testRules')
+              });
             }
           },
-        },
-        startProcessing: {
-          init_function: function() {
-            if (this.opts.jamrules.options.startProcessing)
-              this.opts.jamrules.options.startProcessing(this.jamrules);
-          }
-        },
-        stopProcessing: {
-          init_function: function() {
-            if (this.opts.jamrules.options.stopProcessing)
-              this.opts.jamrules.options.stopProcessing(this.jamrules);
-          }
         },
         /*
          * internal event - starts the process to test the rules against the current configuration and the different element profiles
@@ -710,6 +706,18 @@ var jamrules = (function() {
         },
         testRuleDone: {
           //dummy to catch it
+        },
+        startProcessing: {
+          init_function: function() {
+            if (this.opts.jamrules.options.startProcessing)
+              this.opts.jamrules.options.startProcessing(this.opts.jamrules);
+          }
+        },
+        stopProcessing: {
+          init_function: function() {
+            if (this.opts.jamrules.options.stopProcessing)
+              this.opts.jamrules.options.stopProcessing(this.opts.jamrules);
+          }
         },
 
       }
@@ -1323,7 +1331,7 @@ var jamrules = (function() {
      *
      */
     var createRulesSet = function(aRulesGroup, ruleEvents) {
-      this.log("createRulesSet(aRulesGroup, ruleEvents): " + aRulesGroup + " - " + ruleEvents);
+      this.log("createRulesSet(aRulesGroup, ruleEvents): " + aRulesGroup + " - " + ruleEvents,3);
       var testRules = myRulesEngineStates.TestRules;
       var waitTestRules = myRulesEngineStates.waitTestRules;
       if (!testRules.delegate_machines[aRulesGroup]) {
@@ -1338,7 +1346,7 @@ var jamrules = (function() {
           target_list: ['ruleMatch']
         };
       } else {
-        this.log("createRulesSet: " + aRulesGroup + " still declared! nothing done");
+        this.log("createRulesSet: " + aRulesGroup + " still declared! nothing done",2);
       }
     }
 
@@ -1352,7 +1360,7 @@ var jamrules = (function() {
      *
      */
     var addRule = function(aRulesGroup, aRuleName, aRuleTest, overloadRule) {
-      this.log("addRule(aRulesGroup, aRuleName, aRuleTest): " + aRulesGroup + " - " + aRuleName + "-" + aRuleTest);
+      this.log("addRule(aRulesGroup, aRuleName, aRuleTest): " + aRulesGroup + " - " + aRuleName + "-" + aRuleTest,3);
       var testRules = myRulesEngineStates.TestRules;
 
       if (!overloadRule) overloadRule = false;
@@ -1388,9 +1396,9 @@ var jamrules = (function() {
      * @return void
      */
     var runRulesEngine = function() {
-      this.log("runRulesEngine");
+      this.log("runRulesEngine",3);
       if (!this.myRulesEngine || $.isEmptyObject(this.myRulesEngine)) {
-        if (this.options.debug) console.log("Rules engine is not started. Call first compile rules (cf compileRules())");
+        this.log("Rules engine is not started. Call first compile rules (cf compileRules())",2);
         this.myRulesEngine = {};
         this.compileRules();
         //return;
@@ -1411,7 +1419,7 @@ var jamrules = (function() {
      * @return void
      */
     var checkConfigurationPropertyValue = function(aPropertyName, aPropertyValue, aStatus, doTest) {
-      this.log("checkConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus):" + aPropertyName + ',' + aPropertyValue + ',' + aStatus);
+      this.log("checkConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus):" + aPropertyName + ',' + aPropertyValue + ',' + aStatus,3);
       if (aStatus == undefined) aStatus = false;
       if (doTest == undefined) doTest = true;
 
@@ -1450,7 +1458,7 @@ var jamrules = (function() {
      * @return void
      */
     var selectConfigurationPropertyValue = function(aPropertyName, aPropertyValue, doTest) {
-      this.log("selectConfigurationPropertyValue(aPropertyName,aPropertyValue):" + aPropertyName + ',' + aPropertyValue );
+      this.log("selectConfigurationPropertyValue(aPropertyName,aPropertyValue):" + aPropertyName + ',' + aPropertyValue , 3);
       if (doTest == undefined) doTest = true;
 
       if (!propertiesConfiguration[aPropertyName]) propertiesConfiguration[aPropertyName] = {};
@@ -1478,7 +1486,7 @@ var jamrules = (function() {
      * @return void
      */
     var resetConfigurationPropertyValues = function(aPropertyName) {
-      this.log("resetConfigurationPropertyValues(aPropertyName):" + aPropertyName);
+      this.log("resetConfigurationPropertyValues(aPropertyName):" + aPropertyName,3);
       //unset all property's values
       for (propertyValue in propertiesConfiguration[aPropertyName]) {
         propertiesConfiguration[aPropertyName][propertyValue]=false;
@@ -1494,7 +1502,7 @@ var jamrules = (function() {
      * @return void
      */
     var resetConfigurationProperty = function(aPropertyName) {
-      this.log("resetConfigurationProperty(aPropertyName):" + aPropertyName);
+      this.log("resetConfigurationProperty(aPropertyName):" + aPropertyName,3);
       propertiesConfiguration[aPropertyName] = {};
     }
 
@@ -1503,7 +1511,7 @@ var jamrules = (function() {
      * @abstract initialize the rule engine - to do before action and after adding the rules
      */
     var compileRules = function() {
-      this.log("compileRules");
+      this.log("compileRules",3);
       var jamrules = this;
       this.myJqueryObj.iFSM(myRulesEngineStates, {
         debug: this.options.debug,
@@ -1532,7 +1540,7 @@ var jamrules = (function() {
      * @example
      */
     var addObject = function(anObject) {
-      this.log("addObject");
+      this.log("addObject",3);
       _addObject(anObject, this.getObjectProfiles());
     };
 
@@ -1547,7 +1555,7 @@ var jamrules = (function() {
      * @example
      */
     var addPropertyObject = function(anObject, aMatchingFunction, aNotMatchingFunction) {
-      this.log("addPropertyObject");
+      this.log("addPropertyObject",3);
       if (!aMatchingFunction && anObject[this.options.matchedFunctionName])
       {
         aMatchingFunction = anObject[this.options.matchedFunctionName];
@@ -1578,7 +1586,7 @@ var jamrules = (function() {
      * @example
      */
     var addPropertyObjects = function(objects, aMatchingFunction, aNotMatchingFunction) {
-      this.log("addPropertyObjects");
+      this.log("addPropertyObjects",3);
       let that=this;
       objects.forEach(function(anObject) {
         if (!aMatchingFunction && anObject[this.options.matchedFunctionName])
@@ -1603,16 +1611,47 @@ var jamrules = (function() {
       });
     };
 
-
     /**
-     * @access public
-     * @abstract log a message on the console for debug
+     * this._log - log function
+     * private function
+     * @param message - message to log
+     * @param error_level (default : 3)
+     * 			- 1 : it's an error
+     * 			- 2 : it's a warning
+     * 			- 3 : it's a notice
      *
      */
-    var log = function(msg) {
-      if (!this.options.debug) return;
-      console.debug(msg);
-    }
+    var log = function(message) {
+      /*global console:true */
+
+      let errorLevel = 3;
+
+      if (arguments.length > 1) errorLevel = arguments[1];
+
+      //show only errors if debug is not set
+      if ( (errorLevel >= 2) && (!this.options.debug) ) return;
+
+      if (errorLevel > this.options.LogLevel) return; //on ne continue que si le nv de message est <= LogLevel
+
+      if (window.console && console.log) {
+        switch (errorLevel)
+        {
+          case 1:
+            console.error('[jamrules] ' + message);
+            break;
+          case 2:
+            console.warn('[blapy] ' + message);
+            break;
+          default:
+          case 3:
+            console.log('[blapy] ' + message);
+            break;
+        }
+        if ((errorLevel == 1) && this.options.alertError) alert(message);
+      }
+
+    }; //end Log
+
 
     jamrulesConstructor.prototype = {
       constructor: jamrulesClass
