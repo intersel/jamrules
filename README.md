@@ -144,7 +144,7 @@ var rulesEngine = jamrules.build({
 	"matched":	"<a function to call when the rule find a match>", // default: null
 	"notmatched":	"<a function to call when the rule did not find a match>",// default: null
   "matchedFunctionName": "<property name for the 'matched' function in objects>",// default: matched
-  "matchedFunctionName": "<property name for the 'notmatched' function in objects>"// default: notmatched
+  "notmatchedFunctionName": "<property name for the 'notmatched' function in objects>"// default: notmatched
   "startProcessing": "<a function to call when rule engine starts to process rules>"// default: null
   "stopProcessing": "<a function to call when rule engine finished to process rules>"// default: null
 });
