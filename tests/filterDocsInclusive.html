@@ -215,7 +215,8 @@
     rulesEngine.addRule("cattagNotDefined","CatMatch3",'ConfigurationPropertySet("category","action plan",0)');
     rulesEngine.addRule("cattagNotDefined","CatMatch4",'ConfigurationPropertySet("category","press release",0)');
     rulesEngine.addRule("cattagNotDefined","CatMatch5",'ConfigurationPropertySet("category","misc",0)');
-
+    
+    rulesEngine.compileRules();// we are ready, no more rules to define, so compile the rules            
 
     var docFilter = {
         init: function(){
