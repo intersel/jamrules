@@ -54,7 +54,7 @@ let myobjects = [
     "color":"black"
   },
   {
-    "type":"mammal",
+    "type":["mammal","carnivora"],
     "name":"dog",
     "color":"white"
   },
@@ -62,7 +62,9 @@ let myobjects = [
   ]
 ```
 
-Your objects may not have the same set of properties... Up to you to define in your rules how to select or not your objects...
+A same property may have several values.
+
+Each object may have its own set of properties that may be different from the other object's sets... Up to you to define in your rules how to select or not your objects...
 
 ## Add objects
 
