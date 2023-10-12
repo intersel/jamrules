@@ -426,8 +426,37 @@ rulesEngine.runRulesEngine();
 
 # Filtering configurator
 
-## selectConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus, doTest)
-Set a property/property value status in the filtering configurator
+## selectConfigurationPropertyValue(aPropertyName, aPropertyValue, doTest)
+Select a value in the filtering configurator as a radio would do: unselecting other values of aPropertyName.
+
+### parameters  
+* **aPropertyName**: name of the property that has changed
+* **aProperyValue**: value of the property
+* **doTest**: <boolean> <default:true> (option) if false, configure the configurator but does not run the rules engine test
+
+### Remarks
+If "doTest" is set, the rules engine will **run** and process -only- the rules sets that have configured the "aPropertyName" in the "ruleEvents" parameter in createRulesSet function.
+
+aPropertyValue may be set to "*" to match any value of aPropertyName.
+
+### Example
+```javascript
+
+	rulesEngine.createRulesSet("SameTrousers",["object1"]);
+	rulesEngine.addRule("SameTrousers","Trouser",'MatchProperty("object1")');
+	....
+	//as 'object1' is defined in the "SameTrousers" rules set, the following line will configure the "object1" property and see the rule set "SameTrousers" processed
+	rulesEngine.selectConfigurationPropertyValue("object1","trouser");
+	...
+	//no rule set to process... just configure the property in the configurator
+	rulesEngine.selectConfigurationPropertyValue("object1","trouser",false);
+	...
+	//will process all the rules sets
+	rulesEngine.runRulesEngine();
+```
+
+## checkConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus, doTest)
+set a property/property value status in the rules configurator. It is designed for checkboxes/multiple select as it set a value as a checkbox would do.
 
 ### parameters  
 * **aPropertyName**: name of the property that has changed
@@ -447,15 +476,38 @@ aPropertyValue may be set to "*" to match any value of aPropertyName.
 	rulesEngine.addRule("SameTrousers","Trouser",'MatchProperty("object1")');
 	....
 	//as 'object1' is defined in the "SameTrousers" rules set, the following line will configure the "object1" property and see the rule set "SameTrousers" processed
-	rulesEngine.selectConfigurationPropertyValue("object1","trouser",1);
+	rulesEngine.checkConfigurationPropertyValue("object1","trouser",1);
 	...
 	//no rule set to process... just configure the property in the configurator
-	rulesEngine.selectConfigurationPropertyValue("object1","trouser",1,false);
+	rulesEngine.checkConfigurationPropertyValue("object1","trouser",1,false);
 	...
 	//will process all the rules sets
 	rulesEngine.runRulesEngine();
 ```
 
+## resetConfigurationPropertyValues(aPropertyName)
+reset a property by setting all its property values to a false status in the rules configurator
+
+### parameters  
+* **aPropertyName**: name of the property that has changed
+
+### Remarks
+
+### Example
+```javascript
+```
+
+## resetConfigurationProperty(aPropertyName)
+reset a property completely
+
+### parameters  
+* **aPropertyName**: name of the property that has changed
+
+### Remarks
+
+### Example
+```javascript
+```
 
 # The Available filtering functions for "addRule"
 
@@ -478,6 +530,32 @@ Returns true if any property value for a given aPropertyName is set in the profi
 * configuration.technician.technician2=1
 * MatchProperty('priority') -> match
 * MatchProperty('technician') -> no match
+
+## MatchPropertySearch(aPropertyName)
+Test if a string aPropertyName is found as a property value of objects. Generally used for text input as search input.
+
+### parameters  
+* aPropertyName: a string to search in the property values of objects.
+  wildcards are possible: '*' (0 or more char), '?' (0 or 1 char)
+  eg: 'my*propert?' will match 'myproperty','mygivenpropert','myREDproperts'
+                    won't match 'property', 'myREDproperties'
+* searchMode: default:'or'
+  * or: blank are considered as 'or' operator between keywords to find
+  * and: blank are considered as 'and' operator with all keywords to be found in any property values
+   
+
+### returns
+returns true if the pattern string(s) defined in the configurator are found in property values of object
+
+### Example
+
+*  object.priority.priority1=1
+*  object.technician.technician1=1
+*  configuration.priority['prio*']=1
+*  configuration.technician['technician2']=1
+*  MatchPropertySearch('priority') -> match
+*  MatchPropertySearch('technician') -> no match
+
 
 ## MatchPropertyValue(aPropertyName,aPropertyValue)
 Tests if a given property value is set for configuration and the object
