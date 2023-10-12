@@ -163,6 +163,7 @@ The "matched" and "notmatched" functions are called whenever the rule engine mat
 
 Functions have the following parameters:
   * aListOfMatchedObjects: the list of objects that matched the rule
+  * this refers to the rule engine object
 
 **Remarks**: These functions are not to be confused with the ones defined on the object level...
 
@@ -745,8 +746,14 @@ JamRules needs to include the following javascript libraries and here's what the
 You can get the reasons why the engine did not match by accessing to the following reason property :
 
 ```javascript
+// notmatched function of an element
 var notmatched=function(aJamRules){
 	var reason = aJamRules.myRulesEngine.opts.reason; //array of strings with the rules that did not match
+}
+
+// notmatched function of engine rule
+var notmatched=function(aListOfObjects){
+	var reason = this.myRulesEngine.opts.reason; //array of strings with the rules that did not match
 }
 ```
 
