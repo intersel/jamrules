@@ -266,7 +266,7 @@ There are several filtering functions that may help to test a configuration in t
 * MatchProperties
 * MatchPropertiesSameValue
 * MatchPropertiesSameValues
-* MatchObjectSearch
+* MatchPropertySearch
 * ConfigurationPropertySet
 * ConfigurationPropertiesSameValue
 * ConfigurationPropertiesSameValues
