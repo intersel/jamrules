@@ -536,9 +536,10 @@ Test if a string aPropertyName is found as a property value of objects. Generall
 
 ### parameters  
 * aPropertyName: a string to search in the property values of objects.
-  wildcards are possible: '*' (0 or more char), '?' (0 or 1 char)
-  eg: 'my*propert?' will match 'myproperty','mygivenpropert','myREDproperts'
-                    won't match 'property', 'myREDproperties'
+  wildcards are possible: '\*' (0 or more char), '?' (0 or 1 char)
+  eg:
+  * 'my\*propert?' will match 'myproperty','mygivenpropert','myREDproperts'
+  * but it won't match 'property', 'myREDproperties'
 * searchMode: default:'or'
   * or: blank are considered as 'or' operator between keywords to find
   * and: blank are considered as 'and' operator with all keywords to be found in any property values
@@ -551,7 +552,7 @@ returns true if the pattern string(s) defined in the configurator are found in p
 
 *  object.priority.priority1=1
 *  object.technician.technician1=1
-*  configuration.priority['prio*']=1
+*  configuration.priority['prio\*']=1
 *  configuration.technician['technician2']=1
 *  MatchPropertySearch('priority') -> match
 *  MatchPropertySearch('technician') -> no match
