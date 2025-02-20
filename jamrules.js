@@ -8,6 +8,7 @@
  *
  * -----------------------------------------------------------------------------------------
  * Modifications :
+ * - 20250220 - E.Podvin - V2.5.2 - fix search in MatchPropertySearch
  * - 20210509 - E.Podvin - V2.5.1 - fix on start/stopProcessing
  * - 20210508 - E.Podvin - V2.5.0 - add startProcessing and stopProcessing
  * - 20210507 - E.Podvin - V2.4.0
@@ -643,7 +644,7 @@ var jamrules = (function() {
               this.trigger('startProcessing');
               let propertyNameEvent = this.opts.aPropertyConfiguration.propertyName;
               let that=this;
-              $.doTimeout('testRules',100,function(){
+              $.doTimeout('testRules'+that.FSMName,100,function(){
                 that.trigger(propertyNameEvent);
               });
             }
@@ -667,7 +668,7 @@ var jamrules = (function() {
             {
               this.trigger('startProcessing');
               let that=this;
-              $.doTimeout('testRules',10,function(){
+              $.doTimeout('testRules'+that.FSMName,10,function(){
                 that.trigger('testRules')
               });
             }
@@ -985,29 +986,32 @@ var jamrules = (function() {
 
       let nbfound = 0;
       let nbtofind = 0;
-      let found=false;
+      let found = false;
+      let that = this;
 
       for (searchString in propertiesConfiguration[aPropertyName]) {
-        nbtofind++;
-        for (aObjPropertyName in propertiesObjectProfile) {
-          found=false;
-          for (aObjPropertyValue in propertiesObjectProfile[aObjPropertyName]) {
-            if (    aObjPropertyValue != '*'
-                &&  propertiesObjectProfile[aObjPropertyName][aObjPropertyValue]
-                &&  this.wildcardSearch(aObjPropertyValue,searchString)
-            )
-            {
-              if (searchMode == 'or') return true;
-              found=true;
+        if (!propertiesConfiguration[aPropertyName][searchString]) continue;// not active
+        found = false;
+
+        searchString.split(" ").some(function (searchSubString) {
+          nbtofind++;
+          for (aObjPropertyValue in propertiesObjectProfile[aPropertyName]) {
+            if (aObjPropertyValue != '*'
+              && propertiesObjectProfile[aPropertyName][aObjPropertyValue]
+              && that.wildcardSearch(aObjPropertyValue, searchSubString)
+            ) {
+              found = true;
               break;
             }
           }
-          if (found)
-          {
+          if (found) {
+            if (searchMode == 'or') return true;
             nbfound++;
-            break;
+            return false;
           }
-        }
+        });
+
+        if (found && (searchMode == 'or')) return true;
       }
 
       return (nbfound >= nbtofind);
