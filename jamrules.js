@@ -8,6 +8,7 @@
  *
  * -----------------------------------------------------------------------------------------
  * Modifications :
+ * - 20250224 - E.Podvin - V2.5.3 - use 'let' instead of 'var' to declare variables
  * - 20250220 - E.Podvin - V2.5.2 - fix search in MatchPropertySearch
  * - 20210509 - E.Podvin - V2.5.1 - fix on start/stopProcessing
  * - 20210508 - E.Podvin - V2.5.0 - add startProcessing and stopProcessing
@@ -27,11 +28,11 @@
  *
  * -----------------------------------------------------------------------------------------
  *
- * @copyright Intersel 2017-2021
+ * @copyright Intersel 2017-2025
  * @fileoverview :
  * @see {@link https://github.com/intersel/jamrules}
  * @author : Emmanuel Podvin - emmanuel.podvin@intersel.fr
- * @version : 2.3.0
+ * @version : 2.5.3
  * -----------------------------------------------------------------------------------------
  */
 
@@ -73,15 +74,15 @@ var jamrules = (function() {
    *  	....
    *  }
    */
-  var ObjectProfiles = {};
+  let ObjectProfiles = {};
 
 
   /**
    * private
    * private jQuery object for iFSM when not given
    */
-  var aDefaultJqueryObj;
-  var randomSessionId = $.md5(Math.random());
+  let aDefaultJqueryObj;
+  let randomSessionId = $.md5(Math.random());
   if (!$('html').attr("id")) $('html').attr("id", "jamrules" + randomSessionId)
   aDefaultJqueryObj = $("html");
 
@@ -92,7 +93,7 @@ var jamrules = (function() {
    * @return a md5 key for a json object
    *
    */
-  var getObjectProfileKey = function(anObject) {
+  let getObjectProfileKey = function(anObject) {
     return $.md5(JSON.stringify(anObject.propertiesSet));
   }
   /**
@@ -100,7 +101,7 @@ var jamrules = (function() {
    * @abstract add a new object profile if the one defines by anObject does not exist
    *
    */
-  var addObjectProfile = function(objectKey, anObject, anObjectProfiles) {
+  let addObjectProfile = function(objectKey, anObject, anObjectProfiles) {
     if (!anObjectProfiles) anObjectProfiles = ObjectProfiles;
     if (!anObjectProfiles[objectKey]) anObjectProfiles[objectKey] = {
       propertiesSet: anObject.propertiesSet,
@@ -112,7 +113,7 @@ var jamrules = (function() {
    * @abstract add a new element to the element profiles array
    *
    */
-  var addObjectToObjectProfilesArray = function(objectKey, anObject, anObjectProfiles) {
+  let addObjectToObjectProfilesArray = function(objectKey, anObject, anObjectProfiles) {
     if (!anObjectProfiles) anObjectProfiles = ObjectProfiles;
     anObjectProfiles[objectKey]['objectsList'].push(anObject);
   }
@@ -134,7 +135,7 @@ var jamrules = (function() {
    * }
    * @example
    */
-  var _addObject = function(anObject, anObjectProfiles) {
+  let _addObject = function(anObject, anObjectProfiles) {
     if (!anObject) {
       alert("object is void...?");
       return;
@@ -143,7 +144,7 @@ var jamrules = (function() {
       alert("object has no properties...?");
       return;
     }
-    var objectKey = getObjectProfileKey(anObject);
+    let objectKey = getObjectProfileKey(anObject);
     addObjectProfile(objectKey, anObject, anObjectProfiles);
     addObjectToObjectProfilesArray(objectKey, anObject, anObjectProfiles);
   };
@@ -167,10 +168,10 @@ var jamrules = (function() {
    * - the property value of an object may be a numeric, string or an array of values (multiple values)
    * @example
    */
-  var _translateToJamrulesProperties = function(anObject) {
-    var aPropertiesSet = {};
+  let _translateToJamrulesProperties = function(anObject) {
+    let aPropertiesSet = {};
 
-    for (var aProperty in anObject) {
+    for (let aProperty in anObject) {
       aPropertiesSet[aProperty] = {};
       if (Array.isArray(anObject[aProperty]))
       {
@@ -186,7 +187,7 @@ var jamrules = (function() {
 
   };
 
-  var jamrulesClass = function(options) {
+  let jamrulesClass = function(options) {
 
 
     /**
@@ -221,13 +222,13 @@ var jamrules = (function() {
      * 		}
      *  it is used to test against element profiles to identify the element profiles that match or not to this configuration
      */
-    var propertiesConfiguration = {};
+    let propertiesConfiguration = {};
 
     /**
      * @param matchRuleTemplate
      * @abstract template to create new rule in the state definition of the rules engine
      */
-    var matchRuleTemplate = {
+    let matchRuleTemplate = {
       submachine: {
         startTesting: {
           enterState: {
@@ -265,7 +266,7 @@ var jamrules = (function() {
      * @access private
      * @abstract template of a rule described in a subengine
      */
-    var stateRuleTemplate = {
+    let stateRuleTemplate = {
       enterState: {
         process_event_if: 'this.opts.jamrules.aMatchingTest()',
         propagate_event_on_refused: 'ruleDontMatch',
@@ -279,7 +280,7 @@ var jamrules = (function() {
      * @access private
      * @abstract states definition of the rule engine that handles the rule testing process
      */
-    var myRulesEngineStates = {
+    let myRulesEngineStates = {
       TestRules: {
         enterState: {
           init_function: function() {
@@ -572,7 +573,7 @@ var jamrules = (function() {
               this.opts.reason[aSubMachine] = this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.currentState;
               //not needed 				this.opts.reason[aSubMachine]+=':'+this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.lastState;
             }
-            var thisme = this
+            let thisme = this
             $.each(this.opts.reason, function(index, value) {
               if (value.indexOf("DefaultState") == -1)
                 thisme.opts.jamrules.log("Match reason: State " + index + " --> " + value,3);
@@ -600,7 +601,7 @@ var jamrules = (function() {
               this.opts.reason[aSubMachine] = this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.currentState;
               this.opts.reason[aSubMachine] += ':' + this._stateDefinition.TestRules.delegate_machines[aSubMachine].myFSM.lastState;
             }
-            var thisme = this
+            let thisme = this
             $.each(this.opts.reason, function(index, value) {
               if (value.indexOf("DefaultState") == -1)
                 thisme.opts.jamrules.log("Don't Match reason: State " + index + " --> " + value,3);
@@ -731,13 +732,13 @@ var jamrules = (function() {
      * constructor of a jamRules object
      *
      */
-    var jamrulesConstructor = function(options) {
+    let jamrulesConstructor = function(options) {
 
 
       // variables and functions private unless attached to API below
       // 'this' refers to global window
 
-      var defaults = {
+      let defaults = {
         debug: false,
         LogLevel: 1,
         matchedFunctionName: "matched",
@@ -795,7 +796,7 @@ var jamrules = (function() {
        *  	....
        *  }
        */
-      var _ObjectProfiles = {};
+      let _ObjectProfiles = {};
 
       /**
        * getObjectProfiles - get the current object profiles bound to this rule engine
@@ -848,7 +849,7 @@ var jamrules = (function() {
        * @param  {function} last_map   a function to apply to string parts with no wildcard
        * @return {string}              a regex expression
        */
-      var regexReplaceHelper = function(input, replace_dico, last_map) {
+      let regexReplaceHelper = function(input, replace_dico, last_map) {
         let replace_dict = Object.assign({}, replace_dico);
         if (Object.keys(replace_dict).length === 0) {
           return last_map(input);
@@ -871,7 +872,7 @@ var jamrules = (function() {
       {
           let found = false;
           searchDeep = searchDeep?true:false;
-          for (var i in jsonObj) {
+          for (let i in jsonObj) {
             if (searchDeep && (typeof jsonObj[i] == 'object') && wildcardSearchInPropertyObject(aString, jsonObj[i])) {
               found = true
               break;
@@ -913,8 +914,8 @@ var jamrules = (function() {
      *  MatchProperty('priority') -> match
      *  MatchProperty('technician') -> no match
      */
-    var MatchProperty = function(aPropertyName) {
-      var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
+    let MatchProperty = function(aPropertyName) {
+      let propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
       if (propertiesConfiguration[aPropertyName] && propertiesObjectProfile[aPropertyName]) {
         for (aPropertyValue in propertiesObjectProfile[aPropertyName]) {
@@ -945,8 +946,8 @@ var jamrules = (function() {
      * MatchPropertyValue('priority','priority1') -> match
      * MatchPropertyValue('technician','technician1') -> no match
      */
-    var MatchPropertyValue = function(aPropertyName, aPropertyValue) {
-      var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
+    let MatchPropertyValue = function(aPropertyName, aPropertyValue) {
+      let propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
       if (
         (propertiesConfiguration[aPropertyName]
           && propertiesObjectProfile[aPropertyName])
@@ -980,7 +981,7 @@ var jamrules = (function() {
      *  MatchPropertySearch('priority') -> match
      *  MatchPropertySearch('technician') -> no match
      */
-    var MatchPropertySearch = function(aPropertyName, searchMode) {
+    let MatchPropertySearch = function(aPropertyName, searchMode) {
       searchMode =  searchMode || 'or';
       let propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
@@ -1038,10 +1039,10 @@ var jamrules = (function() {
      * MatchExternalRule('propertiesObjectProfile[priority]==propertiesConfiguration[priority]') -> match
      * MatchExternalRule('propertiesObjectProfile[technician][technician1]==propertiesConfiguration[technician][technician1]') -> not match
      */
-    var MatchExternalRule = function(aRule) {
-      var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
+    let MatchExternalRule = function(aRule) {
+      let propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
-      var resultTest = eval(aRule);
+      let resultTest = eval(aRule);
 
       return resultTest;
     }
@@ -1065,8 +1066,8 @@ var jamrules = (function() {
      *  MatchPropertiesSameValue('activity','priority') -> match
      *  MatchPropertiesSameValue('strawberry','priority') -> no match
      */
-    var MatchPropertiesSameValue = function(aConfigurationPropertyName, anObjectPropertyName, aPropertyValue) {
-      var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
+    let MatchPropertiesSameValue = function(aConfigurationPropertyName, anObjectPropertyName, aPropertyValue) {
+      let propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
       //if undefined, means that we want that one of the property value of object is set in the configuration too
       if (aPropertyValue == undefined) {
@@ -1106,9 +1107,9 @@ var jamrules = (function() {
      *  MatchPropertiesSameValues('activity','priority') -> match
      *  MatchPropertiesSameValues('strawberry','priority','priority1') -> no match
      */
-    var MatchPropertiesSameValues = function(aConfigurationPropertyName, anObjectPropertyName) {
+    let MatchPropertiesSameValues = function(aConfigurationPropertyName, anObjectPropertyName) {
 
-      var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
+      let propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
       // we can process only if the property has only one value
       if (propertiesObjectProfile[anObjectPropertyName])
@@ -1137,7 +1138,7 @@ var jamrules = (function() {
      *  MatchProperties('activity','priority') -> match
      *  MatchProperties('strawberry','priority') -> no match
      */
-    var MatchProperties = function(aConfigurationPropertyName, anObjectPropertyName) {
+    let MatchProperties = function(aConfigurationPropertyName, anObjectPropertyName) {
       propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
       if (
@@ -1166,7 +1167,7 @@ var jamrules = (function() {
      *
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    var ConfigurationPropertySet = function(aPropertyName, aPropertyValue, valueSet) {
+    let ConfigurationPropertySet = function(aPropertyName, aPropertyValue, valueSet) {
       if (valueSet == undefined) valueSet = 1;
       if (
         (propertiesConfiguration[aPropertyName] !== undefined) &&
@@ -1187,7 +1188,7 @@ var jamrules = (function() {
      *
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    var ObjectPropertySet = function(aPropertyName, aPropertyValue, valueSet) {
+    let ObjectPropertySet = function(aPropertyName, aPropertyValue, valueSet) {
       propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
       if (valueSet == undefined) valueSet = 1;
@@ -1210,7 +1211,7 @@ var jamrules = (function() {
      *
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    var ObjectPropertiesSameValue = function(aPropertyName1, aPropertyName2, aPropertyValue) {
+    let ObjectPropertiesSameValue = function(aPropertyName1, aPropertyName2, aPropertyValue) {
       propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
       //if undefined, means that we want that one value of the property 1 and property 2 of object are set
@@ -1246,8 +1247,8 @@ var jamrules = (function() {
      *
      * @return returns boolean
      */
-    var ObjectPropertiesSameValues = function(aPropertyName1, aPropertyName2) {
-      var propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
+    let ObjectPropertiesSameValues = function(aPropertyName1, aPropertyName2) {
+      let propertiesObjectProfile = this.myRulesEngine.opts.objectProfile.propertiesSet;
 
       // we can process only if the property has only one value
       if (propertiesObjectProfile[aPropertyName1])
@@ -1271,7 +1272,7 @@ var jamrules = (function() {
      *
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    var ConfigurationPropertiesSameValue = function(aPropertyName1, aPropertyName2, aPropertyValue) {
+    let ConfigurationPropertiesSameValue = function(aPropertyName1, aPropertyName2, aPropertyValue) {
       //if undefined, means that we want that one of the property value of object is set in the configuration too
       if (aPropertyValue == undefined) {
         if (propertiesConfiguration[aPropertyName1])
@@ -1305,7 +1306,7 @@ var jamrules = (function() {
      *
      * @return returns true if the configuration for the aPropertyName.aPropertyValue == valueSet
      */
-    var ConfigurationPropertiesSameValues = function(aPropertyName1, aPropertyName2) {
+    let ConfigurationPropertiesSameValues = function(aPropertyName1, aPropertyName2) {
       // we can process only if the property has only one value
       if (propertiesConfiguration[aPropertyName1])
         for (aPropertyValue in propertiesConfiguration[aPropertyName1]) {
@@ -1334,10 +1335,10 @@ var jamrules = (function() {
      * The rule engine will react only to events defined in ruleEvents
      *
      */
-    var createRulesSet = function(aRulesGroup, ruleEvents) {
+    let createRulesSet = function(aRulesGroup, ruleEvents) {
       this.log("createRulesSet(aRulesGroup, ruleEvents): " + aRulesGroup + " - " + ruleEvents,3);
-      var testRules = myRulesEngineStates.TestRules;
-      var waitTestRules = myRulesEngineStates.waitTestRules;
+      let testRules = myRulesEngineStates.TestRules;
+      let waitTestRules = myRulesEngineStates.waitTestRules;
       if (!testRules.delegate_machines[aRulesGroup]) {
         testRules.delegate_machines[aRulesGroup] = $.extend(true, {}, matchRuleTemplate);
 
@@ -1363,9 +1364,9 @@ var jamrules = (function() {
      * @param overloadRule: boolean (default: false), if aRuleName exists, will overload it
      *
      */
-    var addRule = function(aRulesGroup, aRuleName, aRuleTest, overloadRule) {
+    let addRule = function(aRulesGroup, aRuleName, aRuleTest, overloadRule) {
       this.log("addRule(aRulesGroup, aRuleName, aRuleTest): " + aRulesGroup + " - " + aRuleName + "-" + aRuleTest,3);
-      var testRules = myRulesEngineStates.TestRules;
+      let testRules = myRulesEngineStates.TestRules;
 
       if (!overloadRule) overloadRule = false;
 
@@ -1399,7 +1400,7 @@ var jamrules = (function() {
      * @abstract run the rules engine
      * @return void
      */
-    var runRulesEngine = function() {
+    let runRulesEngine = function() {
       this.log("runRulesEngine",3);
       if (!this.myRulesEngine || $.isEmptyObject(this.myRulesEngine)) {
         this.log("Rules engine is not started. Call first compile rules (cf compileRules())",2);
@@ -1422,12 +1423,12 @@ var jamrules = (function() {
      * @param doTest: [boolean] [default:true] if false, configure the configurator but does not run the rules engine test
      * @return void
      */
-    var checkConfigurationPropertyValue = function(aPropertyName, aPropertyValue, aStatus, doTest) {
+    let checkConfigurationPropertyValue = function(aPropertyName, aPropertyValue, aStatus, doTest) {
       this.log("checkConfigurationPropertyValue(aPropertyName,aPropertyValue,aStatus):" + aPropertyName + ',' + aPropertyValue + ',' + aStatus,3);
       if (aStatus == undefined) aStatus = false;
       if (doTest == undefined) doTest = true;
 
-      var statusChanged = true;
+      let statusChanged = true;
 
       if (propertiesConfiguration[aPropertyName] &&
         propertiesConfiguration[aPropertyName][aPropertyValue] &&
@@ -1461,7 +1462,7 @@ var jamrules = (function() {
      * @param doTest: [boolean] [default:true] if false, configure the configurator but does not run the rules engine test
      * @return void
      */
-    var selectConfigurationPropertyValue = function(aPropertyName, aPropertyValue, doTest) {
+    let selectConfigurationPropertyValue = function(aPropertyName, aPropertyValue, doTest) {
       this.log("selectConfigurationPropertyValue(aPropertyName,aPropertyValue):" + aPropertyName + ',' + aPropertyValue , 3);
       if (doTest == undefined) doTest = true;
 
@@ -1489,7 +1490,7 @@ var jamrules = (function() {
      * @param aPropertyName: name of the property that has changed
      * @return void
      */
-    var resetConfigurationPropertyValues = function(aPropertyName) {
+    let resetConfigurationPropertyValues = function(aPropertyName) {
       this.log("resetConfigurationPropertyValues(aPropertyName):" + aPropertyName,3);
       //unset all property's values
       for (propertyValue in propertiesConfiguration[aPropertyName]) {
@@ -1505,7 +1506,7 @@ var jamrules = (function() {
      * @param aPropertyName: name of the property to reset
      * @return void
      */
-    var resetConfigurationProperty = function(aPropertyName) {
+    let resetConfigurationProperty = function(aPropertyName) {
       this.log("resetConfigurationProperty(aPropertyName):" + aPropertyName,3);
       propertiesConfiguration[aPropertyName] = {};
     }
@@ -1514,15 +1515,15 @@ var jamrules = (function() {
      * @function compileRules
      * @abstract initialize the rule engine - to do before action and after adding the rules
      */
-    var compileRules = function() {
+    let compileRules = function() {
       this.log("compileRules",3);
-      var jamrules = this;
+      let jamrules = this;
       this.myJqueryObj.iFSM(myRulesEngineStates, {
         debug: this.options.debug,
         logLevel: this.options.logLevel,
         jamrules: jamrules
       });
-      var myRulesEngine = this.myJqueryObj.getFSM(myRulesEngineStates);
+      let myRulesEngine = this.myJqueryObj.getFSM(myRulesEngineStates);
 
       this.myRulesEngine = myRulesEngine;
     }
@@ -1543,7 +1544,7 @@ var jamrules = (function() {
      * }
      * @example
      */
-    var addObject = function(anObject) {
+    let addObject = function(anObject) {
       this.log("addObject",3);
       _addObject(anObject, this.getObjectProfiles());
     };
@@ -1558,7 +1559,7 @@ var jamrules = (function() {
      * @param aNotMatchingFunction (option): the matching function, same as to define the "notmatched" property in the object
      * @example
      */
-    var addPropertyObject = function(anObject, aMatchingFunction, aNotMatchingFunction) {
+    let addPropertyObject = function(anObject, aMatchingFunction, aNotMatchingFunction) {
       this.log("addPropertyObject",3);
       if (!aMatchingFunction && anObject[this.options.matchedFunctionName])
       {
@@ -1589,7 +1590,7 @@ var jamrules = (function() {
      * @param aNotMatchingFunction (option): the matching function, same as to define the "notmatched" property in the object
      * @example
      */
-    var addPropertyObjects = function(objects, aMatchingFunction, aNotMatchingFunction) {
+    let addPropertyObjects = function(objects, aMatchingFunction, aNotMatchingFunction) {
       this.log("addPropertyObjects",3);
       let that=this;
       objects.forEach(function(anObject) {
@@ -1625,7 +1626,7 @@ var jamrules = (function() {
      * 			- 3 : it's a notice
      *
      */
-    var log = function(message) {
+    let log = function(message) {
       /*global console:true */
 
       let errorLevel = 3;
@@ -1700,7 +1701,7 @@ var jamrules = (function() {
   /**
    * builder of instance of a jamrules engine from the jamrulesClass definition
    */
-  var jamRulesBuilder = function(options) {
+  let jamRulesBuilder = function(options) {
 
     if (!options) options = {};
 
@@ -1715,7 +1716,7 @@ var jamrules = (function() {
    *
    * jamrules.build(options)
    */
-  var API = {
+  let API = {
     build: jamRulesBuilder
       /** Static Functions **/
       ,
